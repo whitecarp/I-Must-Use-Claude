@@ -2,12 +2,17 @@ import importlib.util
 import pathlib
 import sys
 import unittest
+import io
+import json
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'backend'))
 from google_worker import GoogleTranslator, TranslationError
 from offline_worker import OfflineTranslator
 from glossary import validated_entries, replacement_spans
+import google_worker
+import offline_worker
 
 
 def entry(source, replacement, target='*'):
@@ -15,6 +20,22 @@ def entry(source, replacement, target='*'):
 
 
 class GlossaryTests(unittest.TestCase):
+    def test_json_protocol_accepts_utf8_bom_and_preserves_request_ids(self):
+        for module, name in ((google_worker, 'GoogleTranslator'), (offline_worker, 'OfflineTranslator')):
+            factory = getattr(module, name)
+            constructor = (lambda: factory(lambda text, direction: text, 0)) if name == 'GoogleTranslator' else (lambda: factory(lambda text, direction: text))
+            requests = ''.join('\ufeff' + json.dumps(dict(id=i, text='Skills', direction='en_zh', glossary=[entry('Skills', '技能')])) + '\n' for i in (1, 2))
+            output = io.StringIO()
+            with mock.patch.object(module, name, constructor), mock.patch.object(module.sys, 'stdin', io.StringIO(requests)), mock.patch.object(module.sys, 'stdout', output):
+                if module is offline_worker:
+                    with mock.patch.object(module, 'installed_packages', return_value=[]): module.main()
+                else:
+                    module.main()
+            responses = [json.loads(line) for line in output.getvalue().splitlines()]
+            self.assertTrue(responses[0]['ready'])
+            self.assertEqual([row['id'] for row in responses[1:]], [1, 2])
+            self.assertEqual([row['translation'] for row in responses[1:]], ['技能', '技能'])
+
     def test_online_preserves_sentence_context_and_reorders_terms(self):
         calls = []
         def google(text, direction):

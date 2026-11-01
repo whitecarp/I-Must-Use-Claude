@@ -269,7 +269,8 @@ def main():
         request_id = None
         try:
             try:
-                request = json.loads(raw)
+                # Accept the optional BOM emitted by redirected .NET Framework stdin.
+                request = json.loads(raw.lstrip("\ufeff"))
             except (ValueError, TypeError):
                 raise TranslationError("invalid_request") from None
             if not isinstance(request, dict):

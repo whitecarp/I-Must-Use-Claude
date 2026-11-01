@@ -274,7 +274,9 @@ def main():
     for raw in sys.stdin:
         request_id = None
         try:
-            request = json.loads(raw)
+            # .NET Framework's redirected stdin writer can emit a UTF-8 BOM on
+            # UTF-8 Windows consoles, before the application's raw JSON bytes.
+            request = json.loads(raw.lstrip("\ufeff"))
             if not isinstance(request, dict):
                 raise TranslationError("invalid_request")
             request_id = request.get("id")

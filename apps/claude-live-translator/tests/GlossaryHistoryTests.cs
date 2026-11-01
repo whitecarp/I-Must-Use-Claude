@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using ClaudeCompanion;
 
@@ -14,6 +15,7 @@ internal static class GlossaryHistoryTests {
     private static object Call(object owner,string name,params object[] args){return owner.GetType().GetMethod(name,Private).Invoke(owner,args);}
     private static void Render(Form form,string filename){form.TopMost=false;form.ShowInTaskbar=false;form.Opacity=0;form.StartPosition=FormStartPosition.Manual;form.Location=new Point(-30000,-30000);form.Show();Application.DoEvents();form.PerformLayout();using(var bitmap=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(bitmap,new Rectangle(Point.Empty,form.Size));bitmap.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,filename));}form.Hide();}
     [STAThread] public static int Main(){
+        Encoding originalInputEncoding=Console.InputEncoding;
         try{
             string fixture=Environment.GetEnvironmentVariable("DAFEIYU_DATA_DIR");
             Check(!String.IsNullOrWhiteSpace(fixture)&&Path.GetFileName(fixture).StartsWith("glossary-history-fixture-",StringComparison.Ordinal),"isolated fixture directory required");
@@ -23,6 +25,9 @@ internal static class GlossaryHistoryTests {
             GlossaryStore.Save(new[]{new GlossaryEntry{source="Skills",replacement="技能",target="zh-CN"}});
             Check(GlossaryStore.Load()[0].replacement=="技能","UTF-8 glossary survives read-back");
             if(!String.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DAFEIYU_FIXTURE_BACKEND"))){
+                // Match UTF-8 Windows CI consoles. Framework Process creates an AutoFlush
+                // stdin writer, which may emit a BOM before our explicit UTF-8 payload bytes.
+                Console.InputEncoding=new UTF8Encoding(true);
                 using(var worker=new Worker()){
                     Check(worker.Translate("Keep Skills with Claude.","auto:zh-CN",false).GetAwaiter().GetResult()=="Keep 技能 with Claude.","real Worker protocol carries glossary into Google engine with synthetic transport");
                     Check(worker.Translate("Keep Skills with Claude.","en_zh",true).GetAwaiter().GetResult()=="Keep 技能 with Claude.","real Worker protocol carries glossary into offline engine with synthetic transport");
@@ -66,5 +71,6 @@ internal static class GlossaryHistoryTests {
             foreach(bool english in new[]{true,false}){Ui.English=english;using(var glossary=new GlossaryForm()){Check(!glossary.Visible,"glossary editor initially hidden");Render(glossary,english?"glossary-090-en.png":"glossary-090-zh.png");}}
             Console.WriteLine("GlossaryHistoryTests passed: "+checks+" isolated checks; no desktop selection, clipboard or network used.");return 0;
         }catch(Exception error){Console.WriteLine(error.GetBaseException());return 1;}
+        finally{Console.InputEncoding=originalInputEncoding;}
     }
 }
