@@ -15,7 +15,7 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.1.0-preview"><strong>↓ Download the apps</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.2.0-preview"><strong>↓ Download the apps</strong></a>
   &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
 </p>
@@ -28,7 +28,7 @@
 | :--- | :--- | :--- |
 | **Whale Translator** | **Two-Zone Clock** | **Whale Environment Helper** |
 | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. | Measure browser signals, handle matched local settings, and measure again. |
-| [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/HomeTimeClock.exe) | [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleEnvironmentHelper.exe) |
+| [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/HomeTimeClock.exe) | [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleEnvironmentHelper.exe) |
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
@@ -36,7 +36,7 @@
 <summary><strong>Requirements, versions and language settings</strong></summary>
 
 - Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
-- This preview contains Translator **0.8.1**, the current Two-Zone Clock build, and Environment Helper **0.3.0**.
+- This preview contains Translator **0.8.1**, the current Two-Zone Clock build, and Environment Helper **0.4.0**.
 - We distribute three Windows EXE files. GitHub's automatic source archives are for development, not the ready-to-run apps.
 - This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
 
@@ -144,7 +144,29 @@ See what the browser actually reports before changing settings. Keep a baseline,
 
 **Measured baseline · Unknown means unknown · Backup before changes · Undo available**
 
-**Preview status:** Version 0.3.0 has compiled and passed isolated scoring checks. Independent Windows VM end-to-end acceptance is still pending.
+### Maintenance & cleanup
+
+Open **Maintenance & cleanup** at the bottom of the helper. These checks and cleanup actions are separate from the browser score.
+
+| Page | What you can do |
+| --- | --- |
+| **Connection & installation** | Check common installation paths and whether proxy variables are set. Optionally probe DNS and HTTPS on official Claude hosts; distinguish timeouts, restrictions and rate limits. |
+| **Official configuration** | Inspect Claude Code endpoint, authentication and model overrides. Choose which overrides to remove, with a configuration backup first. |
+| **Caches & logs** | Scan known cache/log locations, review sizes, select items, verify backups, then move originals to the Recycle Bin. |
+| **Restore backups** | Restore configuration or cache backups. Keep conflicting later edits and newly recreated caches. |
+
+<details>
+<summary><strong>Preview the cleanup page</strong></summary>
+
+<p align="center"><img src="docs/images/helper-maintenance-en.png" alt="English cleanup page rendered with a disabled sample cache entry" width="900"></p>
+
+Offscreen demo rendering with synthetic data. No real cache was scanned or cleaned.
+
+</details>
+
+Close Claude and Claude Code normally before cleanup, repair or restore. Chats, login data, cookies, skills, plugins, hooks, MCP settings, custom rules and local identity remain protected. Configuration repair removes **selected authentication overrides**, not stored official login data. Unknown paths and linked files are skipped. CC Switch / Cockpit provider takeover is not switched automatically.
+
+**Preview status:** This release is validated with isolated fixtures and builds. Independent Windows VM end-to-end acceptance is still pending. No cleanup, configuration repair or live diagnostic probe was tested on the developer's personal environment.
 
 <details>
 <summary><strong>What optimization changes — and what it preserves</strong></summary>
@@ -168,6 +190,10 @@ The page is served locally. Its disclosed WebRTC check contacts Google STUN; the
 </details>
 
 ---
+
+## Other useful tools
+
+[Cockpit Tools](https://github.com/jlcodes99/cockpit-tools) is an independent third-party desktop app for account switching and quota viewing in supported clients; check its [releases](https://github.com/jlcodes99/cockpit-tools/releases) for current Claude support. Its API or gateway access is separate from a Claude subscription. This repository still releases only our three Windows EXEs and does not bundle Cockpit Tools.
 
 ## Explore the source
 

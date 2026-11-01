@@ -25,10 +25,18 @@ Run its build.ps1 without OutputDirectory to place components at its project roo
 
 Runtime binaries and models are not committed to Git. For normal use, download the prepared EXE from Releases; optional language packs are installed inside the translator.
 
-CI compiles the apps and checks Python syntax. It does not open Claude, test live translation, or apply environment settings. Independent Windows VM acceptance of the helper's modification/undo workflow remains pending. Compilation is not end-to-end validation.
+## Isolated helper tests
+
+```powershell
+./apps/whale-claude-helper/tests/run-fixtures.ps1
+```
+
+This explicit runner tests synthetic cache/configuration data, injected network results and offscreen demo controls. It never starts the live helper entry point, reads real Claude configuration, sends diagnostic network requests, or shows application windows. Synthetic files and test receipts are retained for inspection; file moves use an injected fixture recycler, not the real Recycle Bin. Outputs stay under the helper's ignored `artifacts` folder.
+
+CI compiles the apps, runs these isolated fixtures and checks Python syntax. It does not open Claude, test live translation, or apply environment settings. Independent Windows VM acceptance of the helper's modification/undo workflow remains pending. Compilation and fixtures are not end-to-end validation.
 
 ## 中文
 
 日常使用请到 Releases 下载单文件 EXE。源码构建要求 Windows 与 .NET Framework 4.8，上面的命令只编译、不启动程序。
 
-翻译器普通构建只生成组件，自包含打包还需要上述 Python、离线引擎和官方 VC 运行库。模型由用户按需安装。CI 只构建和检查语法，不操作 Claude 或修改系统；环境助手仍需独立 Windows 虚拟机验收。
+翻译器普通构建只生成组件，自包含打包还需要上述 Python、离线引擎和官方 VC 运行库。模型由用户按需安装。CI 构建、检查语法并运行上述隔离测试，不操作真实 Claude 或修改系统；环境助手仍需独立 Windows 虚拟机验收。

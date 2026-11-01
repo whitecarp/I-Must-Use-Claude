@@ -1,5 +1,19 @@
 # Release notes
 
+## v0.2.0-preview — maintenance and cleanup
+
+**Whale Environment Helper 0.4.0** adds a separate **Maintenance & cleanup** entry:
+
+- Optional read-only installation, proxy-variable, DNS and HTTPS checks. No credentials are sent with connection probes; results do not determine account or region eligibility.
+- Claude Code configuration inspection and selective removal of old endpoint, authentication and model overrides, with local backups.
+- Allowlisted cache/log scanning, byte counts, verified backups, Recycle Bin cleanup and conflict-aware restoration. Chats, cookies, login data, skills, plugins, hooks, custom rules and identity are preserved.
+- Additional protections against linked files, unsafe Windows path aliases and cache changes between scan and cleanup.
+- English / 中文 maintenance pages and isolated test fixtures. No developer-machine cleanup, real Claude configuration modification or live connectivity probe was performed for this release. Independent Windows VM end-to-end acceptance is pending.
+
+Translator **0.8.1** and the clock EXE are unchanged. The README also links to the independent **Cockpit Tools** project; it is not bundled. Three Windows EXE downloads, with public source code.
+
+环境助手 **0.4.0** 新增「维护与清理」：连接与安装体检、官方配置检查与选择性修复、缓存日志扫描清理、备份恢复。先查看范围，再核验备份后移入回收站；会话、登录数据、Skills 等保留。只完成隔离模拟测试与构建，未在个人环境执行清理或真实连接探测；仍待独立 Windows 虚拟机验收。翻译器及时钟 EXE 保持不变，Cockpit Tools 作为独立项目推荐。
+
 ## v0.1.0-preview — initial public preview
 
 A Windows companion collection for using Claude:

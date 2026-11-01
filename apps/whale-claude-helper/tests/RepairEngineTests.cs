@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -87,8 +88,20 @@ internal static class RepairEngineTests {
         }
         Check(File.ReadAllText(sentinel)=="REPORT_SENTINEL"&&fixture.Env.Writes==0,"report leaves existing file and environment unchanged");
     }
+    [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] private static extern bool CreateHardLink(string newFile,string existingFile,IntPtr reserved);
+    private static void LinkedPathsAndAliases(){
+        var fixture=new Fixture("hardlink",null);string protectedFile=System.IO.Path.Combine(root,"hardlink-protected.json");File.WriteAllText(protectedFile,"{\"model\":\"keep\",\"hooks\":{}}",Utf8);
+        Check(CreateHardLink(fixture.Path,protectedFile,IntPtr.Zero),"fixture settings hardlink created");var scan=fixture.Engine.Scan();Check(!scan.SettingsValid&&scan.SettingsError=="hardlinked_path_not_supported","hardlinked settings rejected");
+        var result=fixture.Engine.Apply(scan,new RepairOptions{SettingsOfficial=true});Check(!result.Success&&!Directory.Exists(fixture.Backup)&&File.ReadAllText(protectedFile)=="{\"model\":\"keep\",\"hooks\":{}}","hardlinked external file preserved");
+        foreach(string path in new[]{fixture.Config+".",fixture.Config+" ",fixture.Path+":stream",System.IO.Path.Combine(fixture.Config,"..","alias")}) {
+            bool denied=false;try{RepairEngine.AssertPlainPath(path);}catch(InvalidDataException){denied=true;}Check(denied,"Windows alias and traversal rejected");
+        }
+        var backup=new Fixture("hardlink-backup","{\"model\":\"custom\",\"keep\":true}");var applied=backup.Engine.Apply(backup.Engine.Scan(),new RepairOptions{SettingsOfficial=true});Check(applied.Success,"backup hardlink setup repair");
+        Check(CreateHardLink(System.IO.Path.Combine(root,"backup-before-alias"),System.IO.Path.Combine(applied.BackupDirectory,"settings.before.bin"),IntPtr.Zero),"fixture backup hardlink created");
+        string after=File.ReadAllText(backup.Path);Check(!backup.Engine.Restore(applied.BackupDirectory).Success&&File.ReadAllText(backup.Path)==after,"hardlinked backup cannot restore settings");
+    }
     public static int Main(){
-        try{root=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"whale-repair-tests-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);MainFlow();JsonEdges();EnvironmentAndRollback();Conflicts();BackupScope();Reports();Console.WriteLine("RepairEngineTests passed: "+checks+" checks. Synthetic files and injected environment only. No user settings or registry changes.");Console.WriteLine("Fixture root: "+root);return 0;}
+        try{root=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"whale-repair-tests-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);MainFlow();JsonEdges();EnvironmentAndRollback();Conflicts();BackupScope();Reports();LinkedPathsAndAliases();Console.WriteLine("RepairEngineTests passed: "+checks+" checks. Synthetic files and injected environment only. No user settings or registry changes.");Console.WriteLine("Fixture root: "+root);return 0;}
         catch(Exception error){Console.WriteLine("RepairEngineTests failed: "+error.Message);Console.WriteLine(error.StackTrace);return 1;}
     }
 }

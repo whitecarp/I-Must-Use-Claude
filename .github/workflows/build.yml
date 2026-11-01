@@ -19,6 +19,9 @@ jobs:
       - name: Compile environment helper
         shell: pwsh
         run: ./apps/whale-claude-helper/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/helper-build"
+      - name: Test environment helper with isolated fixtures
+        shell: pwsh
+        run: ./apps/whale-claude-helper/tests/run-fixtures.ps1
       - name: Validate Python syntax without running workers
         shell: pwsh
         run: python -m compileall -q apps/claude-live-translator/backend

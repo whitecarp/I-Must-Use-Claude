@@ -15,7 +15,7 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.1.0-preview"><strong>↓ 下载软件</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.2.0-preview"><strong>↓ 下载软件</strong></a>
   &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识三个工具</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
 </p>
@@ -28,7 +28,7 @@
 | :--- | :--- | :--- |
 | **大肥鱼翻译** | **两地时钟** | **大肥鱼环境助手** |
 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 即使电脑用了其他时区，也能看到原本地区的时间。 | 先测浏览器环境，再处理命中的本地设置，最后复测。 |
-| [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/HomeTimeClock.exe) | [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleEnvironmentHelper.exe) |
+| [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/HomeTimeClock.exe) | [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleEnvironmentHelper.exe) |
 
 **下载 EXE，双击打开。** 三个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
@@ -36,7 +36,7 @@
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- 本次预览版包含翻译器 **0.8.1**、两地时钟当前版本、环境助手 **0.3.0**。
+- 本次预览版包含翻译器 **0.8.1**、两地时钟当前版本、环境助手 **0.4.0**。
 - 目前提供三个 Windows EXE。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
 
@@ -144,7 +144,29 @@
 
 **实测基准 · 未知不算零分 · 修改前备份 · 提供撤回**
 
-**预览状态：** 0.3.0 已编译并通过隔离评分检查，仍待独立 Windows 虚拟机端到端验收。
+### 维护与清理
+
+在环境助手底部打开「维护与清理」。这些检查与清理操作独立于浏览器评分。
+
+| 页面 | 可以做什么 |
+| --- | --- |
+| **连接与安装** | 检查常见安装位置、代理变量是否设置；可选择探测 Claude 官方域名的 DNS 和 HTTPS，区分超时、访问受限与限流。 |
+| **官方配置** | 检查 Claude Code 的地址、认证和模型覆盖项，勾选需要移除的项目，先备份再处理。 |
+| **缓存与日志** | 扫描已知缓存与日志位置，查看大小、勾选项目、核验备份后移入回收站。 |
+| **恢复备份** | 恢复配置或缓存备份，保留发生冲突的后续修改及新生成的缓存。 |
+
+<details>
+<summary><strong>查看清理页面预览</strong></summary>
+
+<p align="center"><img src="docs/images/helper-maintenance-zh.png" alt="使用模拟数据离屏渲染的缓存清理页面，示例缓存不可勾选" width="900"></p>
+
+模拟数据离屏渲染，没有扫描或清理真实缓存。
+
+</details>
+
+清理、修复或恢复前，请正常退出 Claude 和 Claude Code。会话、官方登录数据、Cookie、Skills、插件、Hooks、MCP、自建规则及本地身份标识受到保护。配置修复移除的是**选中的认证覆盖项**，不删除官方登录数据。未知路径与链接文件会跳过；不会自动切换 CC Switch / Cockpit 的供应商接管。
+
+**预览状态：** 新版使用隔离模拟数据进行测试并构建，仍待独立 Windows 虚拟机端到端验收。没有在开发者的个人环境执行清理、配置修复或真实连接探测。
 
 <details>
 <summary><strong>优化会改什么，保留什么</strong></summary>
@@ -168,6 +190,10 @@
 </details>
 
 ---
+
+## 其他配套工具
+
+[Cockpit Tools](https://github.com/jlcodes99/cockpit-tools) 是独立的第三方桌面工具，可为其支持的客户端切换账号、查看额度；Claude 相关功能请以[项目最新发布](https://github.com/jlcodes99/cockpit-tools/releases)为准。它提供的 API 或网关接入与 Claude 官方订阅不同。本仓库仍只发布我们自己的三个 Windows EXE，不捆绑 Cockpit Tools。
 
 ## 查看源码
 

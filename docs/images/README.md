@@ -12,6 +12,7 @@ These assets illustrate the public project. They contain no private conversation
 | `translator-offline-dialog.png` | Existing 0.8.1 demonstration screenshot of the offline retry confirmation. |
 | `translator-compose.png` | Existing 0.8.1 demonstration screenshot with fixed Chinese sample text and no connected chat. |
 | `clock-ui.png` | Existing compact clock screenshot; displayed dates and times are examples. |
+| `helper-maintenance-en.png`, `helper-maintenance-zh.png` | 0.4.0 maintenance controls rendered offscreen with static demo data; no app window shown, real cache scanned, network probe sent, or settings changed. |
 
 The existing screenshots were copied without alterations. Their inclusion does not represent new app execution, a new translation test, or a system-settings test.
 

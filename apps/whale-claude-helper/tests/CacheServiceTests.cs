@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -60,11 +61,33 @@ internal static class CacheServiceTests {
         File.WriteAllText(cache,"changed-longer");int before=recycled;var result=service.Clean(new[]{target},None);
         Check(!result.Ok&&result.ChangedCount==0&&recycled==before,"changed cache skipped without recycling");
         Check(File.ReadAllText(cache)=="changed-longer","changed source preserved");
+        target=Find(service,"stats-cache.json");DateTime timestamp=File.GetLastWriteTimeUtc(cache);File.WriteAllText(cache,"changed-SAME!!");File.SetLastWriteTimeUtc(cache,timestamp);
+        result=service.Clean(new[]{target},None);Check(!result.Ok&&result.ChangedCount==0&&recycled==before,"same-length same-timestamp content change rejected by hash stamp");
         string settings=Write(Path.Combine(context.Home,".claude","settings.json"),"protected");
         var forged=new CacheTarget{Path=settings,Id=target.Id,Eligible=true,Stamp=target.Stamp,Name="fake"};result=service.Clean(new[]{forged},None);
         Check(!result.Ok&&result.ChangedCount==0&&File.ReadAllText(settings)=="protected","forged selection cannot touch configuration");
         result=service.Clean(new[]{new CacheTarget{Path=cache,Id="forged",Eligible=true,Stamp=target.Stamp}},None);
         Check(!result.Ok&&result.ChangedCount==0,"forged allowlist identity rejected");
+    }
+    private static void StoreAndProtectionScope() {
+        var context=Context("store-scope");string store=Path.Combine(context.Local,"Packages","Claude_pzs8sxrjxfjjc");
+        string desktop=Path.Combine(store,"LocalCache","Roaming","Claude");
+        string modern=Path.Combine(store,"LocalCache","Local","Claude-Data","claude_fixture");
+        Write(Path.Combine(desktop,"Cache","entry"),"cache");Write(Path.Combine(modern,"logs","entry.log"),"log");
+        Write(Path.Combine(context.Home,".claude","telemetry","event"),"telemetry");Write(Path.Combine(context.Home,".claude","logs","event"),"log");
+        var preserved=new List<string>();
+        foreach(string name in new[]{"Cookies","Local Storage","Session Storage","IndexedDB","Network","Preferences","Local State","config.json","claude_desktop_config.json"})preserved.Add(Write(Path.Combine(desktop,name,"sentinel"),"keep-desktop"));
+        foreach(string name in new[]{"projects","skills","plugins","hooks","settings","sessions"})preserved.Add(Write(Path.Combine(context.Home,".claude",name,"sentinel"),"keep-code"));
+        foreach(string name in new[]{"settings.json","settings.local.json",".credentials.json","history.jsonl"})preserved.Add(Write(Path.Combine(context.Home,".claude",name),"keep-config"));
+        preserved.Add(Write(Path.Combine(context.Home,".claude.json"),"keep-userID-machineID"));
+        preserved.Add(Write(Path.Combine(store,"LocalState","Cache","sentinel"),"keep-persistent-store"));
+        preserved.Add(Write(Path.Combine(context.Local,"Packages","NotClaude_pzs8sxrjxfjjc","LocalCache","Roaming","Claude","Cache","sentinel"),"keep-other-package"));
+        preserved.Add(Write(Path.Combine(context.Local,"Claude-Data","not_claude_profile","Cache","sentinel"),"keep-other-profile"));
+        var originals=preserved.ToDictionary(x=>x,x=>File.ReadAllBytes(x));var service=Service(context);var audit=service.Audit(None);
+        Check(audit.Count==4&&audit.All(x=>x.Eligible),"only explicit Store, log and telemetry candidates discovered");
+        var cleaned=service.Clean(audit,None);Check(cleaned.Ok&&cleaned.ChangedCount==4,"explicit fixture caches cleaned");
+        Check(originals.All(x=>File.Exists(x.Key)&&File.ReadAllBytes(x.Key).SequenceEqual(x.Value)),"login storage chats skills plugins hooks identities and unknown packages unchanged");
+        Check(service.Restore(cleaned.BackupDirectory,None).Ok,"Store fixture cache restore succeeds");
     }
     private static void ProcessAndBackupFailure() {
         var context=Context("process");string path=Write(Path.Combine(context.Home,".claude","cache","cache.txt"),"one");var service=Service(context);var row=Find(service,Path.Combine(".claude","cache"));
@@ -102,10 +125,23 @@ internal static class CacheServiceTests {
         var forced=new CacheTarget{Path=target.Path,Id=target.Id,Eligible=true,Stamp="forced",Name="forced"};result=service.Clean(new[]{forced},None);
         Check(!result.Ok&&recycled==before,"forged eligibility cannot bypass reparse guard");
     }
+    [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] private static extern bool CreateHardLink(string newFile,string existingFile,IntPtr reserved);
+    private static void HardlinksAndUnsafeRoots() {
+        var context=Context("hardlinks");string source=Write(Path.Combine(root,"hardlink-protected","settings.json"),"protected");string cache=Path.Combine(context.Home,".claude","stats-cache.json");Directory.CreateDirectory(Path.GetDirectoryName(cache));
+        Check(CreateHardLink(cache,source,IntPtr.Zero),"fixture hardlink created");var service=Service(context);var target=Find(service,"stats-cache.json");int before=recycled;
+        Check(!target.Eligible&&target.Warning=="hardlink-skipped","hardlink cache is ineligible");Check(!service.Clean(new[]{target},None).Ok&&recycled==before&&File.ReadAllText(source)=="protected","linked source preserved and never recycled");
+        var backupContext=Context("backup-hardlink");string original=Write(Path.Combine(backupContext.Home,".claude","stats-cache.json"),"saved");var backupService=Service(backupContext);var cleaned=backupService.Clean(backupService.Audit(None),None);
+        var manifest=Json.Deserialize<CacheBackupManifest>(File.ReadAllText(Path.Combine(cleaned.BackupDirectory,"manifest.json")));string copy=Path.Combine(cleaned.BackupDirectory,manifest.Targets[0].BackupRelativePath);
+        Check(CreateHardLink(Path.Combine(root,"backup-hardlink-alias"),copy,IntPtr.Zero),"fixture backup hardlink created");
+        Check(!backupService.Restore(cleaned.BackupDirectory,None).Ok&&!File.Exists(original),"hardlinked backup cannot restore");
+        foreach(string suffix in new[]{"."," ",":stream"}) {var invalid=Context("unsafe");invalid.Home+=suffix;bool denied=false;try{Service(invalid);}catch{denied=true;}Check(denied,"Win32 alias root denied");}
+        var overlap=Context("overlap");string overlapCache=Path.Combine(overlap.Home,".claude","cache");Write(Path.Combine(overlapCache,"entry"),"keep");overlap.BackupRoot=Path.Combine(overlapCache,"backups");var overlapService=Service(overlap);
+        Check(!overlapService.Clean(overlapService.Audit(None),None).Ok&&Directory.Exists(overlapCache)&&!Directory.Exists(overlap.BackupRoot),"backup cannot be created within selected cache");
+    }
     public static int Main() {
         try {
             root=Path.Combine(Path.GetTempPath(),"whale-cache-tests-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
-            PreserveAndRestore();StaleAndForgedSelections();ProcessAndBackupFailure();TamperedBackups();ReparsePoints();
+            PreserveAndRestore();StaleAndForgedSelections();StoreAndProtectionScope();ProcessAndBackupFailure();TamperedBackups();ReparsePoints();HardlinksAndUnsafeRoots();
             Console.WriteLine("CacheServiceTests passed: "+checks+" checks. Fixture-only recycler; no real user data or Recycle Bin touched.");Console.WriteLine("Fixture evidence: "+root);return 0;
         }catch(Exception error){Console.WriteLine("CacheServiceTests failed: "+error.Message);Console.WriteLine(error.StackTrace);return 1;}
     }

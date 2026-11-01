@@ -80,6 +80,8 @@ namespace WhaleClaudeHelper {
         private readonly IUserEnvironmentStore environment;
         public RepairEngine(string configurationDirectory,string backupDirectory):this(configurationDirectory,backupDirectory,new WindowsUserEnvironmentStore()){}
         internal RepairEngine(string configurationDirectory,string backupDirectory,IUserEnvironmentStore store){
+            AssertPlainPath(configurationDirectory);AssertPlainPath(backupDirectory);
+            if(store==null)throw new ArgumentNullException("store");
             configDirectory=Path.GetFullPath(configurationDirectory);settingsPath=Path.Combine(configDirectory,"settings.json");backupRoot=Path.GetFullPath(backupDirectory);environment=store;
         }
         public RepairScan Scan(){
@@ -227,9 +229,29 @@ namespace WhaleClaudeHelper {
         private static byte[] EncodeLike(string text,byte[] original){var content=StrictUtf8.GetBytes(text);if(original.Length<3||original[0]!=239||original[1]!=187||original[2]!=191)return content;var result=new byte[content.Length+3];result[0]=239;result[1]=187;result[2]=191;Buffer.BlockCopy(content,0,result,3,content.Length);return result;}
         private static byte[] ReadBounded(string path,int maximum){AssertPlainPath(path);using(var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read)){if(stream.Length>maximum)throw new InvalidDataException("file_too_large");var bytes=new byte[stream.Length];int offset=0;while(offset<bytes.Length){int n=stream.Read(bytes,offset,bytes.Length-offset);if(n==0)throw new EndOfStreamException();offset+=n;}return bytes;}}
         internal static void AssertPlainPath(string path){
-            string full=Path.GetFullPath(path);if(full.StartsWith("\\\\",StringComparison.Ordinal))throw new InvalidDataException("network_path_not_supported");
-            string cursor=full;while(!String.IsNullOrEmpty(cursor)){if((File.Exists(cursor)||Directory.Exists(cursor))&&(File.GetAttributes(cursor)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("linked_path_not_supported");cursor=Path.GetDirectoryName(cursor);}
+            if(String.IsNullOrWhiteSpace(path)||!Path.IsPathRooted(path))throw new InvalidDataException("invalid_local_path");
+            if(path.StartsWith("\\\\",StringComparison.Ordinal))throw new InvalidDataException("network_path_not_supported");
+            string tail=path.Substring(Path.GetPathRoot(path).Length);
+            foreach(string part in tail.Split(new[]{'\\','/'},StringSplitOptions.RemoveEmptyEntries)) {
+                if(part=="."||part==".."||part.EndsWith(".",StringComparison.Ordinal)||part.EndsWith(" ",StringComparison.Ordinal)||part.IndexOf(':')>=0||System.Text.RegularExpressions.Regex.IsMatch(part.Split('.')[0],"^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$",System.Text.RegularExpressions.RegexOptions.IgnoreCase))throw new InvalidDataException("invalid_local_path");
+            }
+            string cursor=Path.GetFullPath(path);
+            while(!String.IsNullOrEmpty(cursor)) {
+                FileAttributes attributes;
+                try{attributes=File.GetAttributes(cursor);}catch(FileNotFoundException){cursor=Path.GetDirectoryName(cursor);continue;}catch(DirectoryNotFoundException){cursor=Path.GetDirectoryName(cursor);continue;}
+                if((attributes&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("linked_path_not_supported");
+                if((attributes&FileAttributes.Directory)==0)using(var stream=new FileStream(cursor,FileMode.Open,FileAccess.Read,FileShare.Read)) {
+                    NativeFileInfo info;if(!GetFileInformationByHandle(stream.SafeFileHandle,out info))throw new InvalidDataException("file_identity_unavailable");
+                    if(info.NumberOfLinks!=1)throw new InvalidDataException("hardlinked_path_not_supported");
+                }
+                cursor=Path.GetDirectoryName(cursor);
+            }
         }
+        [StructLayout(LayoutKind.Sequential)] private struct NativeFileInfo {
+            public uint Attributes;public System.Runtime.InteropServices.ComTypes.FILETIME Created,Accessed,Written;
+            public uint VolumeSerial,SizeHigh,SizeLow,NumberOfLinks,IndexHigh,IndexLow;
+        }
+        [DllImport("kernel32.dll",SetLastError=true)] private static extern bool GetFileInformationByHandle(Microsoft.Win32.SafeHandles.SafeFileHandle handle,out NativeFileInfo information);
         private static string NewPrivateDirectory(string root){
             AssertPlainPath(root);Directory.CreateDirectory(root);AssertPlainPath(root);
             string path=Path.Combine(root,"repair-"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss")+"-"+Guid.NewGuid().ToString("N").Substring(0,12));

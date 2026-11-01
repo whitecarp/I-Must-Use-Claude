@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Principal;
@@ -55,7 +56,7 @@ namespace WhaleClaudeHelper {
         private readonly Action<string,bool> recycle;
         private readonly Func<List<string>> processes;
         private static readonly string[] DesktopCaches={"Cache","Code Cache","GPUCache","DawnCache","GPUPersistentCache","DawnGraphiteCache","DawnWebGPUCache","GrShaderCache","ShaderCache","logs"};
-        private static readonly string[] CodeCaches={"cache","stats-cache.json","telemetry","usage-data","usage.jsonl","usage.with-fix.jsonl","debug"};
+        private static readonly string[] CodeCaches={"cache","stats-cache.json","telemetry","usage-data","usage.jsonl","usage.with-fix.jsonl","debug","logs"};
         private const long MaxBytes=10L*1024*1024*1024;
         private const int MaxFiles=100000;
         private readonly JavaScriptSerializer json=new JavaScriptSerializer{MaxJsonLength=32*1024*1024,RecursionLimit=64};
@@ -108,12 +109,14 @@ namespace WhaleClaudeHelper {
                 cancel.ThrowIfCancellationRequested();CacheTarget current;
                 if(String.IsNullOrWhiteSpace(input.Path)||!allowed.TryGetValue(input.Path,out current)||current.Id!=input.Id||!input.Eligible){result.SkippedCount++;result.Messages.Add("not-allowlisted");continue;}
                 try {
+                    if(String.Equals(current.Path,Path.GetFullPath(context.BackupRoot),StringComparison.OrdinalIgnoreCase)||Under(current.Path,context.BackupRoot))throw new IOException("backup-overlaps-cache");
                     if(String.IsNullOrEmpty(input.Stamp)||Stamp(current.Path,cancel)!=input.Stamp)throw new IOException("changed-since-audit");
                     current.Stamp=input.Stamp;approved.Add(current);
                 }catch(OperationCanceledException){throw;}
                 catch(Exception ex){result.SkippedCount++;result.Messages.Add(current.Name+": "+SafeError(ex));}
             }
-            if(approved.Count==0)return result;
+            // An invalid/stale/unreadable selected item aborts the entire batch before recycling.
+            if(approved.Count==0||result.SkippedCount>0)return result;
             string backup=null;
             var manifest=new CacheBackupManifest{CreatedUtc=DateTime.UtcNow.ToString("o",CultureInfo.InvariantCulture)};
             try {
@@ -160,7 +163,7 @@ namespace WhaleClaudeHelper {
             var result=new CacheOperationResult{BackupDirectory=backupDirectory};
             if(processes().Count>0){result.Messages.Add("close-claude-first");return result;}
             try {
-                if(!Under(context.BackupRoot,backupDirectory)||Path.GetDirectoryName(Path.GetFullPath(backupDirectory))!=Path.GetFullPath(context.BackupRoot).TrimEnd(Path.DirectorySeparatorChar))throw new IOException("invalid-backup-location");
+                if(!Under(context.BackupRoot,backupDirectory)||!String.Equals(Path.GetDirectoryName(Path.GetFullPath(backupDirectory)),Path.GetFullPath(context.BackupRoot).TrimEnd(Path.DirectorySeparatorChar),StringComparison.OrdinalIgnoreCase))throw new IOException("invalid-backup-location");
                 EnsurePlain(backupDirectory);string receipt=Path.Combine(backupDirectory,"manifest.json");EnsurePlain(receipt);
                 if(new FileInfo(receipt).Length>32*1024*1024)throw new IOException("invalid-backup-manifest");
                 var manifest=json.Deserialize<CacheBackupManifest>(File.ReadAllText(receipt,Encoding.UTF8));
@@ -194,7 +197,18 @@ namespace WhaleClaudeHelper {
             Action<string,string,string> add=delegate(string path,string name,string category){result.Add(new CacheTarget{Path=Path.GetFullPath(path),Name=name,Category=category,Id=HashText(Path.GetFullPath(path).ToUpperInvariant())});};
             foreach(string name in CodeCaches)add(Path.Combine(context.Home,".claude",name),"Claude Code / "+name,"code");
             foreach(string root in new[]{Path.Combine(context.Roaming,"Claude"),Path.Combine(context.Local,"Claude")})foreach(string name in DesktopCaches)add(Path.Combine(root,name),"Claude Desktop / "+name,"desktop");
-            string modern=Path.Combine(context.Local,"Claude-Data");
+            AddProfiles(Path.Combine(context.Local,"Claude-Data"),add);
+            // Explicit supported Microsoft Store package family only, never *Claude* matching.
+            // LocalState, settings, credential stores and the package root are not cache targets.
+            string package=Path.Combine(context.Local,"Packages","Claude_pzs8sxrjxfjjc","LocalCache");
+            foreach(string local in new[]{"Roaming","Local"}) {
+                string scope=Path.Combine(package,local);
+                foreach(string name in DesktopCaches)add(Path.Combine(scope,"Claude",name),"Claude Desktop (Store) / "+name,"desktop");
+                AddProfiles(Path.Combine(scope,"Claude-Data"),add);
+            }
+            return result.GroupBy(x=>x.Path,StringComparer.OrdinalIgnoreCase).Select(x=>x.First()).ToList();
+        }
+        private static void AddProfiles(string modern,Action<string,string,string> add) {
             try {
                 EnsurePlain(modern);
                 if(Directory.Exists(modern))foreach(string profile in Directory.GetDirectories(modern,"claude_*",System.IO.SearchOption.TopDirectoryOnly)) {
@@ -203,7 +217,6 @@ namespace WhaleClaudeHelper {
                     foreach(string name in DesktopCaches)add(Path.Combine(profile,name),"Claude Desktop / "+Path.GetFileName(profile)+" / "+name,"desktop");
                 }
             }catch { }
-            return result.GroupBy(x=>x.Path,StringComparer.OrdinalIgnoreCase).Select(x=>x.First()).ToList();
         }
         private static CacheBackupTarget Inventory(string path,CancellationToken cancel,bool hashes) {
             EnsurePlain(path);var result=new CacheBackupTarget{Directory=Directory.Exists(path)};
@@ -230,9 +243,9 @@ namespace WhaleClaudeHelper {
             result.Files.Sort((a,b)=>StringComparer.OrdinalIgnoreCase.Compare(a.RelativePath,b.RelativePath));result.Directories.Sort(StringComparer.OrdinalIgnoreCase);return result;
         }
         private static string Stamp(string path,CancellationToken cancel) {
-            var data=Inventory(path,cancel,false);var text=new StringBuilder();text.Append(data.Directory?"D":"F");
+            var data=Inventory(path,cancel,true);var text=new StringBuilder();text.Append(data.Directory?"D":"F");
             foreach(string dir in data.Directories)text.Append('\n').Append("D:").Append(dir);
-            foreach(var file in data.Files){string full=data.Directory?SafeChild(path,file.RelativePath):path;text.Append('\n').Append(file.RelativePath).Append('|').Append(file.Length).Append('|').Append(File.GetLastWriteTimeUtc(full).Ticks);}
+            foreach(var file in data.Files)text.Append('\n').Append(file.RelativePath).Append('|').Append(file.Length).Append('|').Append(file.Sha256);
             return HashText(text.ToString());
         }
         private static void CopyVerified(string source,string destination,CacheBackupTarget inventory,CancellationToken cancel) {
@@ -279,20 +292,36 @@ namespace WhaleClaudeHelper {
             var sid=WindowsIdentity.GetCurrent().User;if(sid==null)throw new IOException("backup-permissions-unavailable");
             var security=new FileSecurity();security.SetAccessRuleProtection(true,false);security.SetOwner(sid);security.AddAccessRule(new FileSystemAccessRule(sid,FileSystemRights.FullControl,AccessControlType.Allow));File.SetAccessControl(path,security);
         }
-        private static void RequireRoot(string path){if(String.IsNullOrWhiteSpace(path)||!Path.IsPathRooted(path)||Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)==Path.GetPathRoot(path).TrimEnd(Path.DirectorySeparatorChar))throw new ArgumentException("Unsafe root");}
+        private static void RequireRoot(string path){if(String.IsNullOrWhiteSpace(path)||!Path.IsPathRooted(path)||Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)==Path.GetPathRoot(path).TrimEnd(Path.DirectorySeparatorChar))throw new ArgumentException("Unsafe root");EnsurePlain(path);}
         private static bool Under(string root,string path){return !String.IsNullOrEmpty(path)&&Path.GetFullPath(path).StartsWith(Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase);}
         private static string SafeChild(string root,string relative){if(String.IsNullOrEmpty(relative)||Path.IsPathRooted(relative)||relative.Split('/','\\').Any(x=>x==".."||x=="."||x.Length==0))throw new IOException("invalid-relative-path");string full=Path.GetFullPath(Path.Combine(root,relative));if(!Under(root,full))throw new IOException("path-outside-root");EnsurePlain(full);return full;}
         private static void EnsurePlain(string path) {
+            if(String.IsNullOrWhiteSpace(path)||!Path.IsPathRooted(path)||path.StartsWith("\\\\",StringComparison.Ordinal))throw new IOException("unsafe-path");
+            string tail=path.Substring(Path.GetPathRoot(path).Length);
+            foreach(string part in tail.Split(new[]{'\\','/'},StringSplitOptions.RemoveEmptyEntries)) {
+                if(part=="."||part==".."||part.EndsWith(".",StringComparison.Ordinal)||part.EndsWith(" ",StringComparison.Ordinal)||part.IndexOf(':')>=0||System.Text.RegularExpressions.Regex.IsMatch(part.Split('.')[0],"^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$",System.Text.RegularExpressions.RegexOptions.IgnoreCase))throw new IOException("unsafe-path");
+            }
             string current=Path.GetFullPath(path);
             while(!String.IsNullOrEmpty(current)) {
-                if(File.Exists(current)||Directory.Exists(current))if((File.GetAttributes(current)&FileAttributes.ReparsePoint)!=0)throw new IOException("reparse-point-skipped");
+                FileAttributes attributes;
+                try{attributes=File.GetAttributes(current);}catch(FileNotFoundException){current=Path.GetDirectoryName(current);continue;}catch(DirectoryNotFoundException){current=Path.GetDirectoryName(current);continue;}
+                if((attributes&FileAttributes.ReparsePoint)!=0)throw new IOException("reparse-point-skipped");
+                if((attributes&FileAttributes.Directory)==0)using(var stream=new FileStream(current,FileMode.Open,FileAccess.Read,FileShare.Read)) {
+                    NativeFileInfo info;if(!GetFileInformationByHandle(stream.SafeFileHandle,out info))throw new IOException("file-identity-unavailable");
+                    if(info.NumberOfLinks!=1)throw new IOException("hardlink-skipped");
+                }
                 current=Path.GetDirectoryName(current);
             }
         }
+        [StructLayout(LayoutKind.Sequential)] private struct NativeFileInfo {
+            public uint Attributes;public System.Runtime.InteropServices.ComTypes.FILETIME Created,Accessed,Written;
+            public uint VolumeSerial,SizeHigh,SizeLow,NumberOfLinks,IndexHigh,IndexLow;
+        }
+        [DllImport("kernel32.dll",SetLastError=true)] private static extern bool GetFileInformationByHandle(Microsoft.Win32.SafeHandles.SafeFileHandle handle,out NativeFileInfo information);
         private static string HashFile(string path){EnsurePlain(path);using(var sha=SHA256.Create())using(var stream=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read))return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","").ToLowerInvariant();}
         private static string HashText(string text){using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-","").ToLowerInvariant();}
         private static string SafeError(Exception error) {
-            string[] codes={"changed-since-audit","source-missing","scan-limit","close-claude-first","recycle-not-completed","invalid-backup-location","invalid-backup-manifest","invalid-relative-path","path-outside-root","reparse-point-skipped","content-changed","destination-exists","backup-permissions-unavailable"};
+            string[] codes={"changed-since-audit","source-missing","scan-limit","close-claude-first","recycle-not-completed","invalid-backup-location","invalid-backup-manifest","invalid-relative-path","path-outside-root","reparse-point-skipped","content-changed","destination-exists","backup-permissions-unavailable","unsafe-path","hardlink-skipped","file-identity-unavailable","backup-overlaps-cache"};
             if(codes.Contains(error.Message))return error.Message;
             if(error is UnauthorizedAccessException)return "access-denied";
             if(error is IOException)return "file-busy-or-io-error";
