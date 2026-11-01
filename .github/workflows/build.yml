@@ -1,0 +1,32 @@
+name: Build Windows apps
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile translator components
+        shell: pwsh
+        run: ./apps/claude-live-translator/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/translator-build"
+      - name: Compile home-time clock
+        shell: pwsh
+        run: ./apps/two-zone-clock/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/clock-build"
+      - name: Compile environment helper
+        shell: pwsh
+        run: ./apps/whale-claude-helper/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/helper-build"
+      - name: Validate Python syntax without running workers
+        shell: pwsh
+        run: python -m compileall -q apps/claude-live-translator/backend
+      - name: Store build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-components-not-portable-translator
+          path: |
+            ${{ runner.temp }}/translator-build/*
+            ${{ runner.temp }}/clock-build/*
+            ${{ runner.temp }}/helper-build/*
