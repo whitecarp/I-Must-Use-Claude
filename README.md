@@ -1,94 +1,182 @@
-# I Must Use Claude
+<p align="center">
+  <img src="docs/images/hero.png" alt="Whale-themed artwork for I Must Use Claude" width="100%">
+</p>
 
-**Read Claude comfortably. Keep your home time in view. Understand your local setup.**
+<h1 align="center">I Must Use Claude</h1>
+<p align="center"><strong>Read Claude comfortably. Keep your home time in view. Understand your local setup.</strong></p>
+<p align="center">我一定要用上Claude · Three whale-themed Windows companions, built around using Claude.</p>
 
-我一定要用上Claude · Three whale-themed Windows companions for using Claude.
+<p align="center">
+  <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-4E9BC0?style=flat-square" alt="Windows 10 and 11">
+  <img src="https://img.shields.io/badge/Download-EXE-6DAD9C?style=flat-square" alt="EXE downloads">
+  <img src="https://img.shields.io/badge/Interface-English%20%2F%20%E4%B8%AD%E6%96%87-D6A4B8?style=flat-square" alt="English and Chinese interfaces">
+  <img src="https://img.shields.io/badge/Release-Preview-D99869?style=flat-square" alt="Preview release">
+</p>
 
-**English** · [简体中文](README.zh-CN.md)
+<p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
+<p align="center">
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.1.0-preview"><strong>↓ Download the apps</strong></a>
+  &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
+  &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
+</p>
 
-## Three tools, one purpose
+---
 
-| App | What it helps you do |
-| --- | --- |
-| **Whale Translator / 大肥鱼翻译** | Understand Claude's replies in your preferred language, and turn Chinese prompts into English you can review before sending. |
-| **Two-Zone Clock / 两地时钟** | Keep your original/home timezone visible when your computer is set to another timezone. |
-| **Whale Environment Helper / 大肥鱼环境助手** | Measure browser environment signals, apply reversible changes to matched local settings, and measure again. |
+## Choose your companion
 
-These are independent community companion tools, not an Anthropic product. The environment score is a third-party heuristic, not an official Claude eligibility score or a guarantee of access.
+| Understand her replies | Know what time it is at home | Check your setup |
+| :--- | :--- | :--- |
+| **Whale Translator** | **Two-Zone Clock** | **Whale Environment Helper** |
+| Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. | Measure browser signals, handle matched local settings, and measure again. |
+| [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/HomeTimeClock.exe) | [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleEnvironmentHelper.exe) |
 
-## Download and start
+**Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
-**For convenience, we currently distribute Windows EXE files only. Download the app you want and double-click it—no source checkout or manual compilation needed. Source code remains public for developers.**
+<details>
+<summary><strong>Requirements, versions and language settings</strong></summary>
 
-The translator bundles its runtime; optional offline language packs are installed separately inside the app.
+- Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
+- This preview contains Translator **0.8.1**, the current Two-Zone Clock build, and Environment Helper **0.3.0**.
+- We distribute three Windows EXE files. GitHub's automatic source archives are for development, not the ready-to-run apps.
+- This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
 
-Download from the [initial preview release](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.1.0-preview), then double-click the app you need. Each app runs separately; you do not need to install all three.
+</details>
 
-| Download | Includes |
-| --- | --- |
-| [WhaleTranslator.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleTranslator.exe) | Translator 0.8.1; optional language packs are downloaded separately |
-| [HomeTimeClock.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/HomeTimeClock.exe) | Two-Zone Clock, current build |
-| [WhaleEnvironmentHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.1.0-preview/WhaleEnvironmentHelper.exe) | Environment Helper 0.3.0 preview |
+## 01 · Read Claude in your language
 
-- Windows 10/11; the translator's portable runtime requires **x64**.
-- The desktop apps use **.NET Framework 4.8**.
-- Release executables are separate from the source download. Source ZIP files are for development.
-- The repository opens in English and also has a Chinese README. The apps retain their existing language defaults and support English / 中文 switching.
+### Whale Translator · 大肥鱼翻译
 
-### 1. Whale Translator
+Understand Claude's replies without changing the way you work. Choose the Claude window, highlight a passage, and read the original and translation together.
 
-Choose the Claude window from a card showing its icon and title. Select text with the left mouse button and release: the app copies that selection and displays the original alongside its translation. Selections in other windows are ignored.
+<p align="center"><img src="docs/images/translator-preview.svg" alt="Illustrated workflow: choose Claude, select text, and read its translation" width="100%"></p>
+<p align="center"><sub>Static feature illustration with sample text, not a software screenshot.</sub></p>
 
-- Google online mode detects the source language and offers 17 target languages.
-- The Chinese prompt window translates your message into English for review. Sending is an explicit action; copying and pasting is available when direct sending is unsupported.
-- Optional offline language packs can be downloaded while online. Each pack covers one direction, such as English → Chinese; the reverse direction is a separate pack.
-- If Google is rate-limiting or asking for verification, use **Switch to offline** to retry the current text with a compatible installed pack.
-- Pin the window on top, pause selection translation, paste text manually, or copy the translation.
+**Start in three steps**
 
-Online translation sends selected text to Google Translate's key-free web endpoint. It is not Gemini or the paid Google Cloud Translation API, and availability is not guaranteed. Offline mode translates on your device and does not silently switch online. Images and scanned documents are not OCR-translated.
+1. Open **WhaleTranslator.exe** and choose Claude from the window cards.
+2. Choose your target language. In Claude, hold the left mouse button, select text, and release.
+3. Read or copy the translation. Use **Write in Chinese** when you want to write in Chinese and review an English version before sending.
 
-### 2. Two-Zone Clock
+**Automatic source-language detection · 17 online target languages · Optional offline packs · Always-on-top**
 
-Set the upper clock to your **original/home region** and the lower clock to your **target region**. This lets you keep track of home time while using a different computer timezone.
+<details>
+<summary><strong>Offline use, sending prompts and selection behavior</strong></summary>
 
-- Search directly inside either region selector, using English or Chinese.
-- A small vertical desktop panel shows each region's time and date, with daylight saving changes handled by Windows timezone rules.
+- Google online mode detects the source language. Only selections in the chosen window are translated; selections elsewhere are ignored.
+- You can pause selection translation, paste text manually, copy a translation, or pin the window on top.
+- The Chinese prompt window lets you review English before explicitly sending. If direct sending is unsupported, copy and paste instead. Translation does not automatically send a message to Claude.
+- Download offline language packs while online. Each pack covers one direction, such as English → Chinese; the reverse direction is separate.
+- When Google is rate-limiting or requesting verification, **Use offline** can retry the current text with a compatible installed pack. Offline mode does not silently switch online.
+- Images and scanned documents are not OCR-translated. Selection depends on the source app's copy behavior.
+
+</details>
+
+<details>
+<summary><strong>App previews: English prompts and offline retry</strong></summary>
+
+<p align="center"><strong>Review an English prompt before sending</strong></p>
+<p align="center"><img src="docs/images/translator-compose.png" alt="Chinese prompt window with an empty English preview area and offline retry option" width="460"></p>
+
+<p align="center"><strong>Retry with an installed offline language pack</strong></p>
+<p align="center"><img src="docs/images/translator-offline.png" alt="Existing Translator 0.8.1 demonstration showing the Use offline option" width="460"></p>
+<p align="center"><img src="docs/images/translator-offline-dialog.png" alt="Existing offline retry confirmation dialog showing a selected language direction" width="460"></p>
+
+Existing demonstration screenshots with sample text.
+
+</details>
+
+<details>
+<summary><strong>Translation privacy and availability</strong></summary>
+
+Online mode sends selected text to Google Translate's key-free web endpoint. This is not Gemini or the paid Google Cloud Translation API; the endpoint can change, fail or rate-limit requests. Offline translation stays on your device. Language packages download only when you request them. This app does not save original text or translations as a history.
+
+Offline quality depends on the package. Download the required directions and check them on the intended computer before travelling. Moving the EXE to a new computer does not copy installed models.
+
+</details>
+
+## 02 · Keep your home time close
+
+### Two-Zone Clock · 两地时钟
+
+Your computer may use another timezone. Your daily life does not have to. Keep your **original/home region** above your **target region**, in a small whale-themed desktop panel.
+
+<p align="center"><img src="docs/images/clock-preview.svg" alt="Illustrated vertical clock panel with home and target regions" width="100%"></p>
+<p align="center"><sub>Static feature illustration with example times, not a software screenshot.</sub></p>
+
+**Start in three steps**
+
+1. Open **HomeTimeClock.exe**. Right-click the clock or tray icon and open region settings.
+2. Search directly in each selector. Choose a fixed **home region** and your **target region**, then save.
+3. Place the clock where you like. Your home time remains visible even if the computer timezone changes.
+
+**Searchable regions · Compact vertical layout · Daylight saving support · Works offline**
+
+<details>
+<summary><strong>Existing app preview and display options</strong></summary>
+
+<p align="center"><img src="docs/images/clock-ui.png" alt="Previously captured compact clock interface with example times" width="210"></p>
+
+Existing app screenshot with example times.
+
+- Search with English or Chinese names. Each region shows its time and date.
 - Choose 12/24-hour time, seconds, one or two clocks, always-on-top, and a locked position.
-- Drag it where you want, or return it to the lower-right corner. Settings persist between launches.
+- Drag the panel or return it to the lower-right corner. Settings persist between launches.
+- Daylight saving changes follow Windows timezone rules; accuracy depends on the Windows clock and those rules.
+- The app does **not** modify system time or timezone and makes no network requests or account checks.
+- Choose a fixed home region rather than **Follow computer timezone** to keep home time independent of system changes.
 
-The clock works offline and does **not** change your computer's time or timezone. Choose a fixed home region if you want it to stay independent of future system timezone changes.
+</details>
 
-### 3. Whale Environment Helper — preview
+## 03 · Measure first, then adjust
 
-Use **Measure → Optimize → Measure again**. The first measurement opens a local page in your default browser. Click **Start measurement** there, then return to the helper to see the score and individual results.
+### Whale Environment Helper · 大肥鱼环境助手
 
-- Missing or failed checks remain **unknown**, not zero.
-- Optimization requires recent results for the actionable local checks. It skips settings that did not match.
-- Matched timezone settings can be changed to UTC; matched Chrome/Edge language preferences to English; verified matching personal fonts can be backed up and removed.
-- System fonts remain protected. Network, proxy, DNS, Claude login, chats and credentials remain unchanged.
-- Changes are backed up before application. **Undo** restores the previous values while retaining conflicting later edits.
+See what the browser actually reports before changing settings. Keep a baseline, handle supported matches with backups, then check the result rather than assuming the score improved.
 
-Save your work and close Claude, Chrome and Edge before optimization or undo. Timezone changes affect the whole computer; removing a personal font can temporarily change how documents look. Use the same browser and profile for before/after checks.
+<p align="center"><img src="docs/images/helper-preview.svg" alt="Illustrated sequence: measure browser signals, optimize matched settings, remeasure and undo" width="100%"></p>
+<p align="center"><sub>Static workflow illustration for the preview version, not a measured result.</sub></p>
 
-The helper measures the browser page, not Claude Desktop's embedded environment. It cannot fix network routing or account restrictions. Version 0.3.0 has compiled and passed isolated scoring checks, but **independent Windows VM end-to-end acceptance is still pending**.
+**Start in three steps**
 
-## What stays on your device?
+1. Open **WhaleEnvironmentHelper.exe** and choose **Measure first**. In the local page opened by your default browser, click **Start measurement**.
+2. Review the results. Save your work, close Claude, Chrome and Edge, then choose **Optimize** to process supported local matches.
+3. Choose **Measure after** using the same browser and profile. Review the before/after results, or use **Undo last optimization** to restore the previous settings.
 
-| Tool | Network and local data |
-| --- | --- |
-| Translator | Online mode sends selected text to Google. Offline translation stays local. Language packs download only when requested. Source text and translations are not saved as history by this app. |
-| Clock | No network requests or account access. Only display and region preferences are saved. |
-| Environment Helper | The measurement page is served locally. Its disclosed WebRTC check contacts Google STUN; the result contains candidate counts, not raw IP addresses. Configuration backups stay local and may contain private browser data. |
+**Measured baseline · Unknown means unknown · Backup before changes · Undo available**
 
-Do not upload your local configuration backups, credentials, diagnostic folders or personal documents to this repository.
+**Preview status:** Version 0.3.0 has compiled and passed isolated scoring checks. Independent Windows VM end-to-end acceptance is still pending.
 
-## Source and acknowledgements
+<details>
+<summary><strong>What optimization changes — and what it preserves</strong></summary>
 
-- [Translator source](apps/claude-live-translator/)
-- [Clock source](apps/two-zone-clock/)
-- [Environment helper source](apps/whale-claude-helper/)
-- [Third-party notices](THIRD_PARTY_NOTICES.md)
-- [Release notes](RELEASE_NOTES.md)
+- Missing or failed checks remain **unknown**, not zero. Optimization requires recent results for the actionable local checks; settings that did not match are skipped.
+- Matched timezone settings can be changed to **UTC**, matched Chrome/Edge language preferences to **English**, and verified matching personal fonts can be backed up and removed.
+- A timezone change affects the whole computer. Removing a personal font may temporarily change how documents look.
+- System fonts stay protected. Network, proxy, DNS, Claude login, chats and credentials remain unchanged.
+- Changes are backed up before application. Undo retains conflicting later edits and reports them instead of overwriting them.
+- Save work and close Claude, Chrome and Edge before either optimization or undo. Use the same browser and profile for before/after measurements.
 
-The environment scoring rules are adapted from [LinXiaoTao/FuckClaude](https://github.com/LinXiaoTao/FuckClaude). Offline translation uses CTranslate2 and SentencePiece with optional packages from the Argos catalog. See the notices for licenses and scope.
-Build instructions: [English / 中文](docs/BUILDING.md).
+</details>
+
+<details>
+<summary><strong>What the score means and how measurement works</strong></summary>
+
+The score follows a third-party environment heuristic adapted from [LinXiaoTao/FuckClaude](https://github.com/LinXiaoTao/FuckClaude). It is **not** an official Claude eligibility score or a guarantee of access. The helper measures the browser page, not Claude Desktop's embedded environment. It does not fix network routing or account restrictions.
+
+The page is served locally. Its disclosed WebRTC check contacts Google STUN; the result contains candidate counts, not raw IP addresses. Configuration backups remain local and may contain private browser data. Do not upload backups, credentials, diagnostic folders or personal documents to this repository.
+
+</details>
+
+---
+
+## Explore the source
+
+| Project | Source | Further reading |
+| --- | --- | --- |
+| Translator | [apps/claude-live-translator](apps/claude-live-translator/) | [Build instructions](docs/BUILDING.md) |
+| Clock | [apps/two-zone-clock](apps/two-zone-clock/) | [Release notes](RELEASE_NOTES.md) |
+| Environment Helper | [apps/whale-claude-helper](apps/whale-claude-helper/) | [Third-party notices](THIRD_PARTY_NOTICES.md) |
+
+Offline translation uses CTranslate2 and SentencePiece with optional packages from the Argos catalog. Upstream licenses and attribution are retained in the [third-party notices](THIRD_PARTY_NOTICES.md).
+
+<p align="center"><sub>An independent community companion project. Not affiliated with or endorsed by Anthropic or Google.</sub></p>
