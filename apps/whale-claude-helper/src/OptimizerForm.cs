@@ -16,7 +16,7 @@ namespace WhaleClaudeHelper {
         private CancellationTokenSource measurementCancellation;
         private Label state,score,hint;
         private Button optimize,undo,language,cancel;
-        private LinkLabel reset,maintenance;
+        private LinkLabel reset,maintenance,updates;
         private TextBox details;
         private string operationDetails="";
         private static string T(string zh,string en){return Ui.T(zh,en);}
@@ -34,7 +34,7 @@ namespace WhaleClaudeHelper {
         }
         private void Build(){
             var old=Controls.Cast<Control>().ToArray();Controls.Clear();foreach(var c in old)c.Dispose();
-            Text=T("大肥鱼环境助手 0.4.0 预览版","Whale Environment Helper 0.4.0 Preview")+(demo?" · Demo":"");
+            Text=T("大肥鱼环境助手 0.5.0 预览版","Whale Environment Helper 0.5.0 Preview")+(demo?" · Demo":"");
             var root=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=8,Padding=new Padding(24,16,24,14)};
             foreach(float h in new float[]{100,54,85,66,92,42,-1,36})root.RowStyles.Add(new RowStyle(h<0?SizeType.Percent:SizeType.Absolute,h<0?100:h));
             var header=new Panel{Dock=DockStyle.Fill};header.Controls.Add(new WhaleBadge{Size=new Size(110,88)});
@@ -58,6 +58,8 @@ namespace WhaleClaudeHelper {
             maintenance=new LinkLabel{AutoSize=true,Text=T("维护与清理","Maintenance & cleanup"),LinkColor=Theme.BlueDark,Margin=new Padding(0,8,24,0)};
             maintenance.LinkClicked+=delegate{if(busy)return;try{using(var form=new MaintenanceForm(demo))form.ShowDialog(this);Build();}catch{MessageBox.Show(this,T("维护页面无法打开。请检查目录访问权限后重试。","Maintenance could not open. Check folder access and try again."),T("大肥鱼提示","Whale Helper"));}};footer.Controls.Add(maintenance);
             var about=new LinkLabel{AutoSize=true,Text=T("说明与许可","Notes & license"),LinkColor=Theme.BlueDark,Margin=new Padding(0,8,0,0)};about.LinkClicked+=delegate{ShowNotes();};footer.Controls.Add(about);
+            updates=new LinkLabel{AutoSize=true,Text=T("检查更新","Check updates"),LinkColor=Theme.BlueDark,Margin=new Padding(24,8,0,0)};
+            updates.LinkClicked+=delegate{if(!busy&&!demo)WhaleCommon.UpdateChecker.Show(this,"helper","0.5.0",Ui.English);};footer.Controls.Add(updates);
             root.Controls.Add(footer,0,7);Controls.Add(root);RefreshView();
         }
         private bool SafeHasUndo(){try{return !demo&&service.HasUndo;}catch{return false;}}
@@ -66,7 +68,7 @@ namespace WhaleClaudeHelper {
             return report.IsComplete?report.MeasuredScore+" / 100":T("已测小计 ","Measured subtotal ")+report.MeasuredScore+T("；覆盖权重 ","; measured weight ")+report.MeasuredWeight+" / 100";
         }
         private void RefreshView(){
-            optimize.Enabled=undo.Enabled=language.Enabled=reset.Enabled=maintenance.Enabled=!busy;
+            optimize.Enabled=undo.Enabled=language.Enabled=reset.Enabled=maintenance.Enabled=updates.Enabled=!busy;
             undo.Enabled=!busy&&SafeHasUndo();cancel.Visible=measuring;
             optimize.Text=awaitingAfter?T("复测结果","Measure after"):(after!=null?T("开始新一轮检测","Start a new check"):(before!=null&&before.CanOptimize?T("一键优化","Optimize"):T("开始检测","Measure first")));
             score.Text=before==null?T("尚未检测 · 不猜测分数","Not measured · no assumed score"):T("优化前：","Before: ")+ScoreText(before);

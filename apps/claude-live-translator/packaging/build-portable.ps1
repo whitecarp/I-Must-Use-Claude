@@ -1,9 +1,11 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$Version = '0.8.1',
+    [string]$Version = '0.9.0',
     [string]$ApplicationExe = 'ClaudeChinese.exe',
     [string]$OutputName = '大肥鱼翻译.exe',
     [string]$VCRedistDirectory = '',
+    [string]$RuntimeRoot = '',
+    [string]$BuildRoot = '',
     [switch]$StageOnly
 )
 $ErrorActionPreference = 'Stop'
@@ -12,8 +14,9 @@ Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $projectDirectory = [IO.Path]::GetFullPath($ProjectRoot)
 $packagingDirectory = Join-Path $projectDirectory 'packaging'
-$buildRoot = Join-Path $projectDirectory 'artifacts\portable-build'
-$buildDirectory = Join-Path $buildRoot ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8))
+$portableBuildRoot = if ($BuildRoot) { [IO.Path]::GetFullPath($BuildRoot) } else { Join-Path $projectDirectory 'artifacts\portable-build' }
+$runtimeDirectory = if ($RuntimeRoot) { [IO.Path]::GetFullPath($RuntimeRoot) } else { $projectDirectory }
+$buildDirectory = Join-Path $portableBuildRoot ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8))
 $stageDirectory = Join-Path $buildDirectory 'stage'
 $utf8 = New-Object Text.UTF8Encoding($false)
 if ($Version -notmatch '^\d+\.\d+\.\d+(\.\d+)?$') { throw 'Version must contain three or four numeric components.' }
@@ -59,13 +62,13 @@ function Copy-PayloadTree([string]$Source,[string]$RelativeRoot) {
 
 $applicationSource = if ([IO.Path]::IsPathRooted($ApplicationExe)) { $ApplicationExe } else { Join-Path $projectDirectory $ApplicationExe }
 Copy-PayloadFile $applicationSource 'ClaudeChinese.exe'
-foreach ($name in @('ClaudeReader.exe','SelectionReader.exe','ClaudeSender.exe')) { Copy-PayloadFile (Join-Path $projectDirectory $name) $name }
-foreach ($name in @('google_worker.py','offline_worker.py','package_manager.py','package_store.py','argos_catalog.json','launcher.json','MODEL-NOTICES.md')) {
+foreach ($name in @('ClaudeReader.exe','SelectionReader.exe','ClaudeSender.exe')) { Copy-PayloadFile (Join-Path ([IO.Path]::GetDirectoryName($applicationSource)) $name) $name }
+foreach ($name in @('google_worker.py','offline_worker.py','glossary.py','package_manager.py','package_store.py','argos_catalog.json','launcher.json','MODEL-NOTICES.md')) {
     Copy-PayloadFile (Join-Path $projectDirectory ('backend\' + $name)) ('backend\' + $name)
 }
 
 # The embeddable Python distribution is a closed allowlist of top-level files.
-$pythonSource = Join-Path $projectDirectory 'runtime\python'
+$pythonSource = Join-Path $runtimeDirectory 'runtime\python'
 foreach ($file in Get-ChildItem -LiteralPath $pythonSource -File) {
     if ($file.Extension -in @('.dll','.pyd') -or $file.Name -in @('python.exe','pythonw.exe','python312.zip','python312._pth','LICENSE.txt','python.cat')) {
         Copy-PayloadFile $file.FullName ('runtime\python\' + $file.Name)
@@ -76,7 +79,7 @@ foreach ($name in @('python.exe','python312.dll','python312.zip','LICENSE.txt'))
 }
 # Bind imports only to the bundled standard library and selected packages, never global Python.
 [IO.File]::WriteAllText((Join-Path $stageDirectory 'runtime\python\python312._pth'),"python312.zip`n.`n../venv/Lib/site-packages`nimport site`n",$utf8)
-$siteSource = Join-Path $projectDirectory 'runtime\venv\Lib\site-packages'
+$siteSource = Join-Path $runtimeDirectory 'runtime\venv\Lib\site-packages'
 foreach ($package in @('ctranslate2','sentencepiece','numpy','numpy.libs','yaml','_yaml')) {
     Copy-PayloadTree (Join-Path $siteSource $package) ('runtime\venv\Lib\site-packages\' + $package)
 }
@@ -150,7 +153,7 @@ $entries = New-Object 'Collections.Generic.List[object]'
 [long]$totalBytes = 0
 foreach ($file in Get-ChildItem -LiteralPath $stageDirectory -File -Recurse | Sort-Object FullName) {
     $relative = $file.FullName.Substring($stageDirectory.Length+1).Replace('\','/')
-    if ($relative -match '(?i)(^|/)(preferences\.json|diagnostics|stanza|installer-cache|__pycache__|pip)(/|$)' -or
+    if ($relative -match '(?i)(^|/)(preferences\.json|glossary\.json|diagnostics|stanza|installer-cache|__pycache__|pip)(/|$)' -or
         $relative -match '(?i)^runtime/model(?:/|-zh-en/)' -or
         $relative -match '(?i)(^|/)(model\.bin|sentencepiece\.model)$' -or
         $relative -match '(?i)\.(argosmodel|zip)$' -and $relative -ne 'runtime/python/python312.zip') { throw "Forbidden payload file: $relative" }
@@ -203,7 +206,7 @@ namespace DafeiyuPortable { internal static class PortableBuildInfo {
     $receipt['PayloadSha256']=$payloadHash
     $receipt['PayloadBytes']=(Get-Item -LiteralPath $zipPath).Length
 }
-$criticalInputs = [ordered]@{ 'ClaudeChinese.exe'=$applicationSource; 'backend/offline_worker.py'=(Join-Path $projectDirectory 'backend\offline_worker.py'); 'backend/google_worker.py'=(Join-Path $projectDirectory 'backend\google_worker.py'); 'backend/package_manager.py'=(Join-Path $projectDirectory 'backend\package_manager.py'); 'backend/package_store.py'=(Join-Path $projectDirectory 'backend\package_store.py'); 'backend/argos_catalog.json'=(Join-Path $projectDirectory 'backend\argos_catalog.json'); 'backend/launcher.json'=(Join-Path $projectDirectory 'backend\launcher.json'); 'backend/MODEL-NOTICES.md'=(Join-Path $projectDirectory 'backend\MODEL-NOTICES.md') }
+$criticalInputs = [ordered]@{ 'ClaudeChinese.exe'=$applicationSource; 'backend/offline_worker.py'=(Join-Path $projectDirectory 'backend\offline_worker.py'); 'backend/google_worker.py'=(Join-Path $projectDirectory 'backend\google_worker.py'); 'backend/glossary.py'=(Join-Path $projectDirectory 'backend\glossary.py'); 'backend/package_manager.py'=(Join-Path $projectDirectory 'backend\package_manager.py'); 'backend/package_store.py'=(Join-Path $projectDirectory 'backend\package_store.py'); 'backend/argos_catalog.json'=(Join-Path $projectDirectory 'backend\argos_catalog.json'); 'backend/launcher.json'=(Join-Path $projectDirectory 'backend\launcher.json'); 'backend/MODEL-NOTICES.md'=(Join-Path $projectDirectory 'backend\MODEL-NOTICES.md') }
 $inputHashes = [ordered]@{}
 foreach ($relative in $criticalInputs.Keys) {
     $expected = ($entries | Where-Object { $_.Path -eq $relative }).Sha256

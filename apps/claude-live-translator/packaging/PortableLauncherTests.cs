@@ -19,19 +19,23 @@ internal static class PortableLauncherTests {
         try {
             foreach(string path in new[]{"ClaudeChinese.exe","runtime/python/python312.zip","runtime/venv/Lib/site-packages/numpy/_core/_multiarray_umath.cp312-win_amd64.pyd","licenses/第三方许可.txt"})Check(PortableLauncher.IsSafeRelativePath(path),"safe path accepted");
             foreach(string path in new[]{"","/escape","../escape","runtime/../escape","./file","runtime//file","runtime\\python\\file","C:/escape","runtime/file:stream","runtime/NUL.txt","runtime/COM1","runtime/LPT0.txt","runtime/file.","runtime/file ","runtime/a?b","runtime/a\nb"})Check(!PortableLauncher.IsSafeRelativePath(path),"unsafe path rejected");
-            var required=new[]{File("ClaudeChinese.exe"),File("runtime/python/python.exe"),File("backend/offline_worker.py"),File("backend/package_manager.py"),File("backend/package_store.py"),File("backend/argos_catalog.json")};
+            var required=new[]{File("ClaudeChinese.exe"),File("runtime/python/python.exe"),File("backend/offline_worker.py"),File("backend/package_manager.py"),File("backend/package_store.py"),File("backend/argos_catalog.json"),File("backend/glossary.py")};
             PortableLauncher.ValidateManifest(new PayloadManifest { Schema=1,Version=PortableBuildInfo.Version,Files=required,TotalBytes=0 });
+            var withoutGlossary=new PayloadFile[required.Length-1];Array.Copy(required,withoutGlossary,withoutGlossary.Length);RejectManifest(withoutGlossary,"glossary module required by both workers");
             RejectManifest(new[]{File("ClaudeChinese.exe")},"incomplete manifest rejected");
             RejectManifest(new[]{required[0],required[1],required[2]},"package manager and catalog required");
             RejectExtra(required,"claudechinese.exe","case-insensitive duplicate rejected");
             RejectExtra(required,"preferences.json","unapproved payload file rejected");
+            RejectExtra(required,"backend/glossary.json","user glossary data must not be bundled");
+            RejectExtra(required,"backend/credentials.json","credential file must not be bundled");
+            RejectExtra(required,".claude/.credentials.json","Claude credential file must not be bundled");
             RejectExtra(required,"runtime/../escape","traversal manifest rejected");
             RejectExtra(required,"runtime/model/model/model.bin","bundled English-Chinese model rejected");
             RejectExtra(required,"runtime/model-zh-en/sentencepiece.model","bundled Chinese-English tokenizer rejected");
             RejectExtra(required,"runtime/venv/Lib/site-packages/extra/model.bin","model weights cannot hide inside allowed package roots");
             RejectExtra(required,"licenses/package.argosmodel","model archive cannot hide inside license root");
             foreach(string value in new[]{"","simple","has spaces","中文参数","a\"quote","C:\\directory with spaces\\","ends\\\\","line1\nline2"})QuoteRoundTrip(value);
-            Console.WriteLine("PortableLauncherTests passed: traversal/device-name guards, base-only payload, required package manager/catalog, manifest duplicates, Windows argument round trips.");return 0;
+            Console.WriteLine("PortableLauncherTests passed: traversal/device-name guards, base-only payload, required glossary module, credential/user-data rejection, required package manager/catalog, manifest duplicates, Windows argument round trips.");return 0;
         }catch(Exception error) { Console.WriteLine("PortableLauncherTests failed: "+error.Message);return 1; }
     }
     private static void RejectExtra(PayloadFile[] required,string path,string name) {

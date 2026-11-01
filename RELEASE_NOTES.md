@@ -1,5 +1,21 @@
 # Release notes
 
+## v0.3.0-preview — terminology, recent translations and updates
+
+- **Whale Translator 0.9.0:** a personal glossary for preferred terms, plus Previous / Next navigation through translations from the current session. Translation history stays in memory and is cleared on exit; saved glossary entries are separate.
+- **Two-Zone Clock 0.3.0:** show the target region's time difference and relative day compared with the home region, using Windows timezone rules including daylight saving changes.
+- **All three apps, including Environment Helper 0.5.0:** manually check this repository's public GitHub releases, including previews, and save the correct standalone EXE to a user-selected location. A GitHub-provided SHA-256 digest is required and must match. Missing or mismatched digests are not accepted as verified updates. There is no automatic background check, replacement or execution; existing apps and settings stay in place.
+
+Three Windows EXE downloads remain the delivery format. The clock's time display stays offline; manual update checks/downloads are its only new network use. These features do not change the apps' language defaults or the helper's protected-data and account-access boundaries.
+
+**Validation scope:** isolated fixtures and build checks. Independent Windows VM end-to-end acceptance is still pending; this preview does not claim production-environment or account-access validation.
+
+翻译器 **0.9.0** 新增个人术语表，以及仅保留在本次运行内存中的「上一条／下一条」翻译记录；关闭软件清空翻译记录，保存的术语表单独保留。两地时钟 **0.3.0** 新增目标地区相对原本地区的时差与跨日提示，考虑夏令时。
+
+三个软件（含环境助手 **0.5.0**）新增手动检查更新，可查看包含预览版在内的 GitHub 发布，并把对应 EXE 下载到用户选择的位置。必须有 GitHub 提供的 SHA-256 且核验一致；缺少或不匹配时不接受为已验证更新。不后台自动检查、不自动替换或运行，保留旧软件和设置。时钟正常计时仍无需联网。
+
+验证范围为隔离模拟测试与构建检查，独立 Windows 虚拟机端到端验收仍待完成；不代表已在真实用户环境验证，也不保证 Claude 账号可用。
+
 ## v0.2.0-preview — maintenance and cleanup
 
 **Whale Environment Helper 0.4.0** adds a separate **Maintenance & cleanup** entry:

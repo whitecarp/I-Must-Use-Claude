@@ -117,6 +117,34 @@ internal static class ClockTests {
         Assert(english.Local.DateTime == seconds.Local.DateTime && english.Local.Offset == seconds.Local.Offset && english.Time == seconds.Time, "Changing language changed the represented local time");
     }
 
+    private static void Difference(string utc, string source, string target, string expectedEnglish, string expectedChinese) {
+        var instant = Instant(utc);
+        Assert(ClockTime.DifferenceLabel(instant, source, target, true) == expectedEnglish, "Wrong English difference for " + source + " to " + target + " at " + utc);
+        Assert(ClockTime.DifferenceLabel(instant, source, target, false) == expectedChinese, "Wrong Chinese difference for " + source + " to " + target + " at " + utc);
+    }
+
+    private static void CheckTimeDifferences() {
+        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 14h behind · yesterday", "目标慢 14小时 · 昨天");
+        Difference("2026-07-01T12:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
+        Difference("2026-01-01T23:59:00Z", "Central Standard Time", "Singapore Standard Time", "To: 14h ahead · tomorrow", "目标快 14小时 · 明天");
+        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "China Standard Time", "To: same time · same day", "目标与原本同一时间 · 同一天");
+        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "India Standard Time", "To: 2h 30m behind · same day", "目标慢 2小时30分 · 同一天");
+        Difference("2026-01-01T00:00:00Z", "India Standard Time", "Nepal Standard Time", "To: 15m ahead · same day", "目标快 15分 · 同一天");
+
+        // The date label follows the target's calendar date relative to the source, not the PC date.
+        Difference("2026-01-01T15:59:00Z", "Singapore Standard Time", "Eastern Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
+        Difference("2026-01-01T16:00:00Z", "Singapore Standard Time", "Eastern Standard Time", "To: 13h behind · yesterday", "目标慢 13小时 · 昨天");
+        Difference("2026-12-31T16:00:00Z", "Singapore Standard Time", "Eastern Standard Time", "To: 13h behind · yesterday", "目标慢 13小时 · 昨天");
+        Difference("2026-01-01T10:00:00Z", "Dateline Standard Time", "Line Islands Standard Time", "To: 26h ahead · 2 days later", "目标快 26小时 · 晚 2 天");
+        Difference("2026-01-01T10:00:00Z", "Line Islands Standard Time", "Dateline Standard Time", "To: 26h behind · 2 days earlier", "目标慢 26小时 · 早 2 天");
+
+        // Recalculate offsets on either side of both US DST transitions; do not cache base offsets.
+        Difference("2026-03-08T07:59:00Z", "Singapore Standard Time", "Central Standard Time", "To: 14h behind · same day", "目标慢 14小时 · 同一天");
+        Difference("2026-03-08T08:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
+        Difference("2026-11-01T06:59:00Z", "Singapore Standard Time", "Central Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
+        Difference("2026-11-01T07:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 14h behind · same day", "目标慢 14小时 · 同一天");
+    }
+
     private static T NamedControl<T>(Control owner, string name) where T : Control {
         var controls = owner.Controls.Find(name, true);
         if (controls.Length != 1 || !(controls[0] is T)) throw new Exception("Missing or ambiguous control: " + name);
@@ -327,7 +355,7 @@ internal static class ClockTests {
             using (var clock = new ClockForm(true, null)) {
                 clock.RenderPreview(previewPath);
                 using (var image = new Bitmap(previewPath)) {
-                    Assert(image.Width == 168 && image.Height == 156, "Default preview is not the compact vertically stacked 168 x 156 whalegirl clock");
+                    Assert(image.Width == 168 && image.Height == 176, "Default preview is not the compact vertically stacked 168 x 176 whalegirl clock with difference footer");
                 }
                 var prefs = (Preferences)typeof(ClockForm).GetField("prefs", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(clock);
                 string sourceId = prefs.SourceTimeZoneId, targetId = prefs.TargetTimeZoneId;
@@ -335,16 +363,24 @@ internal static class ClockTests {
                 MenuItem(language.DropDownItems, "English").PerformClick();
                 Assert(prefs.English, "Clock language menu did not select English");
                 Assert(MenuItem(clock.ContextMenuStrip.Items, "Show seconds") != null && MenuItem(clock.ContextMenuStrip.Items, "Choose original and target regions…") != null, "Clock menu did not switch to English");
+                Assert(MenuItem(clock.ContextMenuStrip.Items, "Check for updates…") != null, "English check-update action is missing");
                 Assert(clock.Text.IndexOf("Two-Zone Clock", StringComparison.Ordinal) >= 0, "Clock window title did not switch to English");
                 Assert(prefs.SourceTimeZoneId == sourceId && prefs.TargetTimeZoneId == targetId, "Clock language menu changed the chosen time zones");
                 clock.RenderPreview(previewPath);
                 using (var image = new Bitmap(previewPath)) {
-                    Assert(image.Width == 168 && image.Height == 156, "English preview changed the compact clock dimensions");
+                    Assert(image.Width == 168 && image.Height == 176, "English preview changed the compact clock dimensions");
                 }
                 language = MenuItem(clock.ContextMenuStrip.Items, "中文 / English");
                 MenuItem(language.DropDownItems, "中文").PerformClick();
                 Assert(!prefs.English && MenuItem(clock.ContextMenuStrip.Items, "显示秒数") != null, "Clock language menu did not restore Chinese");
+                Assert(MenuItem(clock.ContextMenuStrip.Items, "检查更新…") != null, "Chinese check-update action is missing");
                 Assert(prefs.SourceTimeZoneId == sourceId && prefs.TargetTimeZoneId == targetId, "Returning to Chinese changed the chosen time zones");
+                MenuItem(clock.ContextMenuStrip.Items, "同时显示原本地区").PerformClick();
+                Assert(!prefs.ShowSource, "Single-clock menu did not hide the source");
+                clock.RenderPreview(previewPath);
+                using (var image = new Bitmap(previewPath)) {
+                    Assert(image.Width == 168 && image.Height == 104, "Single-clock mode retained the comparison footer or grew in size");
+                }
             }
         } finally {
             if (File.Exists(previewPath)) File.Delete(previewPath);
@@ -353,6 +389,11 @@ internal static class ClockTests {
 
     [STAThread]
     public static void Main() {
+        try { RunAll(); }
+        catch (Exception error) { Console.Error.WriteLine("Clock fixture failed after " + checks + " checks: " + error.Message); Environment.ExitCode = 1; }
+    }
+
+    private static void RunAll() {
         Check("2026-03-08T06:59:00Z", "Eastern Standard Time", "2026-03-08 01:59 -05:00", "EST");
         Check("2026-03-08T07:00:00Z", "Eastern Standard Time", "2026-03-08 03:00 -04:00", "EDT");
         Check("2026-11-01T05:59:00Z", "Eastern Standard Time", "2026-11-01 01:59 -04:00", "EDT");
@@ -365,12 +406,13 @@ internal static class ClockTests {
         Check("2026-12-31T16:00:00Z", "Singapore Standard Time", "2027-01-01 00:00 +08:00", "SGT");
         Check("2026-01-01T18:30:00Z", "India Standard Time", "2026-01-02 00:00 +05:30", null);
         CheckLocalAndFormatting();
+        CheckTimeDifferences();
         CheckPreferences();
         CheckRegionSettings();
         CheckBilingualCatalog();
         CheckSearchAndLanguageControls();
         CheckNativeComboTyping();
         CheckCompactClockAndLanguageMenu();
-        Console.WriteLine(checks + " checks passed: selectable regions, DST, date rollover, local time, formatting, saved preferences, search, language, and settings controls.");
+        Console.WriteLine(checks + " checks passed: selectable regions, DST, date rollover, time differences, local time, formatting, saved preferences, search, language, and settings controls.");
     }
 }

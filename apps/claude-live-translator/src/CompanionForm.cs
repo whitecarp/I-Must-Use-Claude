@@ -39,7 +39,10 @@ namespace ClaudeCompanion {
         private Button offlineRetry;
         private string seen="", done="";
         private int epoch, selectionEpoch;
-        private bool active, translating, closing;
+        private bool active, translating, closing,viewingHistory;
+        private readonly TranslationHistory history=new TranslationHistory();
+        private Button previousResult,nextResult;
+        private Label historyPosition;
         private readonly bool preview;
         private string T(string zh,string en) { return Ui.T(zh,en); }
 
@@ -53,7 +56,7 @@ namespace ClaudeCompanion {
             Font=new Font("Microsoft YaHei UI",10F); BackColor=Theme.Cream; ForeColor=Theme.Ink;
             AutoScaleMode=AutoScaleMode.Dpi; TopMost=Preferences.Pin;
             var layout=new TableLayoutPanel { Dock=DockStyle.Fill,ColumnCount=1,RowCount=8,Padding=new Padding(20,12,20,12) };
-            foreach(float height in new float[]{78,134,46,82})layout.RowStyles.Add(new RowStyle(SizeType.Absolute,height));
+            foreach(float height in new float[]{78,134,46,118})layout.RowStyles.Add(new RowStyle(SizeType.Absolute,height));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute,26));
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute,100));
@@ -87,8 +90,8 @@ namespace ClaudeCompanion {
             checkConnection=Button("检测连接","Test Google",false,110);checkConnection.Click+=async delegate{await CheckGoogleConnection();};
             var compose=Button("中文提问","Write in Chinese",false,130);compose.Click+=async delegate{await OpenCompose();};
             actions.Controls.AddRange(new Control[]{toggle,paste,copy,checkConnection,compose});layout.Controls.Add(actions,0,2);
-            var optionRows=new TableLayoutPanel{Dock=DockStyle.Fill,RowCount=2,ColumnCount=1,Margin=new Padding(0)};
-            optionRows.RowStyles.Add(new RowStyle(SizeType.Absolute,38));optionRows.RowStyles.Add(new RowStyle(SizeType.Percent,100));
+            var optionRows=new TableLayoutPanel{Dock=DockStyle.Fill,RowCount=3,ColumnCount=1,Margin=new Padding(0)};
+            optionRows.RowStyles.Add(new RowStyle(SizeType.Absolute,38));optionRows.RowStyles.Add(new RowStyle(SizeType.Absolute,38));optionRows.RowStyles.Add(new RowStyle(SizeType.Percent,100));
             var modeRow=new FlowLayoutPanel{Dock=DockStyle.Fill,Margin=new Padding(0),WrapContents=false};
             var modeLabel=Label("翻译方式","Translate with");modeLabel.Margin=new Padding(0,7,8,0);
             engine=new ComboBox{DropDownStyle=ComboBoxStyle.DropDownList,Width=205,Margin=new Padding(0,3,10,0),BackColor=Color.White,FlatStyle=FlatStyle.Flat};
@@ -103,6 +106,13 @@ namespace ClaudeCompanion {
             direction.SelectedIndexChanged+=delegate{if(changingOptions||direction.SelectedItem==null)return;if(Preferences.Offline){var pair=direction.SelectedItem as LanguagePack;if(pair==null)return;Preferences.OfflinePair=pair.Pair;}else Preferences.Target=((LanguageChoice)direction.SelectedItem).Code;if(!preview)Preferences.Save();ChangeDirection();};
             autoLabel=Label("原文自动识别","Auto-detect source");autoLabel.Margin=new Padding(0,7,0,0);autoLabel.Font=new Font(Font.FontFamily,9F);
             options.Controls.AddRange(new Control[]{pin,targetLabel,direction,autoLabel});optionRows.Controls.Add(options,0,1);layout.Controls.Add(optionRows,0,3);
+            var readingTools=new FlowLayoutPanel{Dock=DockStyle.Fill,Margin=new Padding(0),WrapContents=false};
+            previousResult=Button("上一条","Previous",false,92);previousResult.Height=30;previousResult.Click+=delegate{NavigateHistory(-1);};
+            nextResult=Button("下一条","Next",false,74);nextResult.Height=30;nextResult.Click+=delegate{NavigateHistory(1);};
+            historyPosition=new Label{AutoSize=false,Width=110,Height=30,TextAlign=ContentAlignment.MiddleLeft,ForeColor=Theme.Muted,Margin=new Padding(0,3,5,0),Font=new Font(Font.FontFamily,9F)};
+            var glossary=Button("术语词典","Glossary",false,100);glossary.Height=30;glossary.Click+=delegate{EditGlossary();};
+            var updates=Button("检查更新","Check updates",false,132);updates.Height=30;updates.Click+=delegate{WhaleCommon.UpdateChecker.Show(this,"translator","0.9.0",Ui.English);};
+            readingTools.Controls.AddRange(new Control[]{previousResult,nextResult,historyPosition,glossary,updates});optionRows.Controls.Add(readingTools,0,2);
             translated=TextBox(14F,Theme.Ink);layout.Controls.Add(Theme.Card(translated,new Padding(0,4,0,4)),0,4);
             var originalLabel=Label("原文对照","Original selection");originalLabel.Dock=DockStyle.Fill;originalLabel.TextAlign=ContentAlignment.BottomLeft;layout.Controls.Add(originalLabel,0,5);
             original=TextBox(9.5F,Theme.Muted);layout.Controls.Add(Theme.Card(original,new Padding(0,4,0,4)),0,6);
@@ -132,7 +142,8 @@ namespace ClaudeCompanion {
         private void RefreshLanguage(){
             if(closing)return;
             foreach(var update in labels)update();
-            Text=T("大肥鱼翻译 0.8.1","Whale Translator 0.8.1");
+            Text=T("大肥鱼翻译 0.9.0","Whale Translator 0.9.0");
+            RefreshHistoryButtons();
             RefreshEngineLabels();
             chooseSource.AccessibleName=T("选择要翻译的程序窗口","Choose a program window to translate");direction.AccessibleName=T("目标语言","Target language");
             translated.AccessibleName=T("译文","Translation");original.AccessibleName=T("所选原文","Selected text");
@@ -146,6 +157,7 @@ namespace ClaudeCompanion {
                 SetGoogleStatus(T("这段在线翻译未完成，可用离线包重试","This online translation failed. You can retry with an offline pack"),true);
                 SetStatus(T("原文已保留，点「改用离线翻译」继续","Original retained. Click Use offline to continue"),true);
             }
+            if(viewingHistory&&history.Current!=null)ShowHistoryStatus(history.Current);
         }
         private string TranslationWait(){return Preferences.Offline?T("大肥鱼正在本机翻译…","Your whale is translating on this device…"):T("大肥鱼正在请 Google 翻译…","Your whale is asking Google to translate…");}
         private void RefreshEngineLabels(){
@@ -273,9 +285,33 @@ namespace ClaudeCompanion {
         private void Start(){if(closing||pickingSource)return;if(locked!=null&&!locked.IsAlive()){UnlockSource(true);return;}if(locked==null){RefreshLockLabels();SetStatus(T("请先选择翻译窗口","Choose a window first"),false);return;}active=true;watcher.Start();RefreshLockLabels();SetStatus(T("回到所选窗口，划选文字后松开就翻译","Select text in your chosen window; release to translate"),false);}
         private void Pause(){active=false;watcher.Pause();CancelCapture();++epoch;if(pendingOfflineRetry!=null)pendingOfflineEpoch=epoch;if(translating)worker.Dispose();wait.Stop();RefreshLockLabels();SetStatus(T("划选已暂停；仍可粘贴翻译","Selection paused; Paste is still available"),false);}
         private void CancelCapture(){++selectionEpoch;var old=captureCancellation;captureCancellation=null;if(old!=null)old.Cancel();}
+        private void RefreshHistoryButtons(){
+            if(previousResult==null)return;previousResult.Enabled=history.CanPrevious;nextResult.Enabled=history.CanNext;
+            historyPosition.Text=history.Count==0?T("本次记录：0","Session: 0"):(history.Current==null?"—":(history.Position+1).ToString())+" / "+history.Count;
+        }
+        private void NavigateHistory(int delta){
+            if(closing)return;var entry=history.Move(delta);if(entry==null)return;
+            ClearOfflineRetry();CancelCapture();++epoch;worker.Dispose();wait.Stop();needsFreshSelection=true;
+            latest=new Snapshot{Conversation="history",MessageId=epoch.ToString(),Text=entry.Source,Direction=entry.Direction};
+            viewingHistory=true;
+            original.Text=DisplayLines(entry.Source);translated.Text=DisplayLines(entry.Result);done=seen=latest.Key+latest.Text;
+            RefreshHistoryButtons();ShowHistoryStatus(entry);
+        }
+        private void ShowHistoryStatus(TranslationHistory.Entry entry){
+            string code=entry.Direction;int separator=code.LastIndexOf(':');if(separator>=0)code=code.Substring(separator+1);if(code=="en_zh"||code=="zh")code="zh-CN";else if(code=="zh_en")code="en";else if(code=="zt")code="zh-TW";
+            string target=code;foreach(var choice in LanguageChoice.All)if(choice.Code==code){target=choice.Name;break;}
+            SetStatus(T("本次记录 · 译成 ","Session history · To ")+target+" · "+(entry.Offline?T("离线","Offline"):"Google"),false);
+        }
+        private void EditGlossary(){
+            bool resume=active;Pause();
+            try{using(var dialog=new GlossaryForm()){dialog.TopMost=TopMost;if(dialog.ShowDialog(this)==DialogResult.OK){needsFreshSelection=true;SetStatus(T("词典已保存；下次划选或粘贴时生效","Glossary saved; applies to your next selection or paste"),false);}}}
+            catch(InvalidOperationException error){MessageBox.Show(this,error.Message,T("术语词典","Glossary"),MessageBoxButtons.OK,MessageBoxIcon.Information);}
+            finally{if(resume&&!closing&&locked!=null&&locked.IsAlive())Start();}
+        }
         private async void CloseSafely(object sender,FormClosingEventArgs e){
             if(closing)return;
             closing=true;++epoch;++sourceIconEpoch;CancelCapture();watcher.Dispose();lockTimer.Dispose();wait.Dispose();connectionWait.Dispose();worker.Dispose();
+            history.Clear();
             if(sourcePicker!=null&&!sourcePicker.IsDisposed)sourcePicker.Close();
             var icon=sourceIcon.Image;sourceIcon.Image=null;if(icon!=null)icon.Dispose();
             if(connectionWorker!=null)connectionWorker.Dispose();
@@ -289,7 +325,7 @@ namespace ClaudeCompanion {
                 if(!IsDisposed)Close();
             }
         }
-        private void ChangeDirection(){ClearOfflineRetry();CancelCapture();if(latest==null||closing||needsFreshSelection)return;++epoch;if(translating)worker.Dispose();wait.Stop();latest=new Snapshot{Conversation=latest.Conversation,MessageId=epoch.ToString(),Text=latest.Text,Direction=SelectedDirection};translated.Clear();done="";seen=latest.Key+latest.Text;TranslateWhenIdle(epoch);}
+        private void ChangeDirection(){ClearOfflineRetry();CancelCapture();if(latest==null||closing||needsFreshSelection)return;history.LeaveView();RefreshHistoryButtons();++epoch;if(translating)worker.Dispose();wait.Stop();latest=new Snapshot{Conversation=latest.Conversation,MessageId=epoch.ToString(),Text=latest.Text,Direction=SelectedDirection};translated.Clear();done="";seen=latest.Key+latest.Text;TranslateWhenIdle(epoch);}
         private void SetStatus(string value,bool error){if(!closing){status.Text="●  "+value;status.ForeColor=error?Color.FromArgb(190,72,72):Theme.BlueDark;}}
         private void SetGoogleStatus(string value,bool error){if(!closing){googleStatus.Text=(Preferences.Offline?T("离线：","Offline: "):"Google: ")+value;googleStatus.ForeColor=error?Color.FromArgb(190,72,72):Theme.Muted;}}
         private async Task ReadSelection(IntPtr handle){
@@ -329,6 +365,8 @@ namespace ClaudeCompanion {
         private void AcceptText(string text,string source){
             ClearOfflineRetry();
             needsFreshSelection=false;
+            viewingHistory=false;
+            history.LeaveView();RefreshHistoryButtons();
             ++epoch;if(translating)worker.Dispose();wait.Stop();
             latest=new Snapshot{Conversation=source,MessageId=epoch.ToString(),Text=text,Direction=SelectedDirection};
             original.Text=DisplayLines(text);translated.Clear();done="";seen=latest.Key+text;TranslateWhenIdle(epoch);
@@ -344,7 +382,7 @@ namespace ClaudeCompanion {
             if(Preferences.Offline&&!(direction.SelectedItem is LanguagePack)){SetStatus(T("请先点「离线语言包」安装所需方向","Open Offline packs and install the direction you need"),true);return;}
             var request=latest;int requestedEpoch=epoch;bool offlineMode=Preferences.Offline;translating=true;
             wait.Start(TranslationWait(),delegate(string text){SetStatus(text,false);},Preferences.Offline);
-            try{string result=await worker.Translate(request.Text,request.Direction);if(!closing&&ResultGate.CanShow(requestedEpoch,epoch,request,latest)){wait.Stop();translated.Text=DisplayLines(result);done=request.Key+request.Text;if(connectionWorker==null)SetGoogleStatus(T("上次翻译完成 · ","Last translation completed · ")+DateTime.Now.ToString("HH:mm:ss"),false);SetStatus(T("译文已更新 · ","Translation updated · ")+DateTime.Now.ToString("HH:mm:ss"),false);}}
+            try{string result=await worker.Translate(request.Text,request.Direction);if(!closing&&ResultGate.CanShow(requestedEpoch,epoch,request,latest)){wait.Stop();translated.Text=DisplayLines(result);done=request.Key+request.Text;history.Add(request.Text,result,request.Direction,offlineMode);RefreshHistoryButtons();if(connectionWorker==null)SetGoogleStatus(T("上次翻译完成 · ","Last translation completed · ")+DateTime.Now.ToString("HH:mm:ss"),false);SetStatus(T("译文已更新 · ","Translation updated · ")+DateTime.Now.ToString("HH:mm:ss"),false);}}
             catch(Exception ex){worker.Dispose();wait.Stop();if(!closing&&requestedEpoch==epoch){SetStatus(Preferences.Offline?T("离线翻译未完成，可检测离线库后重试","Offline translation failed; test the offline library and retry"):T("翻译未完成，可检测连接后重新划选","Translation failed; test Google and select again"),true);SetGoogleStatus(ex is InvalidOperationException?ex.Message:T("翻译未完成，请重试","Translation failed; try again"),true);RecordOfflineRetry(request,requestedEpoch,offlineMode,ex);}}
             finally{translating=false;wait.Stop();}
         }

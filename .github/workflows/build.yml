@@ -15,13 +15,26 @@ jobs:
         run: ./apps/claude-live-translator/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/translator-build"
       - name: Compile home-time clock
         shell: pwsh
-        run: ./apps/two-zone-clock/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/clock-build"
+        run: ./apps/two-zone-clock/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/clock-build" -RunTests
       - name: Compile environment helper
         shell: pwsh
         run: ./apps/whale-claude-helper/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/helper-build"
       - name: Test environment helper with isolated fixtures
         shell: pwsh
         run: ./apps/whale-claude-helper/tests/run-fixtures.ps1
+      - name: Test glossary and session history without live windows
+        shell: pwsh
+        run: ./apps/claude-live-translator/tests/run-glossary-history.ps1 -OutputDirectory "$env:RUNNER_TEMP/translator-tests" -PythonPath (Get-Command python).Source
+      - name: Test translation workers with fake providers
+        shell: pwsh
+        working-directory: apps/claude-live-translator/tests
+        run: python -m unittest test_google_worker test_offline_worker test_glossary
+      - name: Test update selection and verified downloads offline
+        shell: pwsh
+        run: ./shared/tests/run-fixtures.ps1
+      - name: Test portable launcher allowlist without extracting or launching
+        shell: pwsh
+        run: ./apps/claude-live-translator/packaging/run-launcher-tests.ps1
       - name: Validate Python syntax without running workers
         shell: pwsh
         run: python -m compileall -q apps/claude-live-translator/backend

@@ -9,6 +9,9 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
+[assembly: System.Reflection.AssemblyVersion("0.3.0.0")]
+[assembly: System.Reflection.AssemblyFileVersion("0.3.0.0")]
+
 namespace TwoZoneClock {
     public sealed class Preferences {
         // Keep reading the old setting so upgrades preserve the single-column preference.
@@ -68,6 +71,28 @@ namespace TwoZoneClock {
         }
         public static string OffsetLabel(TimeSpan offset) {
             return "UTC" + (offset < TimeSpan.Zero ? "−" : "+") + offset.Duration().ToString(@"hh\:mm", CultureInfo.InvariantCulture);
+        }
+        public static string DifferenceLabel(DateTimeOffset instant, string sourceZoneId, string targetZoneId, bool english) {
+            var source = TimeZoneInfo.ConvertTime(instant, ResolveZone(sourceZoneId));
+            var target = TimeZoneInfo.ConvertTime(instant, ResolveZone(targetZoneId));
+            // Subtract the offsets, not the DateTimeOffsets: both readings represent the same instant.
+            var difference = target.Offset - source.Offset;
+            int minutes = (int)Math.Abs(difference.TotalMinutes);
+            string duration = minutes / 60 > 0 ? (minutes / 60).ToString(CultureInfo.InvariantCulture) + (english ? "h" : "小时") : "";
+            if (minutes % 60 > 0) duration += (english && duration.Length > 0 ? " " : "") + (minutes % 60).ToString(CultureInfo.InvariantCulture) + (english ? "m" : "分");
+            string relative = minutes == 0 ? (english ? "To: same time" : "目标与原本同一时间")
+                : english ? "To: " + duration + (difference > TimeSpan.Zero ? " ahead" : " behind")
+                : "目标" + (difference > TimeSpan.Zero ? "快 " : "慢 ") + duration;
+            int days = (target.Date - source.Date).Days;
+            string day;
+            switch (days) {
+                case -1: day = english ? "yesterday" : "昨天"; break;
+                case 0: day = english ? "same day" : "同一天"; break;
+                case 1: day = english ? "tomorrow" : "明天"; break;
+                default: day = english ? Math.Abs(days).ToString(CultureInfo.InvariantCulture) + (days < 0 ? " days earlier" : " days later")
+                    : (days < 0 ? "早 " : "晚 ") + Math.Abs(days).ToString(CultureInfo.InvariantCulture) + " 天"; break;
+            }
+            return relative + " · " + day;
         }
         private static string ZoneLabel(TimeZoneInfo zone, DateTimeOffset instant, TimeSpan offset) {
             bool daylight = zone.IsDaylightSavingTime(instant);
@@ -146,10 +171,11 @@ namespace TwoZoneClock {
         private int PanelWidth { get { return prefs.ShowSeconds ? 192 : 168; } }
         private const int HeaderHeight = 44;
         private const int RowHeight = 52;
+        private const int DifferenceHeight = 20;
         private void ResizeClock() {
             int oldRight = Right;
             int oldBottom = Bottom;
-            ClientSize = new Size((int)Math.Round(PanelWidth * scale), (int)Math.Round((HeaderHeight + RowHeight * (prefs.ShowSource ? 2 : 1) + 8) * scale));
+            ClientSize = new Size((int)Math.Round(PanelWidth * scale), (int)Math.Round((HeaderHeight + RowHeight * (prefs.ShowSource ? 2 : 1) + 8 + (prefs.ShowSource ? DifferenceHeight : 0)) * scale));
             using (var p = Rounded(new RectangleF(0, 0, Width - 1, Height - 1), 15 * scale)) { var old = Region; Region = new Region(p); if (old != null) old.Dispose(); }
             if (IsHandleCreated && oldRight > 0) { Left = oldRight - Width; Top = oldBottom - Height; }
             Invalidate();
@@ -178,6 +204,20 @@ namespace TwoZoneClock {
                 DrawRow(g, HeaderHeight+4, T("原本", "From") + " · " + RegionChoice.ShortName(prefs.SourceTimeZoneId, prefs.English), ClockTime.Read(instant, prefs.SourceTimeZoneId, prefs.TwentyFourHours, prefs.ShowSeconds, prefs.English), true);
             }
             DrawRow(g, HeaderHeight+4+(prefs.ShowSource ? RowHeight : 0), T("目标", "To") + " · " + RegionChoice.ShortName(prefs.TargetTimeZoneId, prefs.English), ClockTime.Read(instant, prefs.TargetTimeZoneId, prefs.TwentyFourHours, prefs.ShowSeconds, prefs.English), false);
+            if (prefs.ShowSource) {
+                string difference = ClockTime.DifferenceLabel(instant, prefs.SourceTimeZoneId, prefs.TargetTimeZoneId, prefs.English);
+                using (var hintFont = new Font("Microsoft YaHei UI", 9f, FontStyle.Regular, GraphicsUnit.Pixel))
+                using (var hintBrush = new SolidBrush(Muted))
+                using (var fmt = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center, FormatFlags = StringFormatFlags.NoWrap }) {
+                    // Keep even extreme date-line pairs readable without widening the compact clock.
+                    float available = PanelWidth - 12;
+                    float measured = g.MeasureString(difference, hintFont).Width;
+                    if (measured > available) {
+                        using (var fitted = new Font(hintFont.FontFamily, hintFont.Size * available / measured, GraphicsUnit.Pixel))
+                            g.DrawString(difference, fitted, hintBrush, new RectangleF(6, HeaderHeight + RowHeight * 2 + 5, available, DifferenceHeight), fmt);
+                    } else g.DrawString(difference, hintFont, hintBrush, new RectangleF(6, HeaderHeight + RowHeight * 2 + 5, available, DifferenceHeight), fmt);
+                }
+            }
         }
         private void DrawRow(Graphics g, int y, string title, ClockReading time, bool source) {
             WhaleTheme.DrawCard(g, new RectangleF(5, y, PanelWidth-11, RowHeight-2), source ? WhaleTheme.Day : WhaleTheme.Night, 9);
@@ -212,13 +252,15 @@ namespace TwoZoneClock {
             var show = new ToolStripMenuItem(T("显示时钟", "Show clock")); show.Click += delegate { Reveal(); };
             var hide = new ToolStripMenuItem(T("暂时隐藏", "Hide clock")); hide.Click += delegate { Hide(); };
             var exit = new ToolStripMenuItem(T("退出", "Exit")); exit.Click += delegate { Close(); };
+            var update = new ToolStripMenuItem(T("检查更新…", "Check for updates…"));
+            update.Click += delegate { WhaleCommon.UpdateChecker.Show(this, "clock", "0.3.0", prefs.English); };
             var language = new ToolStripMenuItem("中文 / English");
             var chinese = new ToolStripMenuItem("中文") { Checked = !prefs.English };
             var english = new ToolStripMenuItem("English") { Checked = prefs.English };
             chinese.Click += delegate { SetLanguage(false); };
             english.Click += delegate { SetLanguage(true); };
             language.DropDownItems.AddRange(new ToolStripItem[] { chinese, english });
-            result.Items.AddRange(new ToolStripItem[] { regions, swap, language, new ToolStripSeparator(), show, hide, sourceItem, formatItem, secondsItem, topItem, lockItem, new ToolStripSeparator(), reset, exit });
+            result.Items.AddRange(new ToolStripItem[] { regions, swap, language, new ToolStripSeparator(), show, hide, sourceItem, formatItem, secondsItem, topItem, lockItem, new ToolStripSeparator(), reset, update, exit });
             return result;
         }
         internal void ConfigureRegions() {

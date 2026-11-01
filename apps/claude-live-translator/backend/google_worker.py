@@ -8,6 +8,9 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from glossary import validated_entries, replacement_spans
 
 ENDPOINT = "https://translate.googleapis.com/translate_a/single"
 MAX_TEXT, MAX_CHUNK = 32000, 2600
@@ -192,28 +195,28 @@ class GoogleTranslator:
 
     def fragments(self, block: str, spans, direction: str, deadline: float) -> str:
         output, cursor = [], 0
-        for start, end in spans:
+        for start, end, replacement in spans:
             output.append(self.prose(block[cursor:start], direction, deadline))
-            output.append(block[start:end])
+            output.append(replacement)
             cursor = end
         output.append(self.prose(block[cursor:], direction, deadline))
         return "".join(output)
 
-    def paragraph(self, block: str, direction: str, deadline: float) -> str:
-        spans = protected_spans(block)
+    def paragraph(self, block: str, direction: str, deadline: float, glossary=()) -> str:
+        spans = replacement_spans(block, glossary, language_pair(direction)[1], protected_spans(block))
         if not spans:
             return self.prose(block, direction, deadline)
         if len(spans) <= MAX_TOKENS and TOKEN_PATTERN.search(block) is None:
             masked, values, cursor = [], [], 0
-            for index, (start, end) in enumerate(spans):
+            for index, (start, end, replacement) in enumerate(spans):
                 masked.append(block[cursor:start])
                 masked.append(TOKEN_PREFIX + str(index))
-                values.append(block[start:end])
+                values.append(replacement)
                 cursor = end
             masked.append(block[cursor:])
             masked_text = "".join(masked)
             if not needs_translation(TOKEN_PATTERN.sub(" ", masked_text), direction):
-                return block
+                return self.fragments(block, spans, direction, deadline)
             # Transport errors propagate: a failed request is never retried as fragments.
             restored = restore_tokens(self.prose(masked_text, direction, deadline), values)
             if restored is not None:
@@ -221,8 +224,12 @@ class GoogleTranslator:
             self.fallbacks += 1
         return self.fragments(block, spans, direction, deadline)
 
-    def translate(self, text: str, direction: str) -> str:
+    def translate(self, text: str, direction: str, glossary=None) -> str:
         language_pair(direction)
+        try:
+            entries = validated_entries(glossary)
+        except ValueError:
+            raise TranslationError("invalid_glossary") from None
         if len(text) > MAX_TEXT:
             raise TranslationError("text_too_long")
         deadline = time.monotonic() + 120
@@ -233,7 +240,7 @@ class GoogleTranslator:
                 return
             block = "".join(pending)
             pending.clear()
-            output.append(self.paragraph(block, direction, deadline))
+            output.append(self.paragraph(block, direction, deadline, entries))
         for line in text.splitlines(keepends=True):
             fm = re.match(r"(`{3,}|~{3,})", line.lstrip())
             if fence:
@@ -274,7 +281,7 @@ def main():
             text = request.get("text")
             if not isinstance(text, str) or request_id is None:
                 raise TranslationError("invalid_request")
-            result = engine.translate(text, request.get("direction", "en_zh"))
+            result = engine.translate(text, request.get("direction", "en_zh"), request.get("glossary"))
             response = {"id": request_id, "translation": result, "provider": "google-web"}
         except TranslationError as exc:
             response = {"id": request_id, "error": str(exc)}

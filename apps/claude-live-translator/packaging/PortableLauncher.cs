@@ -113,7 +113,7 @@ namespace DafeiyuPortable {
                     throw new InvalidDataException("Invalid payload file entry.");
                 total=checked(total+file.Length);
             }
-            if(total!=manifest.TotalBytes||total>2L*1024*1024*1024||!paths.Contains("ClaudeChinese.exe")||!paths.Contains("runtime/python/python.exe")||!paths.Contains("backend/offline_worker.py")||!paths.Contains("backend/package_manager.py")||!paths.Contains("backend/package_store.py")||!paths.Contains("backend/argos_catalog.json"))
+            if(total!=manifest.TotalBytes||total>2L*1024*1024*1024||!paths.Contains("ClaudeChinese.exe")||!paths.Contains("runtime/python/python.exe")||!paths.Contains("backend/offline_worker.py")||!paths.Contains("backend/glossary.py")||!paths.Contains("backend/package_manager.py")||!paths.Contains("backend/package_store.py")||!paths.Contains("backend/argos_catalog.json"))
                 throw new InvalidDataException("Payload is incomplete or too large.");
         }
         internal static bool IsSafeRelativePath(string path) {
@@ -129,7 +129,7 @@ namespace DafeiyuPortable {
         private static bool IsAllowedPayloadPath(string path) {
             if(path.EndsWith(".argosmodel",StringComparison.OrdinalIgnoreCase)||path.EndsWith("/model.bin",StringComparison.OrdinalIgnoreCase)||path.EndsWith("/sentencepiece.model",StringComparison.OrdinalIgnoreCase))return false;
             return path=="ClaudeChinese.exe"||path=="ClaudeReader.exe"||path=="SelectionReader.exe"||path=="ClaudeSender.exe"||
-                path=="backend/google_worker.py"||path=="backend/offline_worker.py"||path=="backend/launcher.json"||path=="backend/MODEL-NOTICES.md"||
+                path=="backend/google_worker.py"||path=="backend/offline_worker.py"||path=="backend/glossary.py"||path=="backend/launcher.json"||path=="backend/MODEL-NOTICES.md"||
                 path=="backend/package_manager.py"||path=="backend/package_store.py"||path=="backend/argos_catalog.json"||
                 path.StartsWith("runtime/python/",StringComparison.Ordinal)||path.StartsWith("runtime/venv/Lib/site-packages/",StringComparison.Ordinal)||
                 path.StartsWith("licenses/",StringComparison.Ordinal);

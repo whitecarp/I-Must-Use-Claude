@@ -149,7 +149,7 @@ namespace ClaudeCompanion {
         }
         internal static void Save(Dictionary<string,object> data,int attempt) {
             try {
-                var safe=SafeFields(data);safe["attempt"]=attempt;safe["version"]="0.8.1";
+                var safe=SafeFields(data);safe["attempt"]=attempt;safe["version"]="0.9.0";
                 string folder=Path.Combine(Preferences.DataDirectory,"diagnostics");
                 Directory.CreateDirectory(folder);
                 // One bounded diagnostic record only: never selected text, title, URL, or credentials.
@@ -230,7 +230,7 @@ namespace ClaudeCompanion {
             }
             int id = ++sequence;
             // Explicit UTF-8 bytes; Windows console encodings must not corrupt Chinese input.
-            byte[] bytes = new UTF8Encoding(false).GetBytes(Json.Encode(new { id = id, text = text, direction = direction }) + "\n");
+            byte[] bytes = new UTF8Encoding(false).GetBytes(Json.Encode(new { id = id, text = text, direction = direction, glossary=GlossaryStore.Load() }) + "\n");
             await process.StandardInput.BaseStream.WriteAsync(bytes, 0, bytes.Length);
             await process.StandardInput.BaseStream.FlushAsync();
             // Allow the worker's 120-second deadline plus one in-flight 15-second request.
@@ -262,6 +262,7 @@ namespace ClaudeCompanion {
                 case "text_too_long": return Ui.T("内容超过 32,000 字符，请分段翻译。","Text exceeds 32,000 characters. Translate smaller sections.");
                 case "deadline": return Ui.T("Google 翻译用时过长，请分段重试。","Google took too long. Try a smaller selection.");
                 case "invalid_direction": return Ui.T("请选择支持的目标语言。","Choose a supported target language.");
+                case "invalid_glossary": return Ui.T("术语词典格式有误，请检查术语条目。","The glossary format is invalid. Check its entries.");
                 default: return Ui.T("Google 翻译暂不可用，请稍后重试。","Google Translate is unavailable. Try again later.");
             }
         }
@@ -284,7 +285,7 @@ namespace ClaudeCompanion {
             Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false); Preferences.Load();
             if(args.Length==2&&(args[0]=="--self-test-offline"||args[0]=="--self-test-online")) { TranslationSelfTest(args[1],args[0]=="--self-test-offline");return; }
             if(args.Length==2&&args[0]=="--self-test-packs"){
-                var report=new Dictionary<string,object>();report["version"]="0.8.1";
+                var report=new Dictionary<string,object>();report["version"]="0.9.0";
                 try{var result=PackService.Run("--list",null,null,CancellationToken.None).GetAwaiter().GetResult();report["ok"]=Json.Bool(result,"ok");report["catalogCount"]=LanguagePack.ReadList(result,"catalog").Count;report["installedCount"]=LanguagePack.ReadList(result,"installed").Count;report["uiInstalledCount"]=LanguagePack.InstalledPacks().Count;}
                 catch(Exception ex){report["ok"]=false;report["error"]=ex.Message;}
                 File.WriteAllText(args[1],Json.Encode(report),new UTF8Encoding(false));return;
@@ -312,7 +313,7 @@ namespace ClaudeCompanion {
             }
         }
         private static void TranslationSelfTest(string path,bool offline){
-            var report=new Dictionary<string,object>();report["version"]="0.8.1";report["offline"]=offline;
+            var report=new Dictionary<string,object>();report["version"]="0.9.0";report["offline"]=offline;
             try {
                 using(var worker=new Worker()){
                     string chinese=worker.Translate("Please keep the original file.","auto:zh-CN",offline).GetAwaiter().GetResult();

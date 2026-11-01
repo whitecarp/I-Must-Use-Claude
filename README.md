@@ -15,7 +15,7 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.2.0-preview"><strong>↓ Download the apps</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.3.0-preview"><strong>↓ Download the apps</strong></a>
   &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
 </p>
@@ -28,7 +28,7 @@
 | :--- | :--- | :--- |
 | **Whale Translator** | **Two-Zone Clock** | **Whale Environment Helper** |
 | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. | Measure browser signals, handle matched local settings, and measure again. |
-| [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/HomeTimeClock.exe) | [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleEnvironmentHelper.exe) |
+| [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) | [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe) |
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
@@ -36,9 +36,23 @@
 <summary><strong>Requirements, versions and language settings</strong></summary>
 
 - Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
-- This preview contains Translator **0.8.1**, the current Two-Zone Clock build, and Environment Helper **0.4.0**.
+- This preview contains Translator **0.9.0**, Two-Zone Clock **0.3.0**, and Environment Helper **0.5.0**.
 - We distribute three Windows EXE files. GitHub's automatic source archives are for development, not the ready-to-run apps.
 - This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
+
+</details>
+
+### Keep the apps up to date
+
+Each app has a manual update check. It shows the available version from this repository's public GitHub releases, including previews, and lets you save the matching EXE to a location you choose.
+
+<details>
+<summary><strong>How update downloads work</strong></summary>
+
+- Checks and downloads run only when you request them; there is no background update check.
+- The download must match the SHA-256 digest supplied by GitHub for that release asset. A missing digest or a mismatch stops the download from being accepted as verified.
+- The app does not replace itself or run the new EXE. Your existing app and settings stay in place; you decide when to switch.
+- Update checking requires an internet connection. Translation offline mode and clock time display still work without it.
 
 </details>
 
@@ -57,12 +71,19 @@ Understand Claude's replies without changing the way you work. Choose the Claude
 2. Choose your target language. In Claude, hold the left mouse button, select text, and release.
 3. Read or copy the translation. Use **Write in Chinese** when you want to write in Chinese and review an English version before sending.
 
-**Automatic source-language detection · 17 online target languages · Optional offline packs · Always-on-top**
+**Automatic language detection · Optional offline packs · Personal glossary · Session history**
+
+Open **Glossary** to save preferred terms for names and phrases. Use **Previous / Next** to revisit translations from the current session when a new selection replaces the result you were reading.
+
+<p align="center"><img src="docs/images/translator-glossary-en.png" alt="Glossary editor with example terms Claude, Codex and Skills" width="600"></p>
+<p align="center"><sub>Rendered offscreen using sample entries; no personal dictionary or conversation was read.</sub></p>
 
 <details>
-<summary><strong>Offline use, sending prompts and selection behavior</strong></summary>
+<summary><strong>Glossary, recent translations and offline use</strong></summary>
 
-- Google online mode detects the source language. Only selections in the chosen window are translated; selections elsewhere are ignored.
+- Google online mode detects the source language and supports 17 target languages. Only selections in the chosen window are translated; selections elsewhere are ignored.
+- Glossary entries can apply to one target language or all languages, online and offline. Matching is case-sensitive; longer phrases take priority. Links and code keep their original text.
+- Recent translations hold up to 20 successful results within a bounded memory budget. Closing the app clears them; glossary entries remain saved locally.
 - You can pause selection translation, paste text manually, copy a translation, or pin the window on top.
 - The Chinese prompt window lets you review English before explicitly sending. If direct sending is unsupported, copy and paste instead. Translation does not automatically send a message to Claude.
 - Download offline language packs while online. Each pack covers one direction, such as English → Chinese; the reverse direction is separate.
@@ -88,7 +109,7 @@ Existing demonstration screenshots with sample text.
 <details>
 <summary><strong>Translation privacy and availability</strong></summary>
 
-Online mode sends selected text to Google Translate's key-free web endpoint. This is not Gemini or the paid Google Cloud Translation API; the endpoint can change, fail or rate-limit requests. Offline translation stays on your device. Language packages download only when you request them. This app does not save original text or translations as a history.
+Online mode sends selected text to Google Translate's key-free web endpoint. This is not Gemini or the paid Google Cloud Translation API; the endpoint can change, fail or rate-limit requests. Offline translation stays on your device. Language packages download only when you request them. Translation history stays in memory for the current session and is cleared when the app closes; it is not written to a history file. Your saved glossary is separate from translation history.
 
 Offline quality depends on the package. Download the required directions and check them on the intended computer before travelling. Moving the EXE to a new computer does not copy installed models.
 
@@ -109,20 +130,22 @@ Your computer may use another timezone. Your daily life does not have to. Keep y
 2. Search directly in each selector. Choose a fixed **home region** and your **target region**, then save.
 3. Place the clock where you like. Your home time remains visible even if the computer timezone changes.
 
-**Searchable regions · Compact vertical layout · Daylight saving support · Works offline**
+**Searchable regions · Compact vertical layout · Time difference and day hints · Offline clock**
+
+With both regions visible, see how far your target region is ahead or behind home, plus the relative day: yesterday, the same day, tomorrow, or a larger day difference. Daylight saving changes are included.
 
 <details>
 <summary><strong>Existing app preview and display options</strong></summary>
 
-<p align="center"><img src="docs/images/clock-ui.png" alt="Previously captured compact clock interface with example times" width="210"></p>
+<p align="center"><img src="docs/images/clock-offset-en.png" alt="Compact clock showing home and target times with a 13-hour difference" width="210"></p>
 
-Existing app screenshot with example times.
+Offscreen preview from the compiled clock, with synthetic times and regions.
 
 - Search with English or Chinese names. Each region shows its time and date.
 - Choose 12/24-hour time, seconds, one or two clocks, always-on-top, and a locked position.
 - Drag the panel or return it to the lower-right corner. Settings persist between launches.
 - Daylight saving changes follow Windows timezone rules; accuracy depends on the Windows clock and those rules.
-- The app does **not** modify system time or timezone and makes no network requests or account checks.
+- The app does **not** modify system time or timezone or check an account. Time display works offline; only a manually requested update check or download contacts GitHub.
 - Choose a fixed home region rather than **Follow computer timezone** to keep home time independent of system changes.
 
 </details>

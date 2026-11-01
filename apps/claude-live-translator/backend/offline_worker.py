@@ -15,6 +15,7 @@ from pathlib import Path
 # The embeddable runtime's isolated ._pth does not add the script directory.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from package_store import installed_for_pair, installed_packages, valid_code
+from glossary import validated_entries, replacement_spans
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_TEXT = 32000
@@ -212,19 +213,23 @@ class OfflineTranslator:
         output.append(self.prose(text[cursor:], direction, deadline))
         return "".join(output)
 
-    def line(self, text, direction, deadline):
+    def line(self, text, direction, deadline, glossary=()):
         # Protected contents never enter the model. Fragment translation is deliberate:
         # these local models are not reliable enough with placeholder tokens.
         output, cursor = [], 0
-        for start, end in protected_spans(text):
+        for start, end, replacement in replacement_spans(text, glossary, direction_pair(direction)[1], protected_spans(text)):
             output.append(self.mixed_prose(text[cursor:start], direction, deadline))
-            output.append(text[start:end])
+            output.append(replacement)
             cursor = end
         output.append(self.mixed_prose(text[cursor:], direction, deadline))
         return "".join(output)
 
-    def translate(self, text, direction):
+    def translate(self, text, direction, glossary=None):
         direction = normalize_direction(direction)
+        try:
+            entries = validated_entries(glossary)
+        except ValueError:
+            raise TranslationError("invalid_glossary") from None
         if not isinstance(text, str):
             raise TranslationError("invalid_request")
         if len(text) > MAX_TEXT:
@@ -246,7 +251,7 @@ class OfflineTranslator:
             else:
                 ending = LINE_END.search(line)
                 body, suffix = (line[:ending.start()], ending.group(0)) if ending else (line, "")
-                output.append(self.line(body, direction, deadline) + suffix)
+                output.append(self.line(body, direction, deadline, entries) + suffix)
         return "".join(output)
 
 
@@ -272,7 +277,7 @@ def main():
             request_id = request.get("id")
             if request_id is None or not isinstance(request.get("text"), str):
                 raise TranslationError("invalid_request")
-            result = engine.translate(request["text"], request.get("direction", "en_zh"))
+            result = engine.translate(request["text"], request.get("direction", "en_zh"), request.get("glossary"))
             response = {"id": request_id, "translation": result, "provider": "argos-cpu", "offline": True}
         except TranslationError as error:
             response = {"id": request_id, "error": str(error), "offline": True}

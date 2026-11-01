@@ -56,7 +56,8 @@ internal static class MaintenanceUiFixtureTests {
             using(var main=new OptimizerForm(true)){
                 Check(All(main).OfType<LinkLabel>().Any(x=>x.Text==(english?"Maintenance & cleanup":"维护与清理")),"main screen exposes maintenance");
                 Check(Field(main,"service")==null&&!main.Visible,"main demo stays isolated");
-                Check(main.Text.Contains("0.4.0"),"new version visible");
+                Check(main.Text.Contains("0.5.0"),"new version visible");
+                Check(All(main).OfType<LinkLabel>().Any(x=>x.Text==(english?"Check updates":"检查更新")),"manual update entry is localized");
             }
         }
         Console.WriteLine("PASS "+checks+" isolated UI checks. No windows shown; no live probes or mutations.");

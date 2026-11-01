@@ -6,7 +6,7 @@ $wpfPath = (Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\WPF')
 Push-Location -LiteralPath $projectPath
 try {
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-    & $compilerPath /nologo /target:winexe "/out:$OutputDirectory\ClaudeChinese.exe" /win32icon:icon.ico /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Web.Extensions.dll "/r:$wpfPath\UIAutomationClient.dll" "/r:$wpfPath\UIAutomationTypes.dll" "/r:$wpfPath\WindowsBase.dll" src\Program.cs src\CompanionForm.cs src\Ui.cs src\SourceWindow.cs src\SourceWindowPickerForm.cs src\SelectionClipboard.cs src\ComposeForm.cs src\WhaleBadge.cs src\Theme.cs src\SourceHighlighter.cs src\SelectionWatcher.cs src\LanguagePacks.cs
+    & $compilerPath /nologo /target:winexe "/out:$OutputDirectory\ClaudeChinese.exe" /win32icon:icon.ico /r:System.Core.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Web.Extensions.dll "/r:$wpfPath\UIAutomationClient.dll" "/r:$wpfPath\UIAutomationTypes.dll" "/r:$wpfPath\WindowsBase.dll" src\Program.cs src\CompanionForm.cs src\Ui.cs src\SourceWindow.cs src\SourceWindowPickerForm.cs src\SelectionClipboard.cs src\ComposeForm.cs src\WhaleBadge.cs src\Theme.cs src\SourceHighlighter.cs src\SelectionWatcher.cs src\LanguagePacks.cs src\Glossary.cs src\TranslationHistory.cs ..\..\shared\UpdateChecker.cs
     if ($LASTEXITCODE -ne 0) { throw 'App compilation failed' }
     & $compilerPath /nologo /target:exe "/out:$OutputDirectory\ClaudeReader.exe" "/r:$wpfPath\UIAutomationClient.dll" "/r:$wpfPath\UIAutomationTypes.dll" "/r:$wpfPath\WindowsBase.dll" src\ClaudeReader.cs
     if ($LASTEXITCODE -ne 0) { throw 'Reader compilation failed' }

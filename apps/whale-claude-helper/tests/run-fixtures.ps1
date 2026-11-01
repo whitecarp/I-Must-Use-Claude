@@ -30,7 +30,7 @@ if(-not(Test-Path -LiteralPath $vb)) { throw 'Microsoft.VisualBasic reference as
 $uiSources=@('src\AssemblyInfo.cs','src\Program.cs','src\OptimizerForm.cs','src\MaintenanceForm.cs','src\ScoreMeasurement.cs',
     'src\OptimizerService.cs','src\BrowserLocaleService.cs','src\ResultText.cs','src\RepairEngine.cs',
     'src\ReportExporter.cs','src\CacheService.cs','src\DiagnosticsService.cs','src\SystemTools.cs',
-    'src\FontService.cs','src\Theme.cs','src\WhaleBadge.cs','tests\MaintenanceUiFixtureTests.cs')
+    'src\FontService.cs','src\Theme.cs','src\WhaleBadge.cs','tests\MaintenanceUiFixtureTests.cs','..\..\shared\UpdateChecker.cs')
 $suites=@(
     @{Name='CacheServiceTests';EntryPoint='CacheServiceTests';Sources=@('src\CacheService.cs','tests\CacheServiceTests.cs')},
     @{Name='RepairEngineTests';EntryPoint='RepairEngineTests';Sources=@('src\RepairEngine.cs','src\ReportExporter.cs','tests\RepairEngineTests.cs')},

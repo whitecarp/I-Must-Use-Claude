@@ -23,6 +23,8 @@ Run its build.ps1 without OutputDirectory to place components at its project roo
 ./apps/claude-live-translator/packaging/build-portable.ps1
 ```
 
+For separate runtime and component build folders, pass `-RuntimeRoot` (a directory containing `runtime/`), `-ApplicationExe` (the compiled UI EXE, next to its three helper EXEs), and optionally `-BuildRoot` for a short temporary output path. The payload is allowlisted and includes `backend/glossary.py`; personal preferences, glossary files and translation history are never packaged.
+
 Runtime binaries and models are not committed to Git. For normal use, download the prepared EXE from Releases; optional language packs are installed inside the translator.
 
 ## Isolated helper tests
@@ -33,7 +35,17 @@ Runtime binaries and models are not committed to Git. For normal use, download t
 
 This explicit runner tests synthetic cache/configuration data, injected network results and offscreen demo controls. It never starts the live helper entry point, reads real Claude configuration, sends diagnostic network requests, or shows application windows. Synthetic files and test receipts are retained for inspection; file moves use an injected fixture recycler, not the real Recycle Bin. Outputs stay under the helper's ignored `artifacts` folder.
 
-CI compiles the apps, runs these isolated fixtures and checks Python syntax. It does not open Claude, test live translation, or apply environment settings. Independent Windows VM acceptance of the helper's modification/undo workflow remains pending. Compilation and fixtures are not end-to-end validation.
+CI also runs the clock's `-RunTests`, translator `tests/run-glossary-history.ps1`, mocked Google/offline/glossary Python tests, and `shared/tests/run-fixtures.ps1` for update selection and verified file saving. None opens Claude, translates real conversations, or applies environment settings. Independent Windows VM acceptance of the helper's modification/undo workflow remains pending. Compilation and fixtures are not end-to-end validation.
+
+## Publishing an update
+
+Attach only `WhaleTranslator.exe`, `HomeTimeClock.exe` and `WhaleEnvironmentHelper.exe`. Include a single-line machine-readable comment in the GitHub release body, updating each app version when its binary changes:
+
+```html
+<!-- whale-app-versions: {"translator":"0.9.0","clock":"0.3.0","helper":"0.5.0"} -->
+```
+
+The updater reads public published releases, including previews, validates the asset's repository URL, size and GitHub SHA-256 digest, and never overwrites or launches a download. Missing digests or version metadata are not accepted. Preview builds pass `currentPreview=true` to `UpdateChecker.Show` (the default); stable builds must pass `false`. A stable release with the same app version can replace a preview. Keep the artifact versions, this metadata and each app's current version in sync.
 
 ## 中文
 

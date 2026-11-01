@@ -15,7 +15,7 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.2.0-preview"><strong>↓ 下载软件</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.3.0-preview"><strong>↓ 下载软件</strong></a>
   &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识三个工具</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
 </p>
@@ -28,7 +28,7 @@
 | :--- | :--- | :--- |
 | **大肥鱼翻译** | **两地时钟** | **大肥鱼环境助手** |
 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 即使电脑用了其他时区，也能看到原本地区的时间。 | 先测浏览器环境，再处理命中的本地设置，最后复测。 |
-| [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/HomeTimeClock.exe) | [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.2.0-preview/WhaleEnvironmentHelper.exe) |
+| [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) | [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe) |
 
 **下载 EXE，双击打开。** 三个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
@@ -36,9 +36,23 @@
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- 本次预览版包含翻译器 **0.8.1**、两地时钟当前版本、环境助手 **0.4.0**。
+- 本次预览版包含翻译器 **0.9.0**、两地时钟 **0.3.0**、环境助手 **0.5.0**。
 - 目前提供三个 Windows EXE。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
+
+</details>
+
+### 在软件里检查更新
+
+三个软件都提供手动更新检查。点击后会查看本仓库的 GitHub 公开发布（包含预览版），显示可用版本，并让你选择位置保存对应软件的 EXE。
+
+<details>
+<summary><strong>更新下载如何工作</strong></summary>
+
+- 只有主动操作才会检查或下载，不在后台自动检查更新。
+- 下载文件必须与 GitHub 为该发布文件提供的 SHA-256 校验值一致；缺少校验值或核验不一致时，不会把文件作为已验证的更新交付。
+- 软件不会自行替换或运行新版 EXE。旧软件和设置保留，何时切换由你决定。
+- 检查更新需要联网；翻译器离线模式和时钟显示时间仍可离线使用。
 
 </details>
 
@@ -57,12 +71,19 @@
 2. 选好目标语言，到 Claude 里按住鼠标左键划选文字，松开。
 3. 阅读或复制译文；需要中文提问时，打开「中文提问」，预览英文后再主动发送。
 
-**自动识别原文 · 17 种在线目标语言 · 可选离线包 · 支持置顶**
+**自动识别原文 · 可选离线包 · 个人术语表 · 本次翻译记录**
+
+打开「术语词典」，保存名字和常用词的偏好译法。划选了新内容后，还能用「上一条／下一条」回看本次打开期间的译文，不怕刚才那段被替换。
+
+<p align="center"><img src="docs/images/translator-glossary-zh.png" alt="术语词典界面，显示 Claude、Codex 和 Skills 示例词条" width="600"></p>
+<p align="center"><sub>使用示例词条离屏渲染；未读取个人词典或会话。</sub></p>
 
 <details>
-<summary><strong>离线使用、发送问题与划选行为</strong></summary>
+<summary><strong>术语词典、近期译文与离线使用</strong></summary>
 
-- Google 在线模式自动识别原文；只处理所选窗口中的划选，忽略其他窗口。
+- Google 在线模式自动识别原文，支持 17 种目标语言；只处理所选窗口中的划选，忽略其他窗口。
+- 术语可按目标语言或所有语言生效，支持在线和离线翻译。匹配区分大小写，较长词组优先；链接和代码保留原样。
+- 近期译文在有限内存中最多保留 20 条成功结果；关闭软件后清空，术语词典则单独保存在本机。
 - 可以暂停划选、手动粘贴、复制译文，或把窗口置顶。
 - 「中文提问」允许先预览英文，再主动发送。不支持直接发送时可复制后手动粘贴；翻译完成不会自动给 Claude 发消息。
 - 有网时下载需要的离线语言包。每个包对应一个方向，例如英文 → 中文；反向需要另装。
@@ -88,7 +109,7 @@
 <details>
 <summary><strong>翻译隐私与可用性</strong></summary>
 
-在线模式会把所选文字发给 Google Translate 的免密钥网页接口。这不是 Gemini 或付费 Google Cloud Translation API，接口可能变化、失败或限流。离线翻译在本机完成；语言包仅在用户操作时下载。软件不把原文和译文保存成历史记录。
+在线模式会把所选文字发给 Google Translate 的免密钥网页接口。这不是 Gemini 或付费 Google Cloud Translation API，接口可能变化、失败或限流。离线翻译在本机完成；语言包仅在用户操作时下载。翻译记录只保留在本次运行的内存中，关闭软件即清空，不写入历史文件；用户保存的术语表与翻译记录分开。
 
 离线质量取决于语言包。出行前请联网下载需要的方向，并在目标电脑上检查。把 EXE 复制到新电脑不会同时复制已安装的模型。
 
@@ -109,20 +130,22 @@
 2. 直接在两个选择框里搜索，选定固定的**原本地区**和**目标地区**，保存。
 3. 把时钟放在方便看的位置。以后电脑时区变化，你原本地区的时间依然清楚。
 
-**地区直接搜索 · 小巧上下排列 · 支持夏令时 · 完全离线**
+**地区直接搜索 · 小巧上下排列 · 时差与跨日提示 · 离线计时**
+
+同时显示两个地区时，可以直接看出目标地区比原本地区快或慢多久，以及昨天、同一天、明天或更大的跨日差。显示的时差会考虑夏令时。
 
 <details>
 <summary><strong>既有界面预览、显示选项与时区行为</strong></summary>
 
-<p align="center"><img src="docs/images/clock-ui.png" alt="此前保存的紧凑时钟界面截图，显示示例时间" width="210"></p>
+<p align="center"><img src="docs/images/clock-offset-zh.png" alt="两地时钟显示原本和目标地区，并提示相差 13 小时" width="210"></p>
 
-既有软件截图，时间仅作示例。
+用编译后的时钟离屏生成，时间和地区为模拟示例。
 
 - 支持中英文搜索；每个地区显示各自的时间和日期。
 - 可选 12/24 小时制、秒数、单/双时钟、置顶与锁定位置。
 - 面板可以拖动，也能放回屏幕右下角；重新打开后保留设置。
 - 夏令时跟随 Windows 时区规则；准确度取决于 Windows 系统时钟及规则。
-- 软件**不修改电脑时间或时区**，不联网、不读取账号。
+- 软件**不修改电脑时间或时区**，不读取账号。显示时间不需要联网；只有主动检查或下载更新时才会访问 GitHub。
 - 想让原本地区不随系统变化，请选固定地区，而不是「跟随电脑时区」。
 
 </details>
