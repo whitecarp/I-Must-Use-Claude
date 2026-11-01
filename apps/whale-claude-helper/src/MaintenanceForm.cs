@@ -132,12 +132,12 @@ namespace WhaleClaudeHelper {
             p.Controls.Add(Note(T("不删除账号凭据、Cookie、聊天、Skills、插件、Hooks、自建规则或桌面持久数据。\r\n缓存可能重新生成；清理后不会强制重新登录。未知目录与链接路径跳过。","Preserve credentials, cookies, chats, skills, plugins, hooks, custom rules and persistent data.\r\nCaches may regenerate; cleanup does not intentionally sign you out. Unknown or linked paths are skipped.")),0,4);
         }
         private async void ScanCaches(){if(cache==null){Info(T("缓存或备份路径未通过安全检查，不能清理。","A cache or backup path failed safety checks; cleanup is unavailable."));return;}caches.Items.Clear();await Run(T("正在扫描缓存…","Scanning caches…"),token=>Task.Run(()=>{var found=cache.Audit(token);return (Action)delegate{ShowCaches(found);};}),true);}
-        private void ShowCaches(List<CacheTarget> found){caches.Items.Clear();foreach(var item in found){var row=new ListViewItem(item.Name){Tag=item};row.SubItems.Add(SizeText(item.Bytes));row.SubItems.Add(item.Eligible?item.Path:item.Path+" · "+item.Warning);if(!item.Eligible)row.ForeColor=Theme.Muted;caches.Items.Add(row);}SetStatus(found.Count==0?T("未发现可识别的缓存。","No recognized cache found."):T("请勾选要清理的项目。","Select the caches you want to clean."));}
+        private void ShowCaches(List<CacheTarget> found){caches.Items.Clear();foreach(var item in found){var row=new ListViewItem(item.Name){Tag=item};row.SubItems.Add(SizeText(item.Bytes));row.SubItems.Add(item.Eligible?item.Path:item.Path+" · "+(demo?item.Warning:ResultText.Render(item.Warning,Ui.English)));if(!item.Eligible)row.ForeColor=Theme.Muted;caches.Items.Add(row);}SetStatus(found.Count==0?T("未发现可识别的缓存。","No recognized cache found."):T("请勾选要清理的项目。","Select the caches you want to clean."));}
         private async void CleanCaches(){
             var selected=caches.CheckedItems.Cast<ListViewItem>().Select(x=>x.Tag as CacheTarget).Where(x=>x!=null&&x.Eligible).ToList();
             if(selected.Count==0){Info(T("请先扫描并勾选缓存。","Scan and select caches first."));return;}
             if(!Review(String.Join("\r\n\r\n",selected.Select(x=>x.Name+" · "+SizeText(x.Bytes)+"\r\n"+x.Path))+"\r\n\r\n"+T("备份核验后，以上项目才会移入回收站。","These items go to the Recycle Bin only after backup verification."))||!RequireClosed())return;
-            await Run(T("正在备份与清理…","Backing up and cleaning…"),token=>Task.Run(()=>{var r=cache.Clean(selected,CancellationToken.None);return (Action)delegate{caches.Items.Clear();Result(r.Ok,r.BackupDirectory,String.Join("\r\n",r.Messages));};}),false);
+            await Run(T("正在备份与清理…","Backing up and cleaning…"),token=>Task.Run(()=>{var r=cache.Clean(selected,CancellationToken.None);return (Action)delegate{caches.Items.Clear();Result(r.Ok,r.BackupDirectory,ResultText.Render(String.Join("\r\n",r.Messages),Ui.English));};}),false);
         }
         private void BuildBackups(){
             var p=Rows(76,48,-1,52,64);Page("恢复备份","Restore backups").Controls.Add(p);
@@ -151,7 +151,7 @@ namespace WhaleClaudeHelper {
         private async void RestoreBackup(){
             var selected=backups.SelectedItem as BackupItem;if(selected==null){Info(T("请先选择备份。","Select a backup first."));return;}
             if(!Review(selected.Path+"\r\n\r\n"+T("核验后恢复；保留发生冲突的后续修改。","Verify and restore; preserve conflicting later edits."))||!RequireClosed())return;
-            await Run(T("正在核验并恢复…","Verifying and restoring…"),token=>Task.Run(()=>{CheckClosed();if(selected.Kind=="Configuration"){var r=repair.Restore(selected.Path);return (Action)delegate{scan=null;official.Enabled=proxy.Enabled=userEnvironment.Enabled=false;Result(r.Success,selected.Path,String.Join("\r\n",r.Changed.Concat(r.Skipped))+(String.IsNullOrEmpty(r.Error)?"":"\r\n"+r.Error));};}var restored=cache.Restore(selected.Path,CancellationToken.None);return (Action)delegate{Result(restored.Ok,selected.Path,String.Join("\r\n",restored.Messages));};}),false);
+            await Run(T("正在核验并恢复…","Verifying and restoring…"),token=>Task.Run(()=>{CheckClosed();if(selected.Kind=="Configuration"){var r=repair.Restore(selected.Path);return (Action)delegate{scan=null;official.Enabled=proxy.Enabled=userEnvironment.Enabled=false;Result(r.Success,selected.Path,String.Join("\r\n",r.Changed.Concat(r.Skipped))+(String.IsNullOrEmpty(r.Error)?"":"\r\n"+r.Error));};}var restored=cache.Restore(selected.Path,CancellationToken.None);return (Action)delegate{Result(restored.Ok,selected.Path,ResultText.Render(String.Join("\r\n",restored.Messages),Ui.English));};}),false);
         }
         private async Task Run(string text,Func<CancellationToken,Task<Action>> work,bool cancellable){
             if(demo||busy)return;busy=true;tabs.Enabled=false;language.Enabled=false;cancel.Visible=cancellable;cancellation=new CancellationTokenSource();SetStatus(text);

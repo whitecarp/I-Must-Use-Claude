@@ -177,7 +177,10 @@ namespace WhaleClaudeHelper {
                         if(processes().Count>0)throw new IOException("close-claude-first");
                         EnsurePlain(item.OriginalPath);string source=SafeChild(backupDirectory,item.BackupRelativePath);Verify(source,item,cancel);
                         string parent=Path.GetDirectoryName(item.OriginalPath);EnsurePlain(parent);Directory.CreateDirectory(parent);EnsurePlain(parent);
-                        string staging=Path.Combine(parent,".whale-restore-"+Guid.NewGuid().ToString("N"));
+                        // Store profiles already consume much of .NET Framework's path budget.
+                        // Keep the same-directory atomic move, but use a short random 8.3 name.
+                        // CopyVerified still refuses existing destinations; no overwrite retry.
+                        string staging=Path.Combine(parent,Path.GetRandomFileName());
                         CopyVerified(source,staging,item,cancel);Verify(staging,item,cancel);
                         if(processes().Count>0)throw new IOException("close-claude-first");
                         EnsurePlain(item.OriginalPath);
@@ -324,6 +327,7 @@ namespace WhaleClaudeHelper {
             string[] codes={"changed-since-audit","source-missing","scan-limit","close-claude-first","recycle-not-completed","invalid-backup-location","invalid-backup-manifest","invalid-relative-path","path-outside-root","reparse-point-skipped","content-changed","destination-exists","backup-permissions-unavailable","unsafe-path","hardlink-skipped","file-identity-unavailable","backup-overlaps-cache"};
             if(codes.Contains(error.Message))return error.Message;
             if(error is UnauthorizedAccessException)return "access-denied";
+            if(error is PathTooLongException)return "path-too-long";
             if(error is IOException)return "file-busy-or-io-error";
             return "operation-failed";
         }

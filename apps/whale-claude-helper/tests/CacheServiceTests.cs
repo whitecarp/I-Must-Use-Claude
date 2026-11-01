@@ -87,7 +87,35 @@ internal static class CacheServiceTests {
         Check(audit.Count==4&&audit.All(x=>x.Eligible),"only explicit Store, log and telemetry candidates discovered");
         var cleaned=service.Clean(audit,None);Check(cleaned.Ok&&cleaned.ChangedCount==4,"explicit fixture caches cleaned");
         Check(originals.All(x=>File.Exists(x.Key)&&File.ReadAllBytes(x.Key).SequenceEqual(x.Value)),"login storage chats skills plugins hooks identities and unknown packages unchanged");
-        Check(service.Restore(cleaned.BackupDirectory,None).Ok,"Store fixture cache restore succeeds");
+        var restored=service.Restore(cleaned.BackupDirectory,None);
+        Console.WriteLine("Store fixture restore: changed="+restored.ChangedCount+", skipped="+restored.SkippedCount+", messages="+String.Join(" | ",restored.Messages));
+        Check(restored.Ok,"Store fixture cache restore succeeds");
+    }
+    private static string StoreProfile(CacheContext context){return Path.Combine(context.Local,"Packages","Claude_pzs8sxrjxfjjc","LocalCache","Local","Claude-Data","claude_fixture");}
+    private static CacheContext LongProfileContext(string name,int parentLength) {
+        var context=Context(name);string parent=StoreProfile(context);
+        int padding=parentLength-parent.Length-1;if(padding<1)throw new Exception("Fixture root is too long for the path-limit regression.");
+        context.Local=Path.Combine(context.Local,new string('p',padding));return context;
+    }
+    private static void LongRestorePaths() {
+        // A supported cache can fit MAX_PATH while a 47-character temporary name does not.
+        // Lengths are deliberate and independent of runner usernames and TEMP locations.
+        var context=LongProfileContext("long-restore",220);string cache=Path.Combine(StoreProfile(context),"logs");
+        string original=Write(Path.Combine(cache,"x"),"long-path-cache");var service=Service(context);var cleaned=service.Clean(service.Audit(None),None);
+        Check(cleaned.Ok,"long source cache is backed up and recycled");var restored=service.Restore(cleaned.BackupDirectory,None);
+        Console.WriteLine("Long-path fixture restore: changed="+restored.ChangedCount+", skipped="+restored.SkippedCount+", messages="+String.Join(" | ",restored.Messages));
+        Check(restored.Ok&&File.ReadAllText(original)=="long-path-cache","long cache restores using a short collision-safe staging name");
+
+        var boundary=LongProfileContext("restore-limit",240);string boundaryCache=Path.Combine(StoreProfile(boundary),"logs");
+        Write(Path.Combine(boundaryCache,"x"),"backup-must-survive");var boundaryService=Service(boundary);var boundaryClean=boundaryService.Clean(boundaryService.Audit(None),None);
+        Check(boundaryClean.Ok,"near-limit source cache backup succeeds");
+        string receipt=Path.Combine(boundaryClean.BackupDirectory,"manifest.json");byte[] before=File.ReadAllBytes(receipt);var manifest=Json.Deserialize<CacheBackupManifest>(File.ReadAllText(receipt));
+        string backup=Path.Combine(boundaryClean.BackupDirectory,manifest.Targets[0].BackupRelativePath,"x");int recycledBefore=recycled;
+        var limited=boundaryService.Restore(boundaryClean.BackupDirectory,None);
+        Console.WriteLine("Path-limit fixture restore: changed="+limited.ChangedCount+", skipped="+limited.SkippedCount+", messages="+String.Join(" | ",limited.Messages));
+        Check(!limited.Ok&&limited.ChangedCount==0&&limited.Messages.Any(x=>x.Contains("path-too-long")),"unsupported restore path fails with an explicit path-limit result");
+        Check(!Directory.Exists(boundaryCache)&&recycled==recycledBefore,"failed restore neither creates a partial target nor recycles data");
+        Check(File.ReadAllBytes(receipt).SequenceEqual(before)&&File.ReadAllText(backup)=="backup-must-survive","path-limit failure retains complete verified backup and receipt");
     }
     private static void ProcessAndBackupFailure() {
         var context=Context("process");string path=Write(Path.Combine(context.Home,".claude","cache","cache.txt"),"one");var service=Service(context);var row=Find(service,Path.Combine(".claude","cache"));
@@ -141,7 +169,7 @@ internal static class CacheServiceTests {
     public static int Main() {
         try {
             root=Path.Combine(Path.GetTempPath(),"whale-cache-tests-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
-            PreserveAndRestore();StaleAndForgedSelections();StoreAndProtectionScope();ProcessAndBackupFailure();TamperedBackups();ReparsePoints();HardlinksAndUnsafeRoots();
+            PreserveAndRestore();StaleAndForgedSelections();StoreAndProtectionScope();LongRestorePaths();ProcessAndBackupFailure();TamperedBackups();ReparsePoints();HardlinksAndUnsafeRoots();
             Console.WriteLine("CacheServiceTests passed: "+checks+" checks. Fixture-only recycler; no real user data or Recycle Bin touched.");Console.WriteLine("Fixture evidence: "+root);return 0;
         }catch(Exception error){Console.WriteLine("CacheServiceTests failed: "+error.Message);Console.WriteLine(error.StackTrace);return 1;}
     }

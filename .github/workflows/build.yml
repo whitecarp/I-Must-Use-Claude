@@ -25,6 +25,13 @@ jobs:
       - name: Validate Python syntax without running workers
         shell: pwsh
         run: python -m compileall -q apps/claude-live-translator/backend
+      - name: Keep isolated test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: helper-fixture-results
+          path: apps/whale-claude-helper/artifacts/helper-tests/fixture-results.json
+          if-no-files-found: ignore
       - name: Store build outputs
         uses: actions/upload-artifact@v4
         with:
