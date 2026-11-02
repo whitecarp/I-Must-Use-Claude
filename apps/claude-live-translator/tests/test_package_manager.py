@@ -230,6 +230,58 @@ class PackageTests(unittest.TestCase):
                     p.download('unused', stage / 'download.argosmodel')
         self.assertEqual(list((s.packages_directory() / '.staging').iterdir()), [])
 
+    def pinned_catalog(self, sha256=None):
+        row = dict(self.metadata, links=['https://argos-net.com/v1/translate-en_fr-1_9.argosmodel'])
+        if sha256 is not None:
+            row['sha256'] = sha256
+        path = self.root / 'bundled-catalog.json'
+        path.write_text(json.dumps({'schema_version': 1, 'packages': [row]}), encoding='utf-8')
+        return mock.patch.object(p, 'BUNDLED_CATALOG', path)
+
+    def served(self, data):
+        response = io.BytesIO(data)
+        response.headers = {'Content-Length': str(len(data))}
+        return mock.patch.object(p, 'open_official', return_value=response)
+
+    def test_pinned_checksum_mismatch_rejects_download_without_install(self):
+        data = self.archive().read_bytes()
+        with self.pinned_catalog('0' * 64), self.served(data), mock.patch.object(p, 'install_archive') as install:
+            with self.assertRaisesRegex(p.PackageError, '^checksum_mismatch$'):
+                p.install('translate-en_fr-1_9')
+        install.assert_not_called()
+        self.assertEqual(s.installed_packages(), [])
+        self.assertEqual(list((s.packages_directory() / '.staging').iterdir()), [])
+
+    def test_pinned_checksum_match_continues_to_install(self):
+        data = self.archive().read_bytes()
+        digest = __import__('hashlib').sha256(data).hexdigest()
+        with self.pinned_catalog(digest), self.served(data), mock.patch.object(p, 'install_archive', return_value={'ok': True}) as install:
+            self.assertEqual(p.install('translate-en_fr-1_9'), {'ok': True})
+        self.assertEqual(install.call_args[0][3], digest)
+
+    def test_unpinned_package_installs_as_before(self):
+        data = self.archive().read_bytes()
+        with self.pinned_catalog(None), self.served(data), mock.patch.object(p, 'install_archive', return_value={'ok': True}) as install:
+            self.assertEqual(p.install('translate-en_fr-1_9'), {'ok': True})
+        install.assert_called_once()
+
+    def test_malformed_pin_fails_before_any_download(self):
+        with self.pinned_catalog('not-a-sha256'), mock.patch.object(p, 'open_official') as network:
+            with self.assertRaisesRegex(p.PackageError, '^invalid_catalog$'):
+                p.install('translate-en_fr-1_9')
+        network.assert_not_called()
+
+    def test_refreshed_catalog_cannot_remove_a_bundled_pin(self):
+        refreshed = s.data_directory() / 'argos_catalog.json'
+        refreshed.parent.mkdir(parents=True, exist_ok=True)
+        row = dict(self.metadata, links=['https://argos-net.com/v1/translate-en_fr-1_9.argosmodel'])
+        refreshed.write_text(json.dumps({'packages': [row]}), encoding='utf-8')
+        data = self.archive().read_bytes()
+        with self.pinned_catalog('f' * 64), self.served(data), mock.patch.object(p, 'install_archive') as install:
+            with self.assertRaisesRegex(p.PackageError, '^checksum_mismatch$'):
+                p.install('translate-en_fr-1_9')
+        install.assert_not_called()
+
     def test_refresh_is_explicit_and_list_uses_validated_snapshot(self):
         metadata = dict(self.metadata, links=['https://argos-net.com/v1/translate-en_fr-1_9.argosmodel'])
         response = io.BytesIO(json.dumps([metadata]).encode())

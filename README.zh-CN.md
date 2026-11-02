@@ -42,6 +42,22 @@
 
 </details>
 
+<details>
+<summary><strong>第一次打开时 Windows 提示“已保护你的电脑”</strong></summary>
+
+预览版 EXE 还没有代码签名，Windows SmartScreen 可能会拦下第一次运行。先核对文件，再决定是否运行：
+
+1. 在下载 EXE 的文件夹里打开 PowerShell，运行下面的命令（文件名换成你下载的那个）：
+
+   ```powershell
+   Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
+   ```
+
+2. 把输出的值和 [SHA256SUMS.txt](docs/SHA256SUMS.txt) 里同名文件的值对比，一致才说明文件没有被改动。
+3. 一致后，在 SmartScreen 窗口点「更多信息」→「仍要运行」。不一致就删掉文件，重新从本仓库的 Releases 下载。
+
+</details>
+
 ### 在软件里检查更新
 
 环境助手、翻译器和时钟提供手动更新检查；打包助手 0.1.0 暂未加入此功能。点击后会查看本仓库的 GitHub 公开发布（包含预览版），显示可用版本，并让你选择位置保存对应软件的 EXE。
@@ -248,5 +264,9 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 | 打包助手 | [apps/whale-pack-helper](apps/whale-pack-helper/) | [用法与依赖](apps/whale-pack-helper/README.md) |
 
 离线翻译使用 CTranslate2、SentencePiece 和用户选装的 Argos 目录语言包。上游许可和署名保留于[第三方声明](THIRD_PARTY_NOTICES.md)。
+
+## 许可证
+
+本仓库自己的代码以 [MIT 许可证](LICENSE)发布。第三方组件和语言包保留各自的许可证，见[第三方声明](THIRD_PARTY_NOTICES.md)。
 
 <p align="center"><sub>独立社区辅助项目，不隶属于 Anthropic 或 Google，也未获得其背书。</sub></p>

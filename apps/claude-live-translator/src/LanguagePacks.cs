@@ -119,6 +119,7 @@ namespace ClaudeCompanion {
         internal static string Error(string code){
             if(code=="package_busy")return Ui.T("这个语言包正在使用，请关闭中文提问窗口后重试。","This pack is in use. Close the Write in Chinese window and retry.");
             if(code=="cancelled")return Ui.T("下载已取消，已安装的语言包不受影响。","Download cancelled. Installed packs are unchanged.");
+            if(code=="checksum_mismatch")return Ui.T("下载到的语言包与已知校验值不一致，已拒绝安装。请稍后重试或换个网络。","The downloaded pack did not match its known checksum and was rejected. Retry later or on another network.");
             if(code.Contains("network")||code.Contains("download")||code.Contains("http"))return Ui.T("语言包下载失败，请检查网络后重试。","Download failed. Check your connection and retry.");
             if(code.Contains("unsupported"))return Ui.T("这个语言包暂不兼容，请选择其他包。","This pack is not compatible yet. Choose another pack.");
             if(code.Contains("space"))return Ui.T("磁盘空间不足，请腾出空间后重试。","Not enough disk space. Free up space and retry.");

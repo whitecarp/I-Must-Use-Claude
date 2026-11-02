@@ -42,6 +42,22 @@
 
 </details>
 
+<details>
+<summary><strong>Windows says it "protected your PC" on first launch</strong></summary>
+
+Preview EXEs are not code-signed yet, so Windows SmartScreen may stop the first launch. Check the file before you decide to run it:
+
+1. Open PowerShell in the folder with the download and run (use the name of the file you downloaded):
+
+   ```powershell
+   Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
+   ```
+
+2. Compare the result with the same file's line in [SHA256SUMS.txt](docs/SHA256SUMS.txt). Only a match shows the file is unchanged.
+3. If it matches, choose **More info → Run anyway** in the SmartScreen window. If it does not, delete the file and download it again from this repository's Releases.
+
+</details>
+
 ### Keep the apps up to date
 
 Environment Helper, Translator and Clock have a manual update check. Pack Helper 0.1.0 does not yet include this feature. It shows the available version from this repository's public GitHub releases, including previews, and lets you save the matching EXE to a location you choose.
@@ -248,5 +264,9 @@ Keep `WhalePackHelper.exe.config` beside `WhalePackHelper.exe`. [Source and usag
 | Pack Helper | [apps/whale-pack-helper](apps/whale-pack-helper/) | [Usage and dependencies](apps/whale-pack-helper/README.md) |
 
 Offline translation uses CTranslate2 and SentencePiece with optional packages from the Argos catalog. Upstream licenses and attribution are retained in the [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## License
+
+This repository's own code is released under the [MIT License](LICENSE). Third-party components and language packages keep their own licenses; see the [third-party notices](THIRD_PARTY_NOTICES.md).
 
 <p align="center"><sub>An independent community companion project. Not affiliated with or endorsed by Anthropic or Google.</sub></p>

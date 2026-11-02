@@ -1,0 +1,56 @@
+name: 问题反馈 / Bug report
+description: 软件出错、结果不对或界面显示异常 / Something went wrong in one of the apps
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请不要上传 API 密钥、密码、账号文件、订阅链接、浏览器或配置备份、私人对话，或包含这些内容的截图。
+        Do not attach API keys, passwords, account files, subscription links, browser or configuration backups, private chats, or screenshots that show them.
+  - type: dropdown
+    id: app
+    attributes:
+      label: 哪个软件 / Which app
+      options:
+        - 大肥鱼环境助手 / Whale Environment Helper
+        - 大肥鱼翻译 / Whale Translator
+        - 两地时钟 / Two-Zone Clock
+        - 大肥鱼打包助手 / Whale Pack Helper
+        - 项目主页或说明 / Project page or docs
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 软件版本 / App version
+      description: 标题栏或「检查更新」里能看到 / Shown in the title bar or under Check updates
+      placeholder: "0.7.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows 版本 / Windows version
+      placeholder: "Windows 11 23H2, x64"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 怎么重现 / Steps to reproduce
+      placeholder: |
+        1. 打开…… / Open …
+        2. 点击…… / Click …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 实际看到了什么，原本希望看到什么 / What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充信息 / Anything else
+      description: 界面上的提示文字、截图（先遮住个人信息） / Messages shown in the app, screenshots with personal details hidden

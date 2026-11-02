@@ -264,7 +264,7 @@ namespace WhalePack {
             Section(text, en ? "Verified" : "已验证", data.Verified); Section(text, en ? "Not yet verified" : "还没验证", data.Unverified); Section(text, en ? "Next steps" : "下一步", data.Next);
             if (result.MergeInstructions.Count > 0) { text.AppendLine(en ? "## Reassemble split originals" : "## 原文件切片合并方法"); text.AppendLine(); foreach (string instruction in result.MergeInstructions) text.AppendLine(instruction); }
             if (result.Warnings.Count > 0) { text.AppendLine(en ? "## Exclusions and notes" : "## 排除与备注"); text.AppendLine(); foreach (string warning in result.Warnings) text.AppendLine("- " + warning.Replace("\r", " ").Replace("\n", " ")); }
-            text.AppendLine(); text.AppendLine(en ? "Prepared locally by Whale Pack Helper 0.1.0. Nothing was uploaded. Secret detection is a heuristic, not a guarantee; review attachments before sharing." : "由大肥鱼打包助手 0.1.0 在本机整理，未上传任何内容。密钥检测是启发式筛查，不能保证识别所有隐私信息；发送前请复核附件。");
+            text.AppendLine(); text.AppendLine(en ? "Prepared locally by Whale Pack Helper 0.1.1. Nothing was uploaded. Secret detection is a heuristic, not a guarantee; review attachments before sharing." : "由大肥鱼打包助手 0.1.1 在本机整理，未上传任何内容。密钥检测是启发式筛查，不能保证识别所有隐私信息；发送前请复核附件。");
             return text.ToString();
         }
         private static void Section(StringBuilder text, string heading, string value) { text.AppendLine("## " + heading); text.AppendLine(); text.AppendLine(value ?? ""); text.AppendLine(); }

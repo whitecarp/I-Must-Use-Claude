@@ -1557,8 +1557,8 @@ select {
         </div>
         <div>
           <h3><span data-l="zh">核对文件</span><span data-l="en">Verify the files</span></h3>
-          <p data-l="zh">预览版没有代码签名，可用 <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/docs/SHA256SUMS.txt">SHA256SUMS.txt</a> 核对下载的文件。也可以查看<a href="https://github.com/whitecarp/I-Must-Use-Claude/releases">全部版本</a>。</p>
-          <p data-l="en">Preview builds are unsigned. Check your download against <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/docs/SHA256SUMS.txt">SHA256SUMS.txt</a>, or browse <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases">all releases</a>.</p>
+          <p data-l="zh">预览版还没有代码签名，Windows 可能提示“已保护你的电脑”。先在 PowerShell 运行 <code>Get-FileHash 文件名 -Algorithm SHA256</code>，和 <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/docs/SHA256SUMS.txt">SHA256SUMS.txt</a> 对比一致，再点「更多信息 → 仍要运行」。也可以查看<a href="https://github.com/whitecarp/I-Must-Use-Claude/releases">全部版本</a>。</p>
+          <p data-l="en">Preview builds are not code-signed yet, so Windows may say it protected your PC. Run <code>Get-FileHash &lt;file&gt; -Algorithm SHA256</code> in PowerShell, compare it with <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/docs/SHA256SUMS.txt">SHA256SUMS.txt</a>, then choose More info → Run anyway. You can also browse <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases">all releases</a>.</p>
         </div>
         <div>
           <h3><span data-l="zh">检查更新</span><span data-l="en">Updates</span></h3>
@@ -1618,6 +1618,7 @@ select {
       <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/docs/BUILDING.md"><span data-l="zh">从源码构建</span><span data-l="en">Build from source</span></a>
       <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/THIRD_PARTY_NOTICES.md"><span data-l="zh">第三方声明</span><span data-l="en">Third-party notices</span></a>
       <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/SECURITY.md"><span data-l="zh">安全与隐私</span><span data-l="en">Security &amp; privacy</span></a>
+      <a href="https://github.com/whitecarp/I-Must-Use-Claude/blob/main/LICENSE"><span data-l="zh">MIT 许可证</span><span data-l="en">MIT License</span></a>
     </nav>
     <div class="footer__legal">
       <p><span data-l="zh">独立社区辅助项目，不隶属于 Anthropic 或 Google，也未获得其背书。</span><span data-l="en">An independent community companion project. Not affiliated with or endorsed by Anthropic or Google.</span></p>
