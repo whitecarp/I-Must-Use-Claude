@@ -1,8 +1,8 @@
 # 大肥鱼打包助手 0.1.1 / Whale Pack Helper
 
-只在本机整理文件，不上传；唯一的联网是手动点「检查更新」（0.1.1 起）。Windows 10/11，.NET Framework 4.8 或更高版本。
+在本机整理文件，不上传文件内容。仅在你打开「设置 → 检查更新」及选择下载新版时访问 GitHub；打包过程不联网。Windows 10/11，.NET Framework 4.8 或更高版本。
 
-发布下载使用英文文件名 `WhalePackHelper.exe`。0.1.0 发布版还需要同名 `WhalePackHelper.exe.config` 放在同一文件夹（或下载配对 ZIP 后解压）；从 0.1.1 起，长路径开关写在程序里，单个 EXE 即可运行，配置文件可有可无。源码构建的输出名仍是 `大肥鱼打包助手.exe`。
+**0.1.1 发布下载只提供 `WhalePackHelper.exe`，不需要 `.exe.config`，也不用解压 ZIP。** 程序在首次文件访问前设置长路径开关，使用已安装的 .NET Framework 4.8。源码构建的输出名仍是 `大肥鱼打包助手.exe`。旧 0.1.0 的配对配置要求仅适用于旧版。
 
 ## 使用
 
@@ -11,6 +11,7 @@
 3. 在「写交接说明…」填写项目、目标、做到哪了、已验证、还没验证、下一步。全部可留空。
 4. 选择输出位置，点击「开始打包」。默认输出到桌面的「发给Claude」，每次建立独立子目录，避免覆盖之前的结果。
 5. 完成后打开输出目录，复制交接句子。每个 ZIP 可单独解压；要还原所有内容，将它们解压到同一个空目录。
+6. 如需更新，打开「设置 → 检查更新」。程序查询本仓库的 GitHub Releases（含预览版）；下载新版时核对文件大小和 SHA-256，保存到你选择的新文件名，不覆盖、运行新版或修改现有设置。
 
 右上角可切换中文 / English。交接字段与语言、输出目录、FFmpeg 路径保存在 `%LOCALAPPDATA%/WhalePack/settings.json`，不保存待发送文件内容。
 
@@ -41,6 +42,8 @@ FFmpeg 需要支持 `libx264`、AAC、`scale` 和 `colorspace`。处理在后台
 
 使用 Windows 自带的 `.NET Framework/v4.0.30319/csc.exe`，强制 `/langversion:5`，不需要 NuGet、dotnet SDK 或网络。默认编译并执行单元测试；`-SkipTests` 可仅编译。
 
+构建会编入 `../../shared/UpdateChecker.cs`。产品 EXE 和测试 EXE 均在代码中初始化长路径行为，构建不再复制 `.exe.config`；请使用新的输出目录验收单文件产物。测试包括实际超过 260 字符路径的文件读写、生产扫描器，以及完全离线的更新版本/附件/校验元数据检查；不会启动主窗口或读取个人设置。
+
 Windows PowerShell 5.1 也已验证。如果本机默认禁止运行脚本，可仅对本次构建进程运行下面的命令，不更改系统执行策略：
 
 ```powershell
@@ -60,8 +63,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 
 Open the executable, switch to **English**, add files or folders, review processing modes and exclusions, optionally fill in the handoff, and select **Pack files**. Results are written to a new subfolder. Every output is checked against a strict **29,000,000-byte** ceiling; ZIPs are independently extractable. Originals remain untouched.
 
-Release downloads use `WhalePackHelper.exe`. The 0.1.0 release also needs `WhalePackHelper.exe.config` in the same folder (or extract the paired ZIP). From 0.1.1 the long-path switches are set in code, so the EXE runs on its own and the config file is optional. Source builds retain the Chinese executable name.
+**Version 0.1.1 is distributed as `WhalePackHelper.exe` only: no `.exe.config` sidecar or ZIP is required.** The executable initializes long-path handling before file access and uses the installed .NET Framework 4.8 runtime. Source builds retain the Chinese executable name. The old paired-config requirement applies only to 0.1.0.
 
-This is a local utility. It does not upload files, call AI services, download FFmpeg, or access network shares; from 0.1.1 the only network access is the manual Check updates button in Settings. Secret detection is heuristic; review contents before sending. FFmpeg must already be installed or selected manually. HDR conversion is not supported in v0.1.0; use Original mode or convert to SDR separately.
+Packing stays local. The app does not upload file contents, call AI services, download FFmpeg, or access network shares. **Settings → Check updates** contacts this repository's GitHub Releases, including previews. Choosing to download verifies the new EXE's size and SHA-256 and saves it under a new name; it does not overwrite or run anything, or change existing settings. Secret detection is heuristic; review contents before sending. FFmpeg must already be installed or selected manually. HDR conversion is not supported; use Original mode or convert to SDR separately.
 
-Build with `build.ps1`; it uses the Windows Framework compiler with C# 5 and runs tests by default. All source files, assets, and test harnesses are included.
+Build with `build.ps1`; it uses the Windows Framework compiler with C# 5, compiles the shared update checker into the EXE, and runs tests by default. It does not emit application or test configuration sidecars. Use a fresh output folder when verifying a single-EXE release. Tests cover actual long-path read/write and scanning, plus offline update metadata validation, without opening the application or reading personal settings. All source files, assets, and test harnesses are included.

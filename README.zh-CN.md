@@ -15,8 +15,9 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.0-preview"><strong>↓ 下载软件</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview"><strong>↓ 下载软件</strong></a>
   &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识工具</a>
+  &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">项目主页</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
 </p>
 
@@ -28,7 +29,7 @@
 | :--- | :--- | :--- | :--- |
 | **大肥鱼环境助手** | **大肥鱼翻译** | **两地时钟** | **大肥鱼打包助手** |
 | 先测浏览器环境，再处理命中的本地设置，最后复测。 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 即使电脑用了其他时区，也能看到原本地区的时间。 | 在本机整理源码、图片和视频，每个文件不超过 29 MB。 |
-| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip) |
+| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe) |
 
 **下载 EXE，双击打开。** 各个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
@@ -36,8 +37,8 @@
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- 本次更新提供环境助手 **0.7.0** 与打包助手 **0.1.0**。翻译器 **0.9.0**、两地时钟 **0.3.0** 继续使用原 v0.3.0-preview 下载。
-- 提供 Windows EXE；打包助手还需要同名 `.exe.config` 放在 EXE 旁边，配套 ZIP 已包含两者。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
+- **v0.4.1-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.1**、两地时钟 **0.3.0**、打包助手 **0.1.1**。
+- 提供 Windows EXE；打包助手 0.1.1 无需旁置配置文件或 ZIP。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
 
 </details>
@@ -45,7 +46,7 @@
 <details>
 <summary><strong>第一次打开时 Windows 提示“已保护你的电脑”</strong></summary>
 
-预览版 EXE 还没有代码签名，Windows SmartScreen 可能会拦下第一次运行。先核对文件，再决定是否运行：
+本轮仍是**未签名预览版**，Windows SmartScreen 可能会拦下第一次运行；请阅读[代码签名政策和当前状态](docs/CODE_SIGNING.md)。SHA-256 一致只能核对文件完整性，不代表已认证发布者身份。先核对文件，再决定是否运行：
 
 1. 在下载 EXE 的文件夹里打开 PowerShell，运行下面的命令（文件名换成你下载的那个）：
 
@@ -53,14 +54,14 @@
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. 把输出的值和 [SHA256SUMS.txt](docs/SHA256SUMS.txt) 里同名文件的值对比，一致才说明文件没有被改动。
+2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
 3. 一致后，在 SmartScreen 窗口点「更多信息」→「仍要运行」。不一致就删掉文件，重新从本仓库的 Releases 下载。
 
 </details>
 
 ### 在软件里检查更新
 
-环境助手、翻译器和时钟提供手动更新检查；打包助手 0.1.0 暂未加入此功能。点击后会查看本仓库的 GitHub 公开发布（包含预览版），显示可用版本，并让你选择位置保存对应软件的 EXE。
+四个软件都提供手动更新检查。打包助手 0.1.1 在「设置 → 检查更新」中操作。点击后会查看本仓库的 GitHub 公开发布（包含预览版），显示可用版本，并让你选择位置保存对应软件的 EXE。
 
 <details>
 <summary><strong>更新下载如何工作</strong></summary>
@@ -117,7 +118,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 清理、修复或恢复前，请正常退出 Claude 和 Claude Code。会话、官方登录数据、Cookie、Skills、插件、Hooks、MCP、自建规则及本地身份标识受到保护。配置修复移除的是**选中的认证覆盖项**，不删除官方登录数据。未知路径与链接文件会跳过；不会自动切换 CC Switch / Cockpit 的供应商接管。
 
-**预览状态：** 0.7.0 整合版已通过 1,684 项隔离检查及最终构建核验。独立 Windows 虚拟机端到端验收仍待完成；模拟测试不代表你的浏览器或网络结果，测试不会在个人环境执行清理或配置修改。
+**预览状态：** 源码 `5959687` 的[云端 Windows 验收已通过](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41398526505)：49 项流程检查、11 项时区检查，以及四款软件的窗口截图。修改与撤回只在 GitHub 临时 Windows 虚拟机和临时测试数据上执行，没有操作个人电脑；不代表真实 Claude 账号、个人浏览器／网络、在线更新下载或真实素材端到端验证。后续源码变更仍需对应的新一轮通过记录。
 
 <details>
 <summary><strong>优化会改什么，保留什么</strong></summary>
@@ -242,11 +243,11 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 在本机选择源码、图片或视频，查看文件清单，可选填写交接说明，再生成打包结果。原文件保持不变，每个输出文件不超过 **29,000,000 字节**。源码过滤会跳过常见构建／运行库目录和疑似密钥；分享前仍需检查结果。
 
-软件不上传文件、不连接 AI 服务。普通打包和 PNG/JPEG/BMP 处理使用自带组件；视频压缩和 WebP 解码需要本机已有 **FFmpeg**。
+本地打包不上传文件、不连接 AI 服务；只有用户主动检查或下载更新时才会访问 GitHub。普通打包和 PNG/JPEG/BMP 处理使用自带组件；视频压缩和 WebP 解码需要本机已有 **FFmpeg**。
 
-[下载 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe) · [必需的同名配置](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config) · [两者配套 ZIP](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip)
+[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe)
 
-请把 `WhalePackHelper.exe.config` 与 `WhalePackHelper.exe` 放在一起。[源码和使用说明](apps/whale-pack-helper/README.md) 包含编译脚本、素材与测试。
+单个 EXE，无需旁置配置文件或 ZIP。[源码和使用说明](apps/whale-pack-helper/README.md) 包含编译脚本、素材与测试。
 
 ---
 
@@ -264,6 +265,10 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 | 打包助手 | [apps/whale-pack-helper](apps/whale-pack-helper/) | [用法与依赖](apps/whale-pack-helper/README.md) |
 
 离线翻译使用 CTranslate2、SentencePiece 和用户选装的 Argos 目录语言包。上游许可和署名保留于[第三方声明](THIRD_PARTY_NOTICES.md)。
+
+## 安全、隐私与签名
+
+请阅读[隐私说明](docs/PRIVACY.md)、[安全问题报告方式](SECURITY.md)和[代码签名政策](docs/CODE_SIGNING.md)。在线翻译会把所选文字发送给 Google；离线翻译和本地打包在设备上完成；手动检查和下载更新会联系 GitHub。
 
 ## 许可证
 

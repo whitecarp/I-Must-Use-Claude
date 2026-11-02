@@ -1,5 +1,43 @@
 # Release notes
 
+## v0.4.1-preview — four EXEs, manual updates and single-file Pack Helper
+
+| App | Version | Download |
+| --- | --- | --- |
+| Whale Environment Helper | 0.7.0 | [WhaleEnvironmentHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleEnvironmentHelper.exe) |
+| Whale Translator | 0.9.1 | [WhaleTranslator.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleTranslator.exe) |
+| Two-Zone Clock | 0.3.0 | [HomeTimeClock.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/HomeTimeClock.exe) |
+| Whale Pack Helper | 0.1.1 | [WhalePackHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe) |
+
+- **Pack Helper 0.1.1 is a single EXE.** No `.exe.config` or convenience ZIP is required. Runtime switches and the Windows manifest support long paths without a configuration sidecar. Windows .NET Framework 4.8 is still required; video compression and WebP decoding still need an existing local FFmpeg.
+- **All four apps offer manual update checks.** Pack Helper uses **Settings → Check updates**. Checks and downloads contact this repository's GitHub releases only when requested. Downloads require the release asset's SHA-256 digest; apps do not replace themselves or launch the downloaded EXE.
+- **Translator 0.9.1 refreshes portable-package verification and the offline-package hash catalog.** Language directions remain optional installs; this does not bundle every offline model into the EXE.
+- **Local packing does not upload files or contact an AI service.** Pack Helper's manual update check/download is the GitHub network exception. See the [privacy notice](docs/PRIVACY.md) for the other tools' data flows.
+- **The bilingual [project page](https://whitecarp.github.io/I-Must-Use-Claude/) is live.** Environment Helper remains first, and all four download links use this release. The existing design, CSS, illustrations and language interactions are preserved.
+
+**Signing:** this release remains an **unsigned preview**. Read the [code-signing policy and current status](docs/CODE_SIGNING.md), [security reporting guide](SECURITY.md), and this release's [release SHA-256 checksums](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview#sha-256). A hash match verifies file integrity, not publisher identity. Windows SmartScreen may still warn on first launch.
+
+<!-- release-validation:v0.4.1-preview:run-41398526505 -->
+**Validation status:** [Build and cloud Windows acceptance passed](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41398526505) for source `5959687`. The acceptance scope is **49 workflow checks + 11 time-zone checks + four captured application windows**, including Pack Helper startup without a configuration sidecar. Apply/verify/undo actions used temporary fixtures on a disposable GitHub-hosted Windows VM. No personal PC, real user settings, Claude account or private media were used. This does not establish live update-download or real-media end-to-end behavior. Later source changes require a new successful run; final publication records must tie each downloadable EXE to its version, size and SHA-256.
+
+**Final release-package acceptance:** [Release run 41398725441](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41398725441) passed for `5959687`: the translator completed fresh extraction, imported the four bundled Python dependencies (CTranslate2, SentencePiece, NumPy and PyYAML) with their pinned versions and extracted-package paths verified, and reused its verified cache. All four uploaded EXEs were downloaded back and their SHA-256 hashes matched before publication. Real Google translation and offline-model downloads were not exercised. The published files remain **unsigned previews**.
+
+本次四个软件统一从 **v0.4.1-preview** 下载：环境助手 **0.7.0**、翻译器 **0.9.1**、两地时钟 **0.3.0**、打包助手 **0.1.1**。
+
+- **打包助手改为单 EXE**，无需同名配置文件或 ZIP。长路径运行时开关和 Windows 清单已内置；仍依赖 .NET Framework 4.8，视频压缩与 WebP 解码仍需要本机已有 FFmpeg。
+- **四个软件都有手动更新检查**；打包助手入口是「设置 → 检查更新」。只有用户主动操作时才访问 GitHub；下载须通过发布附件的 SHA-256 验证，不自动替换或运行新版。
+- **翻译器 0.9.1 更新便携包验证和离线包哈希目录**，离线语言方向仍由用户选装，不代表 EXE 已内置所有模型。
+- **本地打包不上传文件、不连接 AI 服务**；手动检查和下载更新会联系 GitHub。各工具的数据流详见[隐私说明](docs/PRIVACY.md)。
+- 中英文[项目主页](https://whitecarp.github.io/I-Must-Use-Claude/)已开启，环境助手排在前面；保留现有布局、CSS、插图和语言切换，四个下载入口统一本版。
+
+**签名状态：** 本轮仍是**未签名预览版**。详见[代码签名政策](docs/CODE_SIGNING.md)、[安全报告方式](SECURITY.md)与本版 [SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview#sha-256)。哈希只能验证文件完整性，不代表发布者身份认证；SmartScreen 仍可能提示。
+
+**验收状态：** 源码 `5959687` 的[构建和云端 Windows 验收已通过](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41398526505)，范围为 **49 项流程检查 + 11 项时区检查 + 四款软件窗口截图**，包含打包助手无旁置配置文件启动。应用、核验与撤回使用 GitHub 临时 Windows 虚拟机内的临时测试数据，没有使用个人电脑、真实用户设置、Claude 账号或私人素材；不代表已验证在线更新下载或真实素材端到端使用。后续源码变更须重新通过，最终发布记录还应关联各 EXE 的版本、大小和 SHA-256。
+
+**最终发布包验收：** 源码 `5959687` 的[发布运行 41398725441](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41398725441) 已通过：翻译器完成首次解包，内置 Python 成功导入 CTranslate2、SentencePiece、NumPy、PyYAML 四个依赖并核对固定版本与解包路径，再验证缓存复用；四个 EXE 上传后重新下载，SHA-256 全部一致后才发布。未实测真实 Google 在线翻译或离线模型下载；发布文件仍为**未签名预览版**。
+
+---
+
 ## v0.4.0-preview — Network & DNS and Pack Helper
 
 - **Whale Environment Helper 0.7.0:** combines the toolbox's existing maintenance, Codex proxy configuration, close-app controls and dedicated icon with the separate 0.3.3 Network & DNS work. The integrated build is a new artifact; it does not reuse the old 0.3.3 binary or checksum.

@@ -15,7 +15,8 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.0-preview"><strong>↓ Download the apps</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview"><strong>↓ Download the apps</strong></a>
+  &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">Project page</a>
   &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
 </p>
@@ -28,7 +29,7 @@
 | :--- | :--- | :--- | :--- |
 | **Whale Environment Helper** | **Whale Translator** | **Two-Zone Clock** | **Whale Pack Helper** |
 | Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. | Package source, images and video locally, each file at most 29 MB. |
-| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip) |
+| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe) |
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
@@ -36,8 +37,8 @@
 <summary><strong>Requirements, versions and language settings</strong></summary>
 
 - Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
-- This update provides Environment Helper **0.7.0** and Pack Helper **0.1.0**. Translator **0.9.0** and Two-Zone Clock **0.3.0** keep their existing v0.3.0-preview downloads.
-- Download the Windows EXEs. Pack Helper also requires its matching `.exe.config` beside the EXE; its ZIP includes both. GitHub's automatic source archives are for development, not the ready-to-run apps.
+- **v0.4.1-preview** provides all four EXEs: Environment Helper **0.7.0**, Translator **0.9.1**, Two-Zone Clock **0.3.0**, and Pack Helper **0.1.1**.
+- Download the Windows EXEs. Pack Helper 0.1.1 needs no configuration sidecar or ZIP. GitHub's automatic source archives are for development, not the ready-to-run apps.
 - This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
 
 </details>
@@ -45,7 +46,7 @@
 <details>
 <summary><strong>Windows says it "protected your PC" on first launch</strong></summary>
 
-Preview EXEs are not code-signed yet, so Windows SmartScreen may stop the first launch. Check the file before you decide to run it:
+These are **unsigned preview** EXEs. Windows SmartScreen may stop the first launch; review the [code-signing policy and current status](docs/CODE_SIGNING.md). A SHA-256 match verifies file integrity, not publisher identity. Check the file before you decide to run it:
 
 1. Open PowerShell in the folder with the download and run (use the name of the file you downloaded):
 
@@ -53,14 +54,14 @@ Preview EXEs are not code-signed yet, so Windows SmartScreen may stop the first 
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. Compare the result with the same file's line in [SHA256SUMS.txt](docs/SHA256SUMS.txt). Only a match shows the file is unchanged.
+2. Compare the result with the same file's line in [release SHA-256 checksums](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview#sha-256). Only a match shows the file is unchanged.
 3. If it matches, choose **More info → Run anyway** in the SmartScreen window. If it does not, delete the file and download it again from this repository's Releases.
 
 </details>
 
 ### Keep the apps up to date
 
-Environment Helper, Translator and Clock have a manual update check. Pack Helper 0.1.0 does not yet include this feature. It shows the available version from this repository's public GitHub releases, including previews, and lets you save the matching EXE to a location you choose.
+All four apps have a manual update check. In Pack Helper 0.1.1, open **Settings → Check updates**. Checks show the available version from this repository's public GitHub releases, including previews, and let you save the matching EXE to a location you choose.
 
 <details>
 <summary><strong>How update downloads work</strong></summary>
@@ -117,7 +118,7 @@ Offscreen demo rendering with synthetic data. No real cache was scanned or clean
 
 Close Claude and Claude Code normally before cleanup, repair or restore. Chats, login data, cookies, skills, plugins, hooks, MCP settings, custom rules and local identity remain protected. Configuration repair removes **selected authentication overrides**, not stored official login data. Unknown paths and linked files are skipped. CC Switch / Cockpit provider takeover is not switched automatically.
 
-**Preview status:** The 0.7.0 integration passed 1,684 isolated checks and its final build verification. Independent Windows VM end-to-end acceptance is still pending; fixture checks do not establish results for your browser or network. Those tests do not apply cleanup or configuration changes to a personal environment.
+**Preview status:** [Cloud Windows acceptance passed](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41398526505) for source `5959687`: 49 workflow checks, 11 time-zone checks, and captured windows for all four apps. Changes and undo were exercised on a disposable GitHub-hosted Windows VM with temporary fixtures, not on a personal PC. This does not verify a real Claude account, personal browser/network behavior, live update downloads or real-media end-to-end use. Later source changes need their own successful run.
 
 <details>
 <summary><strong>What optimization changes — and what it preserves</strong></summary>
@@ -242,11 +243,11 @@ Offscreen preview from the compiled clock, with synthetic times and regions.
 
 Package selected source files, images and video locally before handing them to Claude. Review the file list, optionally add handoff notes, and keep the originals intact. Each output file is capped at **29,000,000 bytes**. Source filtering excludes common build/runtime folders and suspected secrets; review the result before sharing it.
 
-The app does not upload files or contact an AI service. Ordinary packaging and PNG/JPEG/BMP processing use built-in components; video compression and WebP decoding need an existing local **FFmpeg**.
+Local packing does not upload files or contact an AI service. Only a manually requested update check or download contacts GitHub. Ordinary packaging and PNG/JPEG/BMP processing use built-in components; video compression and WebP decoding need an existing local **FFmpeg**.
 
-[Download EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe) · [Required matching config](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config) · [Download both as ZIP](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip)
+[Download Pack Helper 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe)
 
-Keep `WhalePackHelper.exe.config` beside `WhalePackHelper.exe`. [Source and usage](apps/whale-pack-helper/README.md) include the build script, resources and tests.
+One EXE, no configuration sidecar or ZIP. [Source and usage](apps/whale-pack-helper/README.md) include the build script, resources and tests.
 
 ---
 
@@ -264,6 +265,10 @@ Keep `WhalePackHelper.exe.config` beside `WhalePackHelper.exe`. [Source and usag
 | Pack Helper | [apps/whale-pack-helper](apps/whale-pack-helper/) | [Usage and dependencies](apps/whale-pack-helper/README.md) |
 
 Offline translation uses CTranslate2 and SentencePiece with optional packages from the Argos catalog. Upstream licenses and attribution are retained in the [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Security, privacy and signing
+
+Read the [privacy notice](docs/PRIVACY.md), [security reporting guide](SECURITY.md), and [code-signing policy](docs/CODE_SIGNING.md). Online translation sends selected text to Google; offline translation and local packing stay on the device. Manual update checks and downloads contact GitHub.
 
 ## License
 
