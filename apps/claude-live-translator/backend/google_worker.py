@@ -82,7 +82,9 @@ def call_google(text: str, direction: str) -> str:
         pieces = [item[0] for item in data[0] if isinstance(item, list) and item and isinstance(item[0], str)]
         if not pieces:
             raise TranslationError("invalid_response")
-        return "".join(pieces)
+        # Remove artifacts only from Google's returned translation. Source text and
+        # protected code/URLs are left untouched and restored by the caller later.
+        return "".join(pieces).replace("\u200b", "").replace("\ufeff", "")
     except urllib.error.HTTPError as exc:
         if exc.code == 429:
             raise TranslationError("rate_limited") from None

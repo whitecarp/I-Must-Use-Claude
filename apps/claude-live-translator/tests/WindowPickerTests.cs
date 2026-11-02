@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ClaudeCompanion;
 
 internal static class WindowPickerTests {
+    [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
     static void Check(bool value,string name){if(!value)throw new Exception(name);}
     static object Get(object o,string field){return o.GetType().GetField(field,BindingFlags.Instance|BindingFlags.NonPublic).GetValue(o);}
     static object Call(object o,string name,params object[] args){return o.GetType().GetMethod(name,BindingFlags.Instance|BindingFlags.NonPublic).Invoke(o,args);}
@@ -94,8 +96,41 @@ internal static class WindowPickerTests {
             FixturePrivacy(picker,"stale choice");
         }
     }
+    static void CompactPickerTests(SourceWindow fixture){
+        var background=new SourceWindow{App="AsMonitorControl",Title="Monitor"};
+        var regular=new SourceWindow{App="Custom editor",Title="Notes"};
+        var chat=new SourceWindow{App="ChatGPT",Title="Reading"};
+        var browser=new SourceWindow{App="chrome",Title="Browser"};
+        var ordered=SourceWindowPickerForm.OrderedSources(new[]{background,regular,chat,null,browser});
+        Check(ordered.Count==4,"sorting retains every non-null window");
+        Check(ordered[0]==chat&&ordered[1]==browser&&ordered[2]==regular&&ordered[3]==background,"common readers precede normal apps and driver controls");
+        Check(SourceWindowPickerForm.NavigationIndex(0,8,2,Keys.Up)==0,"up at first card is bounded");
+        Check(SourceWindowPickerForm.NavigationIndex(1,8,2,Keys.Down)==3,"down follows the same column");
+        Check(SourceWindowPickerForm.NavigationIndex(3,8,2,Keys.Up)==1,"up follows the same column");
+        Check(SourceWindowPickerForm.NavigationIndex(4,8,2,Keys.Left)==3,"left moves to previous card");
+        Check(SourceWindowPickerForm.NavigationIndex(7,8,2,Keys.Right)==7,"right at final card is bounded");
+        Check(SourceWindowPickerForm.NavigationIndex(1,8,1,Keys.Down)==2,"narrow one-column layouts navigate vertically");
+        using(var picker=new SourceWindowPickerForm(null,new[]{fixture})){
+            int expectedHeight;using(var graphics=picker.CreateGraphics())expectedHeight=(int)Math.Round(65*graphics.DpiX/96F);
+            Check(Cards(picker)[0].Height==expectedHeight,"compact card follows the current device DPI");
+            ((TextBox)Get(picker,"search")).Text="__missing__";
+            ((TextBox)Get(picker,"search")).Text="";
+            Check(Cards(picker)[0].Height==expectedHeight,"cards created after search retain the initial DPI dimensions");
+            Check(Cards(picker)[0].IconImage==null,"missing icons use the painted initial instead of a system icon");
+            var field=(PickerSearchField)Get(picker,"searchField");
+            picker.PerformLayout();field.Parent.PerformLayout();
+            Check(field.Bottom<=field.Parent.ClientSize.Height,"search field stays inside its DPI-scaled row");
+            Check(field.Input.Top>=0&&field.Input.Bottom<=field.ClientSize.Height,"search text is vertically contained at device DPI");
+            var cancel=(Button)Get(picker,"cancel");cancel.Parent.PerformLayout();
+            Check(cancel.Bottom<=cancel.Parent.ClientSize.Height,"cancel button stays inside its footer row");
+            Check(field.Placeholder=="搜索窗口或程序名","Chinese search cue is present");
+            Ui.SetEnglish(true);Check(field.Placeholder=="Search windows or apps","English search cue is present");Ui.SetEnglish(false);
+            Check(picker.Icon!=null,"picker receives a window icon");
+            FixturePrivacy(picker,"compact fixture");
+        }
+    }
     [STAThread] static int Main(){
-        try{return Run();}
+        try{SetProcessDPIAware();return Run();}
         catch(Exception error){Console.WriteLine("WindowPickerTests failed: "+error.GetBaseException().Message);Console.WriteLine(error.GetBaseException().StackTrace);return 1;}
     }
     static int Run(){
@@ -105,7 +140,7 @@ internal static class WindowPickerTests {
             var current=Source(first,"FixtureEditor","Project Alpha — original files");
             var other=Source(second,"FixtureBrowser","中文阅读 · 第二个窗口");
             Check(current.IsAlive()&&other.IsAlive(),"hidden source fixtures are live");
-            FilteringTests(current,other);ChoiceTests(current,other);StaleTests(current);
+            FilteringTests(current,other);ChoiceTests(current,other);StaleTests(current);CompactPickerTests(current);
             Check(!first.Visible&&!second.Visible,"source fixtures remain hidden");
         }
         Console.WriteLine("WindowPickerTests passed: bilingual search/empty states, exact identity badges, single click/keyboard/cancel, stale identities, fixture privacy. No enumeration, clipboard, synthesized input, or network used.");

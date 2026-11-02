@@ -125,7 +125,8 @@ internal static class OfflineModeTests {
                 Check(Preferences.Target == "fr", "Offline direction selection must preserve the saved Google target");
                 Check(((LanguagePack)Field<ComboBox>(form, "direction").SelectedItem).Pair == Preferences.OfflinePair, "Unavailable saved offline direction must fall back to an installed pair");
                 Check(Field<ComboBox>(form, "engine").SelectedIndex == 0, "Offline preference did not initialize the engine selector");
-                Check(Field<Label>(form, "privacy").Text.Contains(english ? "No upload" : "文字不上传"), "Offline privacy label is missing or in the wrong language");
+                Check(Field<Label>(form, "privacy").Text.Contains(english ? "No upload" : "不上传"), "Offline privacy label is missing or in the wrong language");
+                Check(Field<ToolTip>(form, "tips").GetToolTip(Field<Label>(form, "privacy")).Contains(english ? "not uploaded" : "不上传文字"), "Detailed offline disclosure must remain available beside the compact caption");
                 Check(Field<Label>(form, "subtitle").Text.Contains(english ? "Offline" : "离线"), "Offline subtitle is misleading");
                 Check(Field<Button>(form, "checkConnection").Text == (english ? "Test offline" : "检测离线库"), "Offline test button still describes Google");
                 Check(Field<Label>(form, "googleStatus").Text.Contains(english ? "Translation needs no network" : "翻译无需联网"), "Installed offline engine status still implies a network service");
@@ -150,7 +151,8 @@ internal static class OfflineModeTests {
             Check(Field<int>(form, "epoch") > priorEpoch && Field<int>(form, "selectionEpoch") > priorSelection, "Changing engine did not invalidate pending results and captures");
             Check(Field<bool>(form, "needsFreshSelection"), "Google mode may reuse text captured while offline");
             Check(direction.Items.Count == LanguageChoice.All.Length, "Online mode did not restore the full target-language catalog");
-            Check(Field<Label>(form, "privacy").Text.Contains(english ? "goes to Google" : "发送给 Google"), "Online privacy label does not disclose text upload");
+            Check(Field<Label>(form, "privacy").Text.Contains(english ? "Selection → Google" : "发送给 Google"), "Online privacy label does not disclose text upload");
+            Check(Field<ToolTip>(form, "tips").GetToolTip(Field<Label>(form, "privacy")).Contains(english ? "sent to Google" : "发送给 Google"), "Detailed online disclosure must explain the compact Google caption");
             Check(Field<Label>(form, "googleStatus").Text.Contains(english ? "next translation sends text to Google" : "下次翻译会发送文字给 Google"), "Engine change does not explain the next upload");
             Check(Field<Label>(form, "status").Text.Contains(english ? "Select new text" : "重新划选"), "Engine change does not request fresh input");
             ContentRetained(form, snapshot, "Switching to Google");

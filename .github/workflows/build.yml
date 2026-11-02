@@ -110,6 +110,31 @@ jobs:
             (Join-Path $root 'clock/TwoZoneClock.exe'),
             (Get-ChildItem -LiteralPath (Join-Path $root 'pack') -Filter '*.exe' | Where-Object Name -notlike 'WhalePack.Tests*' | Select-Object -First 1).FullName
           )
+      - name: Run translator UI, saved replies and worker regressions in isolation
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        timeout-minutes: 8
+        run: |
+          if ($env:GITHUB_ACTIONS -ne 'true' -or $env:WHALE_E2E_ALLOW_SYSTEM_CHANGES -ne '1' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Translator UI acceptance requires a disposable GitHub-hosted Windows runner.' }
+          ./apps/claude-live-translator/tests/run-regression.ps1 -OutputDirectory "$env:RUNNER_TEMP/translator-regression" -PythonPath (Get-Command python).Source
+      - name: Render translator saved-reply previews with synthetic data only
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        timeout-minutes: 5
+        run: ./.github/scripts/translator-previews.ps1 -Executable "$env:RUNNER_TEMP/launch/translator/ClaudeChinese.exe" -ScreenshotDirectory "$env:RUNNER_TEMP/translator-previews"
+      - name: Keep translator regression receipts and previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: translator-regression-and-previews
+          path: |
+            ${{ runner.temp }}/translator-regression/*.json
+            ${{ runner.temp }}/translator-regression/*.txt
+            ${{ runner.temp }}/translator-previews/*.json
+            ${{ runner.temp }}/translator-previews/*.txt
+            ${{ runner.temp }}/translator-previews/native-100/*.png
+            ${{ runner.temp }}/translator-previews/scaled-preview-150/*.png
+          if-no-files-found: warn
       - name: Render clock reset previews with synthetic data only
         if: ${{ !cancelled() }}
         shell: pwsh

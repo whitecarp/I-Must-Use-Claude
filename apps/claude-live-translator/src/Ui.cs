@@ -5,6 +5,7 @@ using System.Text;
 namespace ClaudeCompanion {
     internal static class Ui {
         public static bool English;
+        public static void ApplyIcon(System.Windows.Forms.Form form) { WindowIcon.Apply(form); }
         public static event Action LanguageChanged;
         public static string T(string zh, string en) { return English ? en : zh; }
         public static void SetEnglish(bool value) {

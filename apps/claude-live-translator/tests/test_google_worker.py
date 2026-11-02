@@ -10,6 +10,31 @@ g = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(g)
 
 class GoogleTests(unittest.TestCase):
+    def test_google_output_zero_width_artifacts_removed_without_editing_request(self):
+        source = 'Original\u200b text\ufeff remains untouched.'
+        response = mock.MagicMock()
+        response.status = 200
+        response.read.return_value = g.json.dumps(
+            [[['中文\u200b', source], ['\ufeff译文\u200c\u200d', None]]]
+        ).encode('utf-8')
+        response.__enter__.return_value = response
+        opener = mock.Mock()
+        opener.open.return_value = response
+        with mock.patch.object(g.urllib.request, 'build_opener', return_value=opener):
+            self.assertEqual(g.call_google(source, 'en_zh'), '中文译文\u200c\u200d')
+        request = opener.open.call_args.args[0]
+        self.assertEqual(g.urllib.parse.parse_qs(request.data.decode('utf-8'))['q'], [source])
+
+    def test_source_zero_width_characters_survive_untranslated_and_protected_content(self):
+        transport = mock.Mock(side_effect=lambda text, direction: text)
+        translator = g.GoogleTranslator(transport, 0)
+        untouched = '原文\u200b保留\ufeff。'
+        self.assertEqual(translator.translate(untouched, 'en_zh'), untouched)
+        transport.assert_not_called()
+        protected = '`name\u200b\ufeff.txt`\n\n```\nkeep\u200b\ufeff()\n```\n'
+        self.assertEqual(translator.translate(protected, 'en_zh'), protected)
+        transport.assert_not_called()
+
     def test_worker_ready_handshake_does_not_claim_google_is_online(self):
         # The startup handshake confirms only the local worker process is ready.
         output = io.StringIO()

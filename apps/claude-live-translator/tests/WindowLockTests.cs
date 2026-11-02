@@ -52,12 +52,12 @@ internal static class WindowLockTests {
             ((Task)Call(form,"ReadSelection",new IntPtr(456))).GetAwaiter().GetResult();
             Check((int)Get(form,"selectionEpoch")==before,"other window ignored before capture");
             Ui.SetEnglish(true);
-            Check(form.Text=="Whale Translator 0.8.1","English title");
+            Check(form.Text=="Whale Translator "+Program.Version,"English title");
             Check(((Button)Get(form,"language")).Text=="中文","Chinese switch label");
             ContentRetained(form,"English toggle");
             Check(((ComboBox)Get(form,"direction")).AccessibleName=="Target language","English accessibility label");
             Ui.SetEnglish(false);
-            Check(form.Text=="大肥鱼翻译 0.8.1","Chinese title");
+            Check(form.Text=="大肥鱼翻译 "+Program.Version,"Chinese title");
             ContentRetained(form,"Chinese toggle");
             int priorEpoch=(int)Get(form,"epoch");Call(form,"Pause");
             Check(!(bool)Get(form,"active")&&(int)Get(form,"epoch")>priorEpoch,"pause invalidates pending results");

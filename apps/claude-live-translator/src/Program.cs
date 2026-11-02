@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
-[assembly: System.Reflection.AssemblyVersion("0.9.1.0")]
-[assembly: System.Reflection.AssemblyFileVersion("0.9.1.0")]
+[assembly:System.Reflection.AssemblyVersion("0.9.4.0")]
+[assembly:System.Reflection.AssemblyFileVersion("0.9.4.0")]
 
 namespace ClaudeCompanion {
     internal static class Json {
@@ -152,7 +152,7 @@ namespace ClaudeCompanion {
         }
         internal static void Save(Dictionary<string,object> data,int attempt) {
             try {
-                var safe=SafeFields(data);safe["attempt"]=attempt;safe["version"]="0.9.1";
+                var safe=SafeFields(data);safe["attempt"]=attempt;safe["version"]=Program.Version;
                 string folder=Path.Combine(Preferences.DataDirectory,"diagnostics");
                 Directory.CreateDirectory(folder);
                 // One bounded diagnostic record only: never selected text, title, URL, or credentials.
@@ -281,14 +281,19 @@ namespace ClaudeCompanion {
         }
     }
     internal static class Program {
+        internal const string Version = "0.9.4";
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
         [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
         private static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
         [STAThread] static void Main(string[] args) {
+            // All forms use a 96-DPI design baseline; let WinForms scale once.
+            try { SetProcessDPIAware(); } catch (EntryPointNotFoundException) { }
             SetCurrentProcessExplicitAppUserModelID("Dafeiyu.Translator.Desktop");
             Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false); Preferences.Load();
             if(args.Length==2&&(args[0]=="--self-test-offline"||args[0]=="--self-test-online")) { TranslationSelfTest(args[1],args[0]=="--self-test-offline");return; }
             if(args.Length==2&&args[0]=="--self-test-packs"){
-                var report=new Dictionary<string,object>();report["version"]="0.9.1";
+                var report=new Dictionary<string,object>();report["version"]=Version;
                 try{var result=PackService.Run("--list",null,null,CancellationToken.None).GetAwaiter().GetResult();report["ok"]=Json.Bool(result,"ok");report["catalogCount"]=LanguagePack.ReadList(result,"catalog").Count;report["installedCount"]=LanguagePack.ReadList(result,"installed").Count;report["uiInstalledCount"]=LanguagePack.InstalledPacks().Count;}
                 catch(Exception ex){report["ok"]=false;report["error"]=ex.Message;}
                 File.WriteAllText(args[1],Json.Encode(report),new UTF8Encoding(false));return;
@@ -316,7 +321,7 @@ namespace ClaudeCompanion {
             }
         }
         private static void TranslationSelfTest(string path,bool offline){
-            var report=new Dictionary<string,object>();report["version"]="0.9.1";report["offline"]=offline;
+            var report=new Dictionary<string,object>();report["version"]=Version;report["offline"]=offline;
             try {
                 using(var worker=new Worker()){
                     string chinese=worker.Translate("Please keep the original file.","auto:zh-CN",offline).GetAwaiter().GetResult();

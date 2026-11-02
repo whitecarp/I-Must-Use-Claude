@@ -18,7 +18,7 @@ internal static class LanguagePackModeTests {
     private static string Direction(CompanionForm form) { return (string)form.GetType().GetProperty("SelectedDirection",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(form,null); }
     private static Button FindButton(Control root,string text) {
         foreach(Control child in root.Controls) {
-            var button=child as Button;if(button!=null&&button.Text==text)return button;
+            var button=child as Button;if(button!=null&&(button.Text==text||button.AccessibleName==text))return button;
             var nested=FindButton(child,text);if(nested!=null)return nested;
         }
         return null;
@@ -54,8 +54,13 @@ internal static class LanguagePackModeTests {
             engine.SelectedIndex=0;
             Check(Preferences.Offline,"offline mode remains selectable before installing any pack");
             Check(!targets.Enabled&&targets.Items.Count==1&&!(targets.SelectedItem is LanguagePack),"missing packs show a disabled explanatory direction row");
-            var manage=FindButton(form,"离线语言包");
-            Check(manage!=null&&manage.Enabled,"language pack manager entry stays available without any installed pack");
+            var settingsModel=(SettingsPanelModel)Call(form,"CreateSettingsModel");
+            using(var settings=new SettingsPanel(settingsModel)){
+                var manage=FindButton(settings,"离线语言包");
+                Check(manage!=null&&manage.Enabled,"settings keeps the language pack manager available without an installed pack");
+                Check(settingsModel.ManagePacks!=null&&settingsModel.ManagePacks.Method.Name=="ManagePacks","settings pack entry delegates to the original pack-management flow");
+                Check(!((ComboBox)Get(settings,"targets")).Enabled,"settings reflects disabled offline directions until a pack is installed");
+            }
             Check(((Label)Get(form,"googleStatus")).Text.Contains("离线语言包"),"missing packs point the user to the pack manager");
             CheckWorkerIdle(form,"mode change without a pack");
             Check(!File.Exists(Path.Combine(directory,"preferences.json")),"preview mode never creates a preference file");

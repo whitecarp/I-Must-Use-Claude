@@ -13,10 +13,44 @@ namespace ClaudeCompanion {
     }
     internal static class GlossaryStore {
         internal static string FilePath { get { return Path.Combine(Preferences.DataDirectory,"glossary.json"); } }
-        internal static List<GlossaryEntry> Defaults(){return new List<GlossaryEntry>{
-            new GlossaryEntry{source="Claude",replacement="Claude",target="*"},
-            new GlossaryEntry{source="Codex",replacement="Codex",target="*"},
-            new GlossaryEntry{source="Skills",replacement="Skills",target="*"}};}
+        internal static List<GlossaryEntry> Defaults(){
+            var rows=new List<GlossaryEntry>();
+            foreach(string name in new[]{"Claude","Claude Code","Claude Desktop","Codex","Skills","Anthropic","OpenAI","ChatGPT","Gemini","DeepSeek","GitHub","Git","MCP","API","CLI","SDK","JSON","YAML","TOML","Markdown","Python","JavaScript","TypeScript","PowerShell","Node.js","Docker","React","UTF-8","Cockpit Tools","CC Switch","Opus","Sonnet","Haiku"})
+                rows.Add(new GlossaryEntry{source=name,replacement=name,target="*"});
+            // Use technical phrases rather than ambiguous words such as build or token.
+            string[,] phrases={
+                {"context window","上下文窗口"},{"system prompt","系统提示词"},
+                {"tool call","工具调用"},{"tool calls","工具调用"},
+                {"rate limit","速率限制"},{"rate limiting","限流"},
+                {"code review","代码审查"},{"pull request","拉取请求"},
+                {"merge conflict","合并冲突"},{"unit test","单元测试"},
+                {"regression test","回归测试"},{"environment variable","环境变量"},
+                {"API key","API 密钥"},{"access token","访问令牌"},
+                {"command line","命令行"},{"working directory","工作目录"},
+                {"source code","源代码"},{"read-only","只读"}};
+            for(int i=0;i<phrases.GetLength(0);i++){
+                string term=phrases[i,0],translation=phrases[i,1];
+                rows.Add(new GlossaryEntry{source=term,replacement=translation,target="zh-CN"});
+                string initial=Char.ToUpperInvariant(term[0])+term.Substring(1);
+                if(initial!=term)rows.Add(new GlossaryEntry{source=initial,replacement=translation,target="zh-CN"});
+            }
+            string[,] reverse={
+                {"上下文窗口","context window"},{"系统提示词","system prompt"},
+                {"工具调用","tool call"},{"速率限制","rate limit"},
+                {"单元测试","unit test"},{"回归测试","regression test"},
+                {"代码审查","code review"},{"环境变量","environment variable"}};
+            for(int i=0;i<reverse.GetLength(0);i++)rows.Add(new GlossaryEntry{source=reverse[i,0],replacement=reverse[i,1],target="en"});
+            return Validate(rows);
+        }
+        // Saved dictionaries are user-owned: only an explicit editor action adds defaults.
+        internal static List<GlossaryEntry> MergeRecommended(IEnumerable<GlossaryEntry> current){
+            var rows=Validate(current);
+            foreach(var recommended in Defaults()){
+                bool conflict=rows.Exists(delegate(GlossaryEntry row){return row.source==recommended.source&&(row.target==recommended.target||row.target=="*"||recommended.target=="*");});
+                if(!conflict)rows.Add(recommended);
+            }
+            return Validate(rows);
+        }
         internal static List<GlossaryEntry> Validate(IEnumerable<GlossaryEntry> source){
             var result=new List<GlossaryEntry>();var seen=new HashSet<string>(StringComparer.Ordinal);
             foreach(var item in source){
@@ -51,30 +85,103 @@ namespace ClaudeCompanion {
     }
     internal sealed class GlossaryForm:Form {
         private readonly DataGridView grid;
+        private readonly TableLayoutPanel layout;
+        private readonly FlowLayoutPanel actions;
+        private readonly List<GlossaryTarget> targetsList=new List<GlossaryTarget>();
+        private ContextMenuStrip targetMenu;
         internal GlossaryForm(){
-            Text=Ui.T("术语词典","Glossary");Size=new Size(650,460);MinimumSize=new Size(610,390);StartPosition=FormStartPosition.CenterParent;
+            SuspendLayout();Ui.ApplyIcon(this);
+            Text=Ui.T("术语词典","Glossary");Size=new Size(720,500);MinimumSize=new Size(700,430);StartPosition=FormStartPosition.CenterParent;
             BackColor=Theme.Cream;ForeColor=Theme.Ink;Font=new Font("Microsoft YaHei UI",10);AutoScaleMode=AutoScaleMode.Dpi;
-            var layout=new TableLayoutPanel{Dock=DockStyle.Fill,Padding=new Padding(16),ColumnCount=1,RowCount=3};
-            layout.RowStyles.Add(new RowStyle(SizeType.Absolute,76));layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,48));
-            layout.Controls.Add(new Label{Dock=DockStyle.Fill,Text=Ui.T("固定常用词的译法，在线和离线都生效。\n区分大小写；较长词组优先，链接和代码保持原样。\n只保存你填写的词典；翻译记录不会保存到磁盘。","Keep recurring terms consistent, online and offline.\nCase-sensitive; longer phrases win. Links and code stay unchanged.\nOnly this glossary is saved. Translation history stays in memory."),ForeColor=Theme.Muted},0,0);
+            layout=new TableLayoutPanel{Dock=DockStyle.Fill,Padding=new Padding(16),ColumnCount=1,RowCount=3};
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute,100));layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,48));
+            layout.Controls.Add(new Label{Dock=DockStyle.Fill,Text=Ui.T("内置 Claude 名称与常用技术术语，在线和离线都生效。\n区分大小写；较长词组优先，链接和代码保持原样。\n「补充内置词条」保留你的译法；点击保存才会生效。\n只保存词典；翻译记录不会保存到磁盘。","Built-in Claude names and technical terms work online and offline.\nCase-sensitive; longer phrases win. Links and code stay unchanged.\nAdd built-in terms keeps your edits; Save applies the changes.\nOnly the glossary is saved. Translation history stays in memory."),ForeColor=Theme.Muted},0,0);
             grid=new DataGridView{Dock=DockStyle.Fill,BackgroundColor=Color.White,BorderStyle=BorderStyle.None,AutoSizeColumnsMode=DataGridViewAutoSizeColumnsMode.Fill,AllowUserToAddRows=true,AllowUserToDeleteRows=true,RowHeadersWidth=28,SelectionMode=DataGridViewSelectionMode.CellSelect};
+            grid.EnableHeadersVisualStyles=false;grid.GridColor=Theme.Line;grid.ColumnHeadersDefaultCellStyle.BackColor=Theme.Mist;grid.ColumnHeadersDefaultCellStyle.ForeColor=Theme.Ink;
+            grid.DefaultCellStyle.ForeColor=Theme.Ink;grid.DefaultCellStyle.SelectionBackColor=Theme.Blue;grid.DefaultCellStyle.SelectionForeColor=Theme.Ink;
+            grid.RowHeadersDefaultCellStyle.BackColor=Theme.Cream;grid.RowHeadersDefaultCellStyle.SelectionBackColor=Theme.Blue;grid.RowTemplate.Height=34;
             grid.Columns.Add("source",Ui.T("原词 / 词组","Term / phrase"));grid.Columns.Add("replacement",Ui.T("固定译法","Replacement"));
-            var targets=new DataGridViewComboBoxColumn{Name="target",HeaderText=Ui.T("译成此语言时生效","Apply when translating to"),DisplayMember="Name",ValueMember="Code",FlatStyle=FlatStyle.Flat};
-            var choices=new List<GlossaryTarget>{new GlossaryTarget{Code="*",Name=Ui.T("所有语言","All languages")}};
+            var targets=new DataGridViewComboBoxColumn{Name="target",HeaderText=Ui.T("译成此语言时生效","Apply when translating to"),DisplayMember="Name",ValueMember="Code",FlatStyle=FlatStyle.Flat,DisplayStyle=DataGridViewComboBoxDisplayStyle.Nothing,ReadOnly=true};
+            var choices=targetsList;choices.Add(new GlossaryTarget{Code="*",Name=Ui.T("所有语言","All languages")});
             foreach(var choice in LanguageChoice.All)choices.Add(new GlossaryTarget{Code=choice.Code,Name=choice.Name});
             var entries=GlossaryStore.Load();foreach(var item in entries)if(!choices.Exists(delegate(GlossaryTarget c){return c.Code==item.target;}))choices.Add(new GlossaryTarget{Code=item.target,Name=item.target});
             targets.DataSource=choices;grid.Columns.Add(targets);grid.Columns["target"].FillWeight=115;
+            grid.CellPainting+=PaintTargetCell;
+            grid.CellMouseClick+=delegate(object sender,DataGridViewCellMouseEventArgs args){if(args.Button==MouseButtons.Left&&args.ColumnIndex==2&&args.RowIndex>=0)ShowTargetMenu(args.RowIndex);};
+            grid.KeyDown+=delegate(object sender,KeyEventArgs args){if(grid.CurrentCell!=null&&grid.CurrentCell.ColumnIndex==2&&(args.KeyCode==Keys.F4||args.KeyCode==Keys.Space||args.KeyCode==Keys.Enter||(args.Alt&&args.KeyCode==Keys.Down))){args.Handled=true;args.SuppressKeyPress=true;ShowTargetMenu(grid.CurrentCell.RowIndex);}};
             grid.DefaultValuesNeeded+=delegate(object sender,DataGridViewRowEventArgs args){args.Row.Cells["target"].Value="*";};
             foreach(var entry in entries)grid.Rows.Add(entry.source,entry.replacement,entry.target);
             layout.Controls.Add(grid,0,1);
-            var actions=new FlowLayoutPanel{Dock=DockStyle.Fill,FlowDirection=FlowDirection.RightToLeft,WrapContents=false};
+            actions=new FlowLayoutPanel{Dock=DockStyle.Fill,FlowDirection=FlowDirection.RightToLeft,WrapContents=false};
             var save=Theme.Button(Ui.T("保存","Save"),true);save.Click+=delegate{SaveRows();};
             var cancel=Theme.Button(Ui.T("取消","Cancel"),false);cancel.Click+=delegate{DialogResult=DialogResult.Cancel;Close();};
             var remove=Theme.Button(Ui.T("删除此行","Remove row"),false);remove.Width=112;remove.Click+=delegate{if(grid.CurrentRow!=null&&!grid.CurrentRow.IsNewRow)grid.Rows.Remove(grid.CurrentRow);};
-            actions.Controls.AddRange(new Control[]{save,cancel,remove});layout.Controls.Add(actions,0,2);Controls.Add(layout);CancelButton=cancel;
+            var recommended=Theme.Button(Ui.T("补充内置词条","Add built-in terms"),false);recommended.Width=170;recommended.Click+=delegate{AddRecommended();};
+            actions.Controls.AddRange(new Control[]{save,cancel,remove,recommended});layout.Controls.Add(actions,0,2);Controls.Add(layout);CancelButton=cancel;
+            AutoScaleDimensions=new SizeF(96F,96F);ResumeLayout(true);
+        }
+        protected override void OnLoad(EventArgs args){
+            base.OnLoad(args);
+            // Framework 4 does not reliably scale nested TableLayoutPanel row
+            // styles or DataGridView row/header metrics. Set these from the
+            // 96-DPI design once the form has its real monitor graphics context.
+            layout.SuspendLayout();actions.SuspendLayout();
+            layout.Padding=new Padding(Theme.Scale(this,16));
+            layout.RowStyles[0].Height=Theme.Scale(this,100);
+            layout.RowStyles[2].Height=Theme.Scale(this,52);
+            foreach(Control child in layout.Controls)child.Margin=new Padding(Theme.Scale(this,3));
+            foreach(Control button in actions.Controls){
+                button.Height=Theme.Scale(this,38);
+                button.Width=Math.Max(Theme.Scale(this,80),TextRenderer.MeasureText(button.Text,button.Font).Width+Theme.Scale(this,28));
+                button.Margin=new Padding(0,Theme.Scale(this,4),Theme.Scale(this,8),Theme.Scale(this,4));
+            }
+            grid.RowHeadersWidth=Theme.Scale(this,28);
+            grid.ColumnHeadersHeightSizeMode=DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            grid.ColumnHeadersHeight=Theme.Scale(this,32);
+            grid.RowTemplate.Height=Theme.Scale(this,34);
+            foreach(DataGridViewRow row in grid.Rows)row.Height=grid.RowTemplate.Height;
+            actions.ResumeLayout(true);layout.ResumeLayout(true);
+        }
+        private void PaintTargetCell(object sender,DataGridViewCellPaintingEventArgs args){
+            if(args.ColumnIndex!=2||args.RowIndex<0)return;
+            args.Paint(args.ClipBounds,args.PaintParts&~(DataGridViewPaintParts.ContentForeground|DataGridViewPaintParts.Focus));
+            var g=args.Graphics;g.SmoothingMode=System.Drawing.Drawing2D.SmoothingMode.AntiAlias;float s=g.DpiX/96F;
+            var face=new RectangleF(args.CellBounds.X+5*s,args.CellBounds.Y+4*s,args.CellBounds.Width-10*s,args.CellBounds.Height-8*s);
+            if(face.Width>20*s&&face.Height>4*s){
+                using(var path=Theme.RoundedRect(face,face.Height/2))using(var fill=new SolidBrush(Color.White))using(var pen=new Pen(Theme.Line,s)){g.FillPath(fill,path);g.DrawPath(pen,path);}
+                string code=Convert.ToString(grid.Rows[args.RowIndex].Cells[2].Value),label=Convert.ToString(args.FormattedValue);
+                if(String.IsNullOrEmpty(code))label=Ui.T("所有语言","All languages");
+                TextRenderer.DrawText(g,label,args.CellStyle.Font,new Rectangle((int)(face.X+8*s),(int)face.Y,Math.Max(1,(int)(face.Width-29*s)),(int)face.Height),Theme.Ink,TextFormatFlags.VerticalCenter|TextFormatFlags.SingleLine|TextFormatFlags.EndEllipsis);
+                float x=face.Right-12*s,y=face.Y+face.Height/2;
+                using(var pen=new Pen(Theme.Muted,1.3F*s))g.DrawLines(pen,new[]{new PointF(x-4*s,y-2*s),new PointF(x,y+2*s),new PointF(x+4*s,y-2*s)});
+                if(grid.CurrentCell==grid.Rows[args.RowIndex].Cells[2]&&grid.Focused)using(var path=Theme.RoundedRect(face,face.Height/2))using(var pen=new Pen(Theme.BlueDark,s))g.DrawPath(pen,path);
+            }
+            args.Handled=true;
+        }
+        private ContextMenuStrip BuildTargetMenu(int rowIndex){
+            var menu=Theme.CreateMenu();if(rowIndex<0||rowIndex>=grid.Rows.Count)return menu;
+            var cell=grid.Rows[rowIndex].Cells["target"];string current=Convert.ToString(cell.Value);
+            foreach(var choice in targetsList){
+                string value=choice.Code;var item=new ToolStripMenuItem(choice.Name){Checked=value==(String.IsNullOrEmpty(current)?"*":current),Tag=value};Theme.MenuItem(item);
+                item.Click+=delegate{if(cell.DataGridView!=grid||cell.RowIndex<0)return;grid.EndEdit();if(Convert.ToString(cell.Value)!=value)cell.Value=value;grid.InvalidateCell(cell);};menu.Items.Add(item);
+            }return menu;
+        }
+        private void ShowTargetMenu(int rowIndex){
+            if(targetMenu!=null){targetMenu.Dispose();targetMenu=null;}targetMenu=BuildTargetMenu(rowIndex);
+            if(targetMenu.Items.Count==0)return;
+            Rectangle cell=grid.GetCellDisplayRectangle(2,rowIndex,true);targetMenu.Show(grid,new Point(cell.Left,cell.Bottom));
+            foreach(ToolStripMenuItem item in targetMenu.Items)if(item.Checked){item.Select();break;}
+        }
+        protected override void Dispose(bool disposing){if(disposing&&targetMenu!=null){targetMenu.Dispose();targetMenu=null;}base.Dispose(disposing);}
+        private List<GlossaryEntry> ReadRows(){
+            grid.EndEdit();var entries=new List<GlossaryEntry>();foreach(DataGridViewRow row in grid.Rows){if(row.IsNewRow)continue;entries.Add(new GlossaryEntry{source=Convert.ToString(row.Cells[0].Value),replacement=Convert.ToString(row.Cells[1].Value),target=Convert.ToString(row.Cells[2].Value)});}return entries;
+        }
+        private void AddRecommended(){
+            try{var entries=GlossaryStore.MergeRecommended(ReadRows());grid.Rows.Clear();foreach(var entry in entries)grid.Rows.Add(entry.source,entry.replacement,entry.target);}
+            catch(InvalidOperationException error){MessageBox.Show(this,error.Message,Text,MessageBoxButtons.OK,MessageBoxIcon.Information);}
         }
         private void SaveRows(){
-            try{grid.EndEdit();var entries=new List<GlossaryEntry>();foreach(DataGridViewRow row in grid.Rows){if(row.IsNewRow)continue;entries.Add(new GlossaryEntry{source=Convert.ToString(row.Cells[0].Value),replacement=Convert.ToString(row.Cells[1].Value),target=Convert.ToString(row.Cells[2].Value)});}GlossaryStore.Save(entries);DialogResult=DialogResult.OK;Close();}
+            try{GlossaryStore.Save(ReadRows());DialogResult=DialogResult.OK;Close();}
             catch(Exception error){MessageBox.Show(this,error is InvalidOperationException?error.Message:Ui.T("词典未保存，请检查文件夹写入权限。","Glossary was not saved. Check folder write permissions."),Text,MessageBoxButtons.OK,MessageBoxIcon.Information);}
         }
         private sealed class GlossaryTarget { public string Code{get;set;}public string Name{get;set;} }

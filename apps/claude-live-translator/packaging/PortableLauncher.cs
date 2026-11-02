@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -50,7 +51,7 @@ namespace DafeiyuPortable {
                         LaunchApplication(report.CacheDirectory,args,originalDirectory);
                     }catch(Exception error) {
                         exitCode=1;
-                        MessageBox.Show(progress,"大肥鱼暂时无法启动。\r\n\r\n"+error.Message+"\r\n\r\n请检查磁盘空间，并关闭正在使用此版本的大肥鱼后重试。\r\n\r\nWhale Translator could not start. Check free space and close this version before trying again.","大肥鱼翻译 · Whale Translator",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                        MessageBox.Show(progress,progress.StartFailure(error.Message),progress.Text,MessageBoxButtons.OK,MessageBoxIcon.Error);
                     }finally { progress.Finish(); }
                 };
                 Application.Run(progress);
@@ -78,7 +79,6 @@ namespace DafeiyuPortable {
                     if(!acquired)throw new IOException("另一个大肥鱼正在准备文件，请稍后重试。 / Another copy is preparing files; try again shortly.");
                     if(!ValidateRuntime(cache,manifest)) {
                         Notify(progress,"首次启动正在准备应用文件… / Preparing application files for first launch…");
-                        using(var resource=OpenResource("payload.zip"))if(HashStream(resource)!=PortableBuildInfo.PayloadSha256)throw new InvalidDataException("Embedded application payload is damaged.");
                         string temporary=Path.Combine(cacheRoot,".tmp-"+PortableBuildInfo.PayloadSha256.Substring(0,12)+"-"+Guid.NewGuid().ToString("N").Substring(0,16));
                         Directory.CreateDirectory(temporary);
                         try {
@@ -144,7 +144,9 @@ namespace DafeiyuPortable {
             var expected=new Dictionary<string,PayloadFile>(StringComparer.OrdinalIgnoreCase);
             foreach(var file in manifest.Files)expected.Add(file.Path,file);
             var seen=new HashSet<string>(StringComparer.OrdinalIgnoreCase);int count=0;
-            using(var resource=OpenResource("payload.zip"))using(var archive=new ZipArchive(resource,ZipArchiveMode.Read,false)) {
+            using(var resource=OpenResource("payload.lzms"))
+            using(var decoded=DecodeArchive(resource,PortableBuildInfo.PayloadSha256,PortableBuildInfo.ArchiveSha256,PortableBuildInfo.ArchiveBytes))
+            using(var archive=new ZipArchive(decoded,ZipArchiveMode.Read,false)) {
                 foreach(var entry in archive.Entries) {
                     PayloadFile file;
                     if(!IsSafeRelativePath(entry.FullName)||!expected.TryGetValue(entry.FullName,out file)||!String.Equals(entry.FullName,file.Path,StringComparison.Ordinal)||!seen.Add(entry.FullName)||entry.Length!=file.Length||
@@ -161,6 +163,18 @@ namespace DafeiyuPortable {
                 }
             }
             if(seen.Count!=expected.Count)throw new InvalidDataException("Application archive is incomplete.");
+        }
+        internal static MemoryStream DecodeArchive(Stream resource,string payloadHash,string archiveHash,long archiveBytes) {
+            if(resource==null||!resource.CanSeek||!IsHash(payloadHash)||!IsHash(archiveHash)||archiveBytes<=0||archiveBytes>NativeCompression.MaximumArchiveBytes)
+                throw new InvalidDataException("Invalid embedded archive metadata.");
+            long remaining=resource.Length-resource.Position;
+            if(remaining<=0||remaining>NativeCompression.MaximumPayloadBytes)throw new InvalidDataException("Invalid embedded payload size.");
+            byte[] compressed=new byte[checked((int)remaining)];int offset=0,read;
+            while(offset<compressed.Length&&(read=resource.Read(compressed,offset,compressed.Length-offset))>0)offset+=read;
+            if(offset!=compressed.Length||HashBytes(compressed)!=payloadHash)throw new InvalidDataException("Embedded application payload is damaged.");
+            byte[] decoded=NativeCompression.Decompress(compressed,archiveBytes);
+            if(HashBytes(decoded)!=archiveHash)throw new InvalidDataException("Decompressed application archive is damaged.");
+            return new MemoryStream(decoded,false);
         }
         private static bool ValidateRuntime(string directory,PayloadManifest manifest) {
             if(!Directory.Exists(directory))return false;
@@ -221,18 +235,75 @@ namespace DafeiyuPortable {
         }
     }
     internal sealed class PrepareForm : Form {
-        private readonly Label message;private bool finished;
-        internal PrepareForm() {
-            Text="大肥鱼翻译 · Whale Translator";ClientSize=new Size(490,158);StartPosition=FormStartPosition.CenterScreen;
-            FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;MinimizeBox=false;ControlBox=false;BackColor=Color.FromArgb(250,248,242);
-            Font=new Font("Microsoft YaHei UI",10F);
-            try { Icon=Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location); }catch{}
-            Controls.Add(new Label { Text="大肥鱼正在准备出发…",Location=new Point(24,19),Size=new Size(440,30),Font=new Font(Font.FontFamily,15F,FontStyle.Bold),ForeColor=Color.FromArgb(76,151,196) });
-            message=new Label { Text="正在检查运行文件… / Checking application files…",Location=new Point(25,61),Size=new Size(440,42),ForeColor=Color.FromArgb(56,78,95) };Controls.Add(message);
-            Controls.Add(new ProgressBar { Location=new Point(25,116),Size=new Size(440,14),Style=ProgressBarStyle.Marquee,MarqueeAnimationSpeed=30 });
+        private readonly Label message;
+        private readonly bool english;
+        private bool finished;
+        internal PrepareForm() : this(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName!="zh") { }
+        internal PrepareForm(bool english) {
+            SuspendLayout();
+            this.english=english;
+            AutoScaleDimensions=new SizeF(96F,96F);AutoScaleMode=AutoScaleMode.Dpi;
+            Text=english?"Whale Translator":"大肥鱼翻译";ClientSize=new Size(490,194);StartPosition=FormStartPosition.CenterScreen;
+            FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;MinimizeBox=false;ControlBox=true;BackColor=Color.FromArgb(250,248,242);
+            Font=new Font("Microsoft YaHei UI",10F);ClaudeCompanion.WindowIcon.Apply(this);
+            Controls.Add(new ClaudeCompanion.WhaleBadge { Location=new Point(22,18),Size=new Size(78,60) });
+            Controls.Add(new Label { Text=english?"Your whale is getting ready…":"大肥鱼正在准备出发…",Location=new Point(110,22),Size=new Size(358,34),Font=new Font(Font.FontFamily,15F,FontStyle.Bold),ForeColor=Color.FromArgb(76,151,196) });
+            message=new Label { Text=english?"Checking application files…":"正在检查运行文件…",Location=new Point(111,61),Size=new Size(356,42),ForeColor=Color.FromArgb(56,78,95) };Controls.Add(message);
+            Controls.Add(new Label { Text=english?"The first launch takes a moment. Next time will be quicker.":"第一次打开需要准备一下，之后就快了",Location=new Point(25,119),Size=new Size(440,25),Font=new Font(Font.FontFamily,9F),ForeColor=Color.FromArgb(122,146,160) });
+            Controls.Add(new PrepareProgress { Location=new Point(25,158),Size=new Size(440,14),BackColor=BackColor });
+            AutoScaleDimensions=new SizeF(96F,96F);ResumeLayout(true);
         }
-        internal void SetProgress(string text) { if(IsDisposed||!IsHandleCreated)return;try { BeginInvoke((Action)delegate { if(!IsDisposed)message.Text=text; }); }catch(InvalidOperationException){} }
+        internal static string LocalizeProgress(string text,bool english) {
+            // The preparation callbacks and extraction code keep their original messages.
+            // Only presentation chooses one language, including counts in the extraction phase.
+            if(text==null)return "";
+            const string prefix="正在准备文件 ";
+            if(text.StartsWith(prefix,StringComparison.Ordinal)) {
+                int end=text.IndexOf('…');
+                string counts=end<0?text.Substring(prefix.Length):text.Substring(prefix.Length,end-prefix.Length);
+                return (english?"Preparing files ":prefix)+counts+"…";
+            }
+            int split=text.LastIndexOf(" / ",StringComparison.Ordinal);
+            return split<0?text:english?text.Substring(split+3):text.Substring(0,split);
+        }
+        internal string StartFailure(string error) {
+            return english?"Whale Translator could not start.\r\n\r\n"+LocalizeProgress(error,true)+"\r\n\r\nCheck free space and close this version before trying again.":
+                "大肥鱼暂时无法启动。\r\n\r\n"+LocalizeProgress(error,false)+"\r\n\r\n请检查磁盘空间，并关闭正在使用此版本的大肥鱼后重试。";
+        }
+        internal void SetProgress(string text) { if(IsDisposed||!IsHandleCreated)return;try { BeginInvoke((Action)delegate { if(!IsDisposed)message.Text=LocalizeProgress(text,english); }); }catch(InvalidOperationException){} }
         internal void Finish() { finished=true;Close(); }
+        protected override void OnHandleCreated(EventArgs e) {
+            base.OnHandleCreated(e);EnableMenuItem(GetSystemMenu(Handle,false),0xF060,0x0001);
+        }
+        [System.Runtime.InteropServices.DllImport("user32.dll")]private static extern IntPtr GetSystemMenu(IntPtr handle,bool reset);
+        [System.Runtime.InteropServices.DllImport("user32.dll")]private static extern uint EnableMenuItem(IntPtr menu,uint item,uint flags);
         protected override void OnFormClosing(FormClosingEventArgs e) { if(!finished&&e.CloseReason==CloseReason.UserClosing)e.Cancel=true;base.OnFormClosing(e); }
+    }
+    internal sealed class PrepareProgress : Control {
+        private readonly System.Windows.Forms.Timer animation=new System.Windows.Forms.Timer { Interval=30 };
+        private float phase;
+        internal PrepareProgress() {
+            SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.ResizeRedraw,true);
+            AccessibleRole=AccessibleRole.ProgressBar;
+            animation.Tick+=delegate { phase=(phase+0.012f)%1f;Invalidate(); };
+        }
+        protected override void OnVisibleChanged(EventArgs e) { base.OnVisibleChanged(e);animation.Enabled=Visible; }
+        private static GraphicsPath Pill(RectangleF box) {
+            var path=new GraphicsPath();float diameter=Math.Min(box.Width,box.Height);
+            path.AddArc(box.X,box.Y,diameter,diameter,90,180);path.AddArc(box.Right-diameter,box.Y,diameter,diameter,270,180);path.CloseFigure();return path;
+        }
+        protected override void OnPaint(PaintEventArgs e) {
+            var g=e.Graphics;g.Clear(BackColor);g.SmoothingMode=SmoothingMode.AntiAlias;
+            if(Width<4||Height<4)return;
+            var box=new RectangleF(0.5f,0.5f,Width-1f,Height-1f);
+            using(var track=Pill(box))using(var fill=new SolidBrush(Color.FromArgb(226,242,250))) {
+                g.FillPath(fill,track);var state=g.Save();g.SetClip(track);
+                float span=Width*0.32f,left=(Width+span)*phase-span;
+                using(var bar=Pill(new RectangleF(left,box.Y,span,box.Height)))
+                using(var blue=new SolidBrush(Color.FromArgb(125,193,225)))g.FillPath(blue,bar);
+                g.Restore(state);
+            }
+        }
+        protected override void Dispose(bool disposing) { if(disposing)animation.Dispose();base.Dispose(disposing); }
     }
 }
