@@ -92,10 +92,17 @@ foreach ($distribution in @('ctranslate2','sentencepiece','numpy','pyyaml')) {
 # Keep their attribution in packaging/licenses; never copy model data into this payload.
 
 # Use only Microsoft's installed redistributable source, never system32 copies.
-$visualStudioRoot = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio'
+# VS 2022 is normally under Program Files; earlier versions use Program Files (x86).
+$visualStudioRoots = @()
+foreach ($programFilesRoot in @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramW6432)) {
+    if ([string]::IsNullOrWhiteSpace($programFilesRoot)) { continue }
+    $visualStudioRoot = [IO.Path]::GetFullPath((Join-Path $programFilesRoot 'Microsoft Visual Studio'))
+    if ($visualStudioRoots -notcontains $visualStudioRoot) { $visualStudioRoots += $visualStudioRoot }
+}
 if (-not $VCRedistDirectory) {
     $candidates = @()
-    if (Test-Path -LiteralPath $visualStudioRoot) {
+    foreach ($visualStudioRoot in $visualStudioRoots) {
+        if (-not (Test-Path -LiteralPath $visualStudioRoot -PathType Container)) { continue }
         foreach ($year in Get-ChildItem -LiteralPath $visualStudioRoot -Directory) {
             foreach ($edition in Get-ChildItem -LiteralPath $year.FullName -Directory) {
                 $redist = Join-Path $edition.FullName 'VC\Redist\MSVC'
@@ -120,7 +127,9 @@ $VCRedistDirectory = [IO.Path]::GetFullPath($VCRedistDirectory)
 if ($VCRedistDirectory -notmatch '\\VC\\Redist\\MSVC\\[^\\]+\\x64\\Microsoft\.VC[^\\]+\.CRT$') { throw 'VCRedistDirectory must point to the official Visual Studio x64 CRT redistributable directory.' }
 foreach ($dll in @('msvcp140.dll','vcruntime140.dll','vcruntime140_1.dll')) { Copy-PayloadFile (Join-Path $VCRedistDirectory $dll) ('runtime\python\' + $dll) }
 $vsInstallRoot = $VCRedistDirectory.Substring(0,$VCRedistDirectory.IndexOf('\VC\Redist\',[StringComparison]::OrdinalIgnoreCase))
-$redistNotices = @(Get-ChildItem -LiteralPath (Join-Path $vsInstallRoot 'Licenses') -Filter Redist.txt -Recurse -File)
+$redistLicenseRoot = Join-Path $vsInstallRoot 'Licenses'
+if (-not (Test-Path -LiteralPath $redistLicenseRoot -PathType Container)) { throw 'The selected Visual Studio installation has no redistributable license directory.' }
+$redistNotices = @(Get-ChildItem -LiteralPath $redistLicenseRoot -Filter Redist.txt -Recurse -File | Sort-Object FullName)
 if ($redistNotices.Count -eq 0) { throw 'The installed Microsoft redistributable notice is missing.' }
 Copy-PayloadFile $redistNotices[0].FullName 'licenses\Microsoft-Visual-Cpp-Redist.txt'
 Copy-PayloadTree (Join-Path $packagingDirectory 'licenses') 'licenses'
