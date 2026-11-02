@@ -3,12 +3,12 @@
 Use Windows 10/11 x64 with .NET Framework 4.8. In PowerShell at the repository root, compile without launching the apps or changing settings:
 
 ```powershell
+./apps/whale-claude-helper/build.ps1 -OutputDirectory "$PWD/artifacts/helper"
 ./apps/claude-live-translator/build.ps1 -OutputDirectory "$PWD/artifacts/translator"
 ./apps/two-zone-clock/build.ps1 -OutputDirectory "$PWD/artifacts/clock"
-./apps/whale-claude-helper/build.ps1 -OutputDirectory "$PWD/artifacts/helper"
 ```
 
-The clock and environment helper outputs are standalone .NET applications. The translator command produces its UI and helper components, not the portable bundle.
+The environment helper and clock outputs are standalone .NET applications. The translator command produces its UI and helper components, not the portable bundle.
 
 ## Portable translator
 
@@ -47,8 +47,14 @@ Attach only `WhaleTranslator.exe`, `HomeTimeClock.exe` and `WhaleEnvironmentHelp
 
 The updater reads public published releases, including previews, validates the asset's repository URL, size and GitHub SHA-256 digest, and never overwrites or launches a download. Missing digests or version metadata are not accepted. Preview builds pass `currentPreview=true` to `UpdateChecker.Show` (the default); stable builds must pass `false`. A stable release with the same app version can replace a preview. Keep the artifact versions, this metadata and each app's current version in sync.
 
+## Project page
+
+`docs/index.html` is the bilingual project page. It is a single static file with no build step; it reuses the images in `docs/images/`, and `docs/.nojekyll` keeps GitHub Pages from processing the folder. To publish it, open the repository's **Settings → Pages**, choose **Deploy from a branch**, then select `main` and `/docs`. Preview it locally by opening the file in a browser.
+
 ## 中文
 
 日常使用请到 Releases 下载单文件 EXE。源码构建要求 Windows 与 .NET Framework 4.8，上面的命令只编译、不启动程序。
 
 翻译器普通构建只生成组件，自包含打包还需要上述 Python、离线引擎和官方 VC 运行库。模型由用户按需安装。CI 构建、检查语法并运行上述隔离测试，不操作真实 Claude 或修改系统；环境助手仍需独立 Windows 虚拟机验收。
+
+项目主页是 `docs/index.html`（中英双语、无需构建）。在仓库 **Settings → Pages** 里选择 **Deploy from a branch**，分支选 `main`、目录选 `/docs` 即可发布。
