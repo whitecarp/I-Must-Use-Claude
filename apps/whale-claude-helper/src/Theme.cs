@@ -57,18 +57,19 @@ namespace WhaleClaudeHelper {
         }
     }
     internal static class Theme {
-        public static readonly Color Cream = Color.FromArgb(250,248,242);
-        public static readonly Color Blue = Color.FromArgb(226,242,250);
-        public static readonly Color Mist = Color.FromArgb(240,248,252);
-        public static readonly Color BlueDark = Color.FromArgb(76,151,196);
-        public static readonly Color BlueHover = Color.FromArgb(94,167,209);
-        public static readonly Color BluePressed = Color.FromArgb(64,136,180);
-        public static readonly Color BlueEdge = Color.FromArgb(52,118,160);
-        public static readonly Color Line = Color.FromArgb(212,231,242);
-        public static readonly Color CardShadow = Color.FromArgb(231,237,238);
-        public static readonly Color Disabled = Color.FromArgb(222,233,239);
-        public static readonly Color Ink = Color.FromArgb(56,78,95);
-        public static readonly Color Muted = Color.FromArgb(122,146,160);
+        internal static void SetWindowIcon(Form form,bool modal){try{form.Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath);}catch{}if(modal)form.ShowInTaskbar=false;}
+        public static readonly Color Cream = Color.FromArgb(255,249,241);
+        public static readonly Color Blue = Color.FromArgb(255,224,197);
+        public static readonly Color Mist = Color.FromArgb(255,241,226);
+        public static readonly Color BlueDark = Color.FromArgb(172,72,37);
+        public static readonly Color BlueHover = Color.FromArgb(190,84,42);
+        public static readonly Color BluePressed = Color.FromArgb(148,59,28);
+        public static readonly Color BlueEdge = Color.FromArgb(121,49,29);
+        public static readonly Color Line = Color.FromArgb(236,213,191);
+        public static readonly Color CardShadow = Color.FromArgb(243,226,208);
+        public static readonly Color Disabled = Color.FromArgb(235,222,209);
+        public static readonly Color Ink = Color.FromArgb(67,48,41);
+        public static readonly Color Muted = Color.FromArgb(125,96,79);
         public static readonly Color Pink = Color.FromArgb(244,158,177);
         public static GraphicsPath RoundedRect(RectangleF r, float radius) {
             var p = new GraphicsPath();

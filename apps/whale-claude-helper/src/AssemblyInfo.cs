@@ -4,5 +4,5 @@ using System.Runtime.Versioning;
 [assembly: AssemblyTitle("大肥鱼环境助手")]
 [assembly: AssemblyDescription("Environment checks, selective maintenance and verified backups; independent Windows utility")]
 [assembly: AssemblyProduct("Whale Environment Helper")]
-[assembly: AssemblyVersion("0.5.0.0")]
-[assembly: AssemblyFileVersion("0.5.0.0")]
+[assembly: AssemblyVersion("0.7.0.0")]
+[assembly: AssemblyFileVersion("0.7.0.0")]

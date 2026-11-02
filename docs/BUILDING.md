@@ -6,9 +6,16 @@ Use Windows 10/11 x64 with .NET Framework 4.8. In PowerShell at the repository r
 ./apps/whale-claude-helper/build.ps1 -OutputDirectory "$PWD/artifacts/helper"
 ./apps/claude-live-translator/build.ps1 -OutputDirectory "$PWD/artifacts/translator"
 ./apps/two-zone-clock/build.ps1 -OutputDirectory "$PWD/artifacts/clock"
+./apps/whale-pack-helper/build.ps1 -OutputDirectory "$PWD/artifacts/pack-helper"
 ```
 
 The environment helper and clock outputs are standalone .NET applications. The translator command produces its UI and helper components, not the portable bundle.
+
+## Pack Helper
+
+Pack Helper 0.1.0 builds with the Windows .NET Framework C# 5 compiler and embeds its icon/artwork. Keep the produced EXE and its matching `.exe.config` together. If you rename the EXE to `WhalePackHelper.exe` for distribution, rename the configuration to `WhalePackHelper.exe.config` too. A convenience ZIP may contain this pair; it does not include FFmpeg.
+
+Ordinary packaging and PNG/JPEG/BMP processing use built-in components. Video compression and WebP decoding need an existing local FFmpeg, found beside the app, on PATH or through its settings. Nothing is downloaded automatically. The default build runs isolated core/media tests; the optional real-media integration runner assumes the default `apps/whale-pack-helper/dist` location.
 
 ## Portable translator
 
@@ -39,10 +46,10 @@ CI also runs the clock's `-RunTests`, translator `tests/run-glossary-history.ps1
 
 ## Publishing an update
 
-Attach only `WhaleTranslator.exe`, `HomeTimeClock.exe` and `WhaleEnvironmentHelper.exe`. Include a single-line machine-readable comment in the GitHub release body, updating each app version when its binary changes:
+For v0.4.0-preview, attach `WhaleEnvironmentHelper.exe`, `WhalePackHelper.exe`, `WhalePackHelper.exe.config` and `WhalePackHelper-0.1.0.zip` (the EXE/config pair). Translator 0.9.0 and Clock 0.3.0 remain linked to v0.3.0-preview. The Pack Helper is not part of the updater schema yet. Include a single-line machine-readable comment for the helper asset actually attached to this release:
 
 ```html
-<!-- whale-app-versions: {"translator":"0.9.0","clock":"0.3.0","helper":"0.5.0"} -->
+<!-- whale-app-versions: {"helper":"0.7.0"} -->
 ```
 
 The updater reads public published releases, including previews, validates the asset's repository URL, size and GitHub SHA-256 digest, and never overwrites or launches a download. Missing digests or version metadata are not accepted. Preview builds pass `currentPreview=true` to `UpdateChecker.Show` (the default); stable builds must pass `false`. A stable release with the same app version can replace a preview. Keep the artifact versions, this metadata and each app's current version in sync.
@@ -53,7 +60,7 @@ The updater reads public published releases, including previews, validates the a
 
 ## 中文
 
-日常使用请到 Releases 下载单文件 EXE。源码构建要求 Windows 与 .NET Framework 4.8，上面的命令只编译、不启动程序。
+日常使用请到 Releases 下载 EXE；打包助手还需配套同名 `.exe.config`，也可下载已包含两者的 ZIP。源码构建要求 Windows 与 .NET Framework 4.8，上面的命令只编译、不启动程序。
 
 翻译器普通构建只生成组件，自包含打包还需要上述 Python、离线引擎和官方 VC 运行库。模型由用户按需安装。CI 构建、检查语法并运行上述隔离测试，不操作真实 Claude 或修改系统；环境助手仍需独立 Windows 虚拟机验收。
 

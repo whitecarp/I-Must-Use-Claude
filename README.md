@@ -4,7 +4,7 @@
 
 <h1 align="center">I Must Use Claude</h1>
 <p align="center"><strong>Understand your local setup. Read Claude comfortably. Keep your home time in view.</strong></p>
-<p align="center">我一定要用上Claude · Three whale-themed Windows companions, built around using Claude.</p>
+<p align="center">我一定要用上Claude · Four whale-themed Windows companions, built around using Claude.</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-4E9BC0?style=flat-square" alt="Windows 10 and 11">
@@ -15,7 +15,7 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.3.0-preview"><strong>↓ Download the apps</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.0-preview"><strong>↓ Download the apps</strong></a>
   &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
 </p>
@@ -28,7 +28,9 @@
 | :--- | :--- | :--- |
 | **Whale Environment Helper** | **Whale Translator** | **Two-Zone Clock** |
 | Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. |
-| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) |
+| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) |
+
+**Also new: [Whale Pack Helper 0.1.0](#04--prepare-a-clear-handoff)** prepares local handoff files for Claude.
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
@@ -36,15 +38,15 @@
 <summary><strong>Requirements, versions and language settings</strong></summary>
 
 - Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
-- This preview contains Environment Helper **0.5.0**, Translator **0.9.0**, and Two-Zone Clock **0.3.0**.
-- We distribute three Windows EXE files. GitHub's automatic source archives are for development, not the ready-to-run apps.
+- This update provides Environment Helper **0.7.0** and Pack Helper **0.1.0**. Translator **0.9.0** and Two-Zone Clock **0.3.0** keep their existing v0.3.0-preview downloads.
+- Download the Windows EXEs. Pack Helper also requires its matching `.exe.config` beside the EXE; its ZIP includes both. GitHub's automatic source archives are for development, not the ready-to-run apps.
 - This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
 
 </details>
 
 ### Keep the apps up to date
 
-Each app has a manual update check. It shows the available version from this repository's public GitHub releases, including previews, and lets you save the matching EXE to a location you choose.
+Environment Helper, Translator and Clock have a manual update check. Pack Helper 0.1.0 does not yet include this feature. It shows the available version from this repository's public GitHub releases, including previews, and lets you save the matching EXE to a location you choose.
 
 <details>
 <summary><strong>How update downloads work</strong></summary>
@@ -73,6 +75,12 @@ See what the browser actually reports before changing settings. Keep a baseline,
 
 **Measured baseline · Unknown means unknown · Backup before changes · Undo available**
 
+### Network & DNS
+
+Open **Network & DNS** to measure DNS resolvers inside the helper without opening a browser. Results describe the helper's HTTPS/default-proxy path; they do not establish that browser-specific DoH or every application is leak-free. Timeouts, cancellation and empty results stay explicit rather than being reported as safe.
+
+CuteCloud DNS changes use a separate **preview → private backup → confirm and apply → recheck** flow, with conflict-aware undo. Browser WebRTC is an optional separate check. Existing maintenance, Codex proxy configuration, close-app controls and the dedicated helper icon remain available.
+
 ### Maintenance & cleanup
 
 Open **Maintenance & cleanup** at the bottom of the helper. These checks and cleanup actions are separate from the browser score.
@@ -95,7 +103,7 @@ Offscreen demo rendering with synthetic data. No real cache was scanned or clean
 
 Close Claude and Claude Code normally before cleanup, repair or restore. Chats, login data, cookies, skills, plugins, hooks, MCP settings, custom rules and local identity remain protected. Configuration repair removes **selected authentication overrides**, not stored official login data. Unknown paths and linked files are skipped. CC Switch / Cockpit provider takeover is not switched automatically.
 
-**Preview status:** This release is validated with isolated fixtures and builds. Independent Windows VM end-to-end acceptance is still pending. No cleanup, configuration repair or live diagnostic probe was tested on the developer's personal environment.
+**Preview status:** The 0.7.0 integration passed 1,668 isolated checks and its final build verification. Independent Windows VM end-to-end acceptance is still pending; fixture checks do not establish results for your browser or network. Those tests do not apply cleanup or configuration changes to a personal environment.
 
 <details>
 <summary><strong>What optimization changes — and what it preserves</strong></summary>
@@ -103,7 +111,7 @@ Close Claude and Claude Code normally before cleanup, repair or restore. Chats, 
 - Missing or failed checks remain **unknown**, not zero. Optimization requires recent results for the actionable local checks; settings that did not match are skipped.
 - Matched timezone settings can be changed to **UTC**, matched Chrome/Edge language preferences to **English**, and verified matching personal fonts can be backed up and removed.
 - A timezone change affects the whole computer. Removing a personal font may temporarily change how documents look.
-- System fonts stay protected. Network, proxy, DNS, Claude login, chats and credentials remain unchanged.
+- System fonts, Claude login, chats and credentials stay protected. **Optimize** does not alter network/proxy/DNS settings; Network & DNS and Codex proxy configuration are separate actions with their own review and confirmation.
 - Changes are backed up before application. Undo retains conflicting later edits and reports them instead of overwriting them.
 - Save work and close Claude, Chrome and Edge before either optimization or undo. Use the same browser and profile for before/after measurements.
 
@@ -112,7 +120,7 @@ Close Claude and Claude Code normally before cleanup, repair or restore. Chats, 
 <details>
 <summary><strong>What the score means and how measurement works</strong></summary>
 
-The score follows a third-party environment heuristic adapted from [LinXiaoTao/FuckClaude](https://github.com/LinXiaoTao/FuckClaude). It is **not** an official Claude eligibility score or a guarantee of access. The helper measures the browser page, not Claude Desktop's embedded environment. It does not fix network routing or account restrictions.
+The score follows a third-party environment heuristic adapted from [LinXiaoTao/FuckClaude](https://github.com/LinXiaoTao/FuckClaude). It is **not** an official Claude eligibility score or a guarantee of access. The score measures the browser page, not Claude Desktop's embedded environment. Separate DNS/proxy tools address supported local settings; they do not guarantee network routing or account access.
 
 The page is served locally. Its disclosed WebRTC check contacts Google STUN; the result contains candidate counts, not raw IP addresses. Configuration backups remain local and may contain private browser data. Do not upload backups, credentials, diagnostic folders or personal documents to this repository.
 
@@ -214,9 +222,23 @@ Offscreen preview from the compiled clock, with synthetic times and regions.
 
 ---
 
+## 04 · Prepare a clear handoff
+
+### Whale Pack Helper · 大肥鱼打包助手
+
+Package selected source files, images and video locally before handing them to Claude. Review the file list, optionally add handoff notes, and keep the originals intact. Each output file is capped at **29,000,000 bytes**. Source filtering excludes common build/runtime folders and suspected secrets; review the result before sharing it.
+
+The app does not upload files or contact an AI service. Ordinary packaging and PNG/JPEG/BMP processing use built-in components; video compression and WebP decoding need an existing local **FFmpeg**.
+
+[Download EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe) · [Required matching config](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config) · [Download both as ZIP](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip)
+
+Keep `WhalePackHelper.exe.config` beside `WhalePackHelper.exe`. [Source and usage](apps/whale-pack-helper/README.md) include the build script, resources and tests.
+
+---
+
 ## Other useful tools
 
-[Cockpit Tools](https://github.com/jlcodes99/cockpit-tools) is an independent third-party desktop app for account switching and quota viewing in supported clients; check its [releases](https://github.com/jlcodes99/cockpit-tools/releases) for current Claude support. Its API or gateway access is separate from a Claude subscription. This repository still releases only our three Windows EXEs and does not bundle Cockpit Tools.
+[Cockpit Tools](https://github.com/jlcodes99/cockpit-tools) is an independent third-party desktop app for account switching and quota viewing in supported clients; check its [releases](https://github.com/jlcodes99/cockpit-tools/releases) for current Claude support. Its API or gateway access is separate from a Claude subscription. This repository does not bundle Cockpit Tools.
 
 ## Explore the source
 
@@ -225,6 +247,7 @@ Offscreen preview from the compiled clock, with synthetic times and regions.
 | Environment Helper | [apps/whale-claude-helper](apps/whale-claude-helper/) | [Build instructions](docs/BUILDING.md) |
 | Translator | [apps/claude-live-translator](apps/claude-live-translator/) | [Release notes](RELEASE_NOTES.md) |
 | Clock | [apps/two-zone-clock](apps/two-zone-clock/) | [Third-party notices](THIRD_PARTY_NOTICES.md) |
+| Pack Helper | [apps/whale-pack-helper](apps/whale-pack-helper/) | [Usage and dependencies](apps/whale-pack-helper/README.md) |
 
 Offline translation uses CTranslate2 and SentencePiece with optional packages from the Argos catalog. Upstream licenses and attribution are retained in the [third-party notices](THIRD_PARTY_NOTICES.md).
 

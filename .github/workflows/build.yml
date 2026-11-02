@@ -22,6 +22,18 @@ jobs:
       - name: Test environment helper with isolated fixtures
         shell: pwsh
         run: ./apps/whale-claude-helper/tests/run-fixtures.ps1
+      - name: Test network, DNS, proxy and process workflows offline
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          node ./apps/whale-claude-helper/tests/WebRtcTests.js
+          if ($LASTEXITCODE -ne 0) { throw 'WebRTC fixtures failed' }
+          foreach ($suite in @('run-score-measurement-tests.ps1', 'run-network-dns-tests.ps1', 'run-dns-leak-measurement-tests.ps1', 'run-network-ui-tests.ps1', 'run-codex-proxy-tests.ps1', 'run-proxy-discovery-tests.ps1', 'run-process-close-tests.ps1', 'run-codex-proxy-ui-tests.ps1')) {
+            & (Join-Path './apps/whale-claude-helper/tests' $suite)
+          }
+      - name: Build and test Pack Helper with generated fixtures
+        shell: pwsh
+        run: ./apps/whale-pack-helper/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/pack-helper-build"
       - name: Test glossary and session history without live windows
         shell: pwsh
         run: ./apps/claude-live-translator/tests/run-glossary-history.ps1 -OutputDirectory "$env:RUNNER_TEMP/translator-tests" -PythonPath (Get-Command python).Source
@@ -53,3 +65,4 @@ jobs:
             ${{ runner.temp }}/translator-build/*
             ${{ runner.temp }}/clock-build/*
             ${{ runner.temp }}/helper-build/*
+            ${{ runner.temp }}/pack-helper-build/*

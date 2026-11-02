@@ -19,6 +19,7 @@
 **/backups/
 **/backup-*/
 **/HANDOFF*
+!apps/whale-pack-helper/src/HandoffForm.cs
 **/direct_url.json
 apps/claude-live-translator/tests/*.png
 apps/claude-live-translator/tests/semantic-report.txt

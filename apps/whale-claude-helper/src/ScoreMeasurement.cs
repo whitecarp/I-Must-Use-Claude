@@ -51,7 +51,9 @@ namespace WhaleClaudeHelper {
                 var matches=wire.signals.Where(x=>x!=null&&x.id==ids[i]).ToArray();
                 if(matches.Length!=1)throw new InvalidDataException();
                 var s=matches[0];
-                if(!new[]{"measured","unavailable","error"}.Contains(s.status)||s.display==null||s.display.Length>256||s.display.Any(Char.IsControl))throw new InvalidDataException();
+                bool knownStatus=new[]{"measured","unavailable","error"}.Contains(s.status);
+                bool webRtcStatus=s.id=="webrtcLeak"&&new[]{"timeout","server_error","unsupported"}.Contains(s.status);
+                if((!knownStatus&&!webRtcStatus)||s.display==null||s.display.Length>256||s.display.Any(Char.IsControl))throw new InvalidDataException();
                 if(s.status=="measured") { if(!s.risk.HasValue||Double.IsNaN(s.risk.Value)||Double.IsInfinity(s.risk.Value)||s.risk<0||s.risk>1)throw new InvalidDataException(); }
                 else if(s.risk.HasValue)throw new InvalidDataException();
                 var fonts=s.fonts??new string[0];
@@ -73,22 +75,30 @@ namespace WhaleClaudeHelper {
         private TcpListener listener;
         private int active;
         public Task<ScoreReport> MeasureAsync(CancellationToken cancellation) {
-            if(Interlocked.CompareExchange(ref active,1,0)!=0)throw new InvalidOperationException();
-            return Task.Run(()=>Run(cancellation));
+            return StartMeasurement(cancellation,false);
         }
-        private ScoreReport Run(CancellationToken cancellation) {
+        public Task<ScoreReport> MeasureWebRtcAsync(CancellationToken cancellation) {
+            return StartMeasurement(cancellation,true);
+        }
+        private Task<ScoreReport> StartMeasurement(CancellationToken cancellation,bool webRtcOnly) {
+            if(Interlocked.CompareExchange(ref active,1,0)!=0)throw new InvalidOperationException();
+            return Task.Run(()=>Run(cancellation,webRtcOnly));
+        }
+        private ScoreReport Run(CancellationToken cancellation,bool webRtcOnly) {
             var deadline=Stopwatch.StartNew();
             try {
+                cancellation.ThrowIfCancellationRequested();
                 byte[] bytes=new byte[24];using(var random=RandomNumberGenerator.Create())random.GetBytes(bytes);
                 string token=BitConverter.ToString(bytes).Replace("-","");
                 string page;
                 using(var resource=Assembly.GetExecutingAssembly().GetManifestResourceStream("ScorePage")) {
                     if(resource==null)throw new InvalidDataException();
-                    using(var reader=new StreamReader(resource,Encoding.UTF8))page=reader.ReadToEnd().Replace("__TOKEN__",token);
+                    using(var reader=new StreamReader(resource,Encoding.UTF8))page=reader.ReadToEnd().Replace("__TOKEN__",token).Replace("__WEBRTC_ONLY__",webRtcOnly?"true":"false");
                 }
                 listener=new TcpListener(IPAddress.Loopback,0);listener.Start(8);
                 string authority="127.0.0.1:"+((IPEndPoint)listener.LocalEndpoint).Port;
                 string origin="http://"+authority;
+                cancellation.ThrowIfCancellationRequested();
                 Process.Start(new ProcessStartInfo(origin+"/measure/"+token){UseShellExecute=true});
                 while(deadline.Elapsed<TimeSpan.FromMinutes(2)) {
                     cancellation.ThrowIfCancellationRequested();

@@ -27,7 +27,7 @@ $vb=Join-Path ${env:ProgramFiles(x86)} 'Reference Assemblies\Microsoft\Framework
 if(-not(Test-Path -LiteralPath $vb)) { $vb=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\Microsoft.VisualBasic.dll' }
 if(-not(Test-Path -LiteralPath $vb)) { throw 'Microsoft.VisualBasic reference assembly was not found.' }
 
-$uiSources=@('src\AssemblyInfo.cs','src\Program.cs','src\OptimizerForm.cs','src\MaintenanceForm.cs','src\ScoreMeasurement.cs',
+$uiSources=@('src\AssemblyInfo.cs','src\Program.cs','src\OptimizerForm.cs','src\NetworkAssistantForm.cs','src\NetworkDnsService.cs','src\DnsLeakMeasurementService.cs','src\MaintenanceForm.cs','src\CodexProxyForm.cs','src\ProcessCloseService.cs','src\ProcessCloseDialog.cs','src\ProxyDiscovery.cs','src\CodexProxySettings.cs','src\ScoreMeasurement.cs',
     'src\OptimizerService.cs','src\BrowserLocaleService.cs','src\ResultText.cs','src\RepairEngine.cs',
     'src\ReportExporter.cs','src\CacheService.cs','src\DiagnosticsService.cs','src\SystemTools.cs',
     'src\FontService.cs','src\Theme.cs','src\WhaleBadge.cs','tests\MaintenanceUiFixtureTests.cs','..\..\shared\UpdateChecker.cs')

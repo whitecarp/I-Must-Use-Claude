@@ -56,7 +56,8 @@ internal static class MaintenanceUiFixtureTests {
             using(var main=new OptimizerForm(true)){
                 Check(All(main).OfType<LinkLabel>().Any(x=>x.Text==(english?"Maintenance & cleanup":"维护与清理")),"main screen exposes maintenance");
                 Check(Field(main,"service")==null&&!main.Visible,"main demo stays isolated");
-                Check(main.Text.Contains("0.5.0"),"new version visible");
+                Check(main.Text.Contains("0.7.0"),"new version visible");
+                Check(All(main).OfType<LinkLabel>().Any(x=>x.Text==(english?"Codex connection repair":"Codex 连接修复")),"generic Codex proxy entry visible");
                 Check(All(main).OfType<LinkLabel>().Any(x=>x.Text==(english?"Check updates":"检查更新")),"manual update entry is localized");
             }
         }

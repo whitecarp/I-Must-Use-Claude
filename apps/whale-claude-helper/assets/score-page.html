@@ -20,14 +20,14 @@ table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;b
 </head>
 <body>
 <main>
-<header><div class="mascot" aria-hidden="true">🐳</div><h1>先看看，再调整<small>大肥鱼 · Measure your browser before making changes</small></h1></header>
+<header><div class="mascot" aria-hidden="true">🐳</div><h1 id="page-heading">先看看，再调整<small>大肥鱼 · Measure your browser before making changes</small></h1></header>
 <section class="panel" aria-labelledby="intro">
 <h2 id="intro" style="font-size:19px;margin-top:0">这是你正在使用的浏览器 / This is your real browser</h2>
-<p>读取本页看到的时区、语言、字体及浏览器环境，不使用内嵌网页或无头浏览器代替。</p>
-<p class="sub">Measures the native environment visible to this page. It does not change your settings.</p>
-<div class="notice">WebRTC 项目会向 Google STUN 服务器发送探测请求，只回传候选数量，不回传 IP 地址。不会修改网络或代理。<br><span class="sub">The WebRTC check contacts Google STUN. Only the candidate count is returned, never the IP addresses. Network and proxy settings remain unchanged.</span></div>
-<p class="sub">这是参考开源项目的环境分数，不是 Claude 官方账号资格评分；低分不保证账号可用。缺失或失败的项目会显示“未知”，不会当作 0 分。</p>
-<p class="sub">This third-party heuristic is not an official Claude eligibility score. Missing or failed checks remain unknown, never zero.</p>
+<p id="measurement-scope">读取本页看到的时区、语言、字体及浏览器环境，不使用内嵌网页或无头浏览器代替。</p>
+<p id="measurement-scope-en" class="sub">Measures the native environment visible to this page. It does not change your settings.</p>
+<div class="notice">WebRTC 项目会向 Google STUN 服务器发送探测请求，最多等待 8 秒，只回传候选数量，不回传 IP 地址。候选数量不等于泄露结论；0 个候选也不证明网络安全。不会修改网络或代理。<br><span class="sub">The WebRTC check contacts Google STUN and waits up to 8 seconds. Only the candidate count is returned, never the IP addresses. Candidate counts do not confirm a leak; zero candidates do not prove network safety. Network and proxy settings remain unchanged.</span></div>
+<p id="score-note" class="sub">这是参考开源项目的环境分数，不是 Claude 官方账号资格评分；低分不保证账号可用。缺失或失败的项目会显示“未知”，不会当作 0 分。</p>
+<p id="score-note-en" class="sub">This third-party heuristic is not an official Claude eligibility score. Missing or failed checks remain unknown, never zero.</p>
 <div class="actions"><button id="start" type="button">开始测量 / Start measurement</button><button id="retry" type="button" class="secondary" hidden>重新发送结果 / Retry sending</button></div>
 <p id="state" class="status" role="status" aria-live="polite">准备就绪；点击开始后才会探测。 / Ready; checks start only after you click.</p>
 </section>
@@ -35,12 +35,12 @@ table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;b
 <div class="pill" id="browser"></div>
 <h2 id="result-title" class="summary">测量结果 / Measurement results</h2>
 <p class="score" id="score">—</p><p id="coverage" class="sub"></p>
-<table><thead><tr><th>项目 / Signal</th><th>结果 / Status</th><th>贡献 / Points</th><th>说明 / Detail</th></tr></thead><tbody id="rows"></tbody></table>
+<table><thead><tr><th>项目 / Signal</th><th>结果 / Status</th><th id="points-header">贡献 / Points</th><th>说明 / Detail</th></tr></thead><tbody id="rows"></tbody></table>
 <p id="return" class="notice" hidden>结果已交给大肥鱼助手。请切回助手继续；本页可以关闭。<br><span class="sub">The helper received your results. Return to the helper to continue; you can close this tab.</span></p>
 </section>
 <footer>所有页面资源都在本机。测量结果只发回此次助手会话，不自动上传到上游项目。<br>
 All page resources are local. Results go only to this helper session, not to the upstream project.<br>
-算法参考 / Algorithm reference: <a href="https://github.com/LinXiaoTao/FuckClaude" target="_blank" rel="noopener noreferrer">LinXiaoTao/FuckClaude</a> · MIT · Copyright (c) 2026 LinXiaoTao</footer>
+算法参考 / Algorithm reference: <a href="https://github.com/LinXiaoTao/FuckClaude" target="_blank" rel="noopener noreferrer">LinXiaoTao/FuckClaude</a> · MIT · Copyright (c) 2025 LinXiaoTao</footer>
 </main>
 <script>
 "use strict";
@@ -50,6 +50,7 @@ All page resources are local. Results go only to this helper session, not to the
   // detect.ts blob 202f3a66b3099cf592949ebca58fdec7a196841e.
   // Formula changes: none. Availability/error handling is explicit rather than silently scored zero.
   const token = "__TOKEN__";
+  const webRtcOnly = "__WEBRTC_ONLY__" === "true";
   const CN_TIMEZONES=["Asia/Shanghai","Asia/Urumqi","Asia/Chongqing","Asia/Chungking","Asia/Harbin","Asia/Kashgar"];
   const GREATER_CN_TIMEZONES=["Asia/Hong_Kong","Asia/Macau"];
   const FONTS_SC=["Microsoft YaHei","Microsoft YaHei UI","SimSun","NSimSun","SimHei","KaiTi","FangSong","DengXian","PingFang SC","Hiragino Sans GB","STHeiti","STSong","Songti SC","Source Han Sans CN","Source Han Sans SC","Noto Sans CJK SC","Noto Serif CJK SC","WenQuanYi Micro Hei","WenQuanYi Zen Hei"];
@@ -204,34 +205,43 @@ All page resources are local. Results go only to this helper session, not to the
   }
   function detectWebrtc(){
     return new Promise(resolve=>{
-      if(typeof window.RTCPeerConnection!=="function"){resolve(unavailable("WebRTC 不可用 / WebRTC unavailable"));return;}
+      if(typeof window.RTCPeerConnection!=="function"){resolve(unknown("unsupported","浏览器不支持 WebRTC / Browser does not support WebRTC"));return;}
       let pc=null,done=false,timer=null,gatheringComplete=false,stunError=false;
       const ips=new Set();
       function finish(mode){
         if(done)return;
         done=true;
-        if(timer!==null)clearTimeout(timer);
-        try{if(pc){pc.onicecandidate=null;pc.onicegatheringstatechange=null;pc.onicecandidateerror=null;pc.close();}}catch{}
+        if(timer!==null){clearTimeout(timer);timer=null;}
+        const connection=pc;pc=null;
+        try{if(connection){connection.onicecandidate=null;connection.onicegatheringstatechange=null;connection.onicecandidateerror=null;connection.close();}}catch{}
         const count=ips.size;
         ips.clear();
-        if(count>0){resolve(measured(0.5,"IP 候选数量 / IP candidate count: "+count));return;}
+        if(count>0){resolve(measured(0.5,"IP 候选数量 / IP candidate count: "+count+(gatheringComplete?"":"；部分结果，收集未完成 / Partial; gathering incomplete")));return;}
+        if(mode==="unsupported"){resolve(unknown("unsupported","浏览器不支持此 WebRTC 探测 / Browser does not support this WebRTC probe"));return;}
+        if(stunError){resolve(unknown("server_error","STUN 服务器探测失败，结果未知 / STUN server probe failed; result unknown"));return;}
         if(mode==="error"){resolve(failed());return;}
-        if(gatheringComplete&&!stunError){resolve(measured(0,"匹配 IP 候选: 0 / Matched IP candidates: 0"));return;}
-        resolve(unavailable("探测超时或未完成 / Probe timed out or incomplete"));
+        if(gatheringComplete){resolve(measured(0,"匹配 IP 候选: 0 / Matched IP candidates: 0"));return;}
+        resolve(unknown("timeout","探测超过 8 秒，结果未知 / Probe timed out after 8 seconds; result unknown"));
       }
+      function fail(error){finish(error&&error.name==="NotSupportedError"?"unsupported":"error");}
+      timer=setTimeout(()=>finish("timeout"),8000);
       try{
         pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
         pc.onicecandidate=e=>{
-          if(!e.candidate||!e.candidate.candidate){gatheringComplete=true;finish("complete");return;}
+          if(done)return;
+          // null ends all gathering; an empty candidate ends only one generation.
+          if(e.candidate===null){gatheringComplete=true;finish("complete");return;}
+          if(!e.candidate||typeof e.candidate.candidate!=="string"||!e.candidate.candidate)return;
           const match=/([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/i.exec(e.candidate.candidate);
           if(match&&match[1])ips.add(match[1]);
         };
-        pc.onicegatheringstatechange=()=>{if(pc&&pc.iceGatheringState==="complete"){gatheringComplete=true;finish("complete");}};
-        pc.onicecandidateerror=()=>{stunError=true;};
+        pc.onicegatheringstatechange=()=>{if(!done&&pc&&pc.iceGatheringState==="complete"){gatheringComplete=true;finish("complete");}};
+        // A failed route must not discard a usable candidate from another route.
+        pc.onicecandidateerror=()=>{if(!done)stunError=true;};
         pc.createDataChannel("");
-        Promise.resolve(pc.createOffer()).then(sdp=>{if(!done&&pc)return pc.setLocalDescription(sdp);}).catch(()=>finish("error"));
-        timer=setTimeout(()=>finish("timeout"),1000);
-      }catch{finish("error");}
+        if(done)return;
+        Promise.resolve(pc.createOffer()).then(sdp=>{if(!done&&pc)return pc.setLocalDescription(sdp);}).catch(fail);
+      }catch(error){fail(error);}
     });
   }
   function actualBrowserId(){
@@ -244,6 +254,17 @@ All page resources are local. Results go only to this helper session, not to the
     return "Other";
   }
   const start=document.getElementById("start"),retry=document.getElementById("retry"),state=document.getElementById("state");
+  if(webRtcOnly){
+    document.title="大肥鱼 · WebRTC 检测 / WebRTC check";
+    document.getElementById("page-heading").textContent="WebRTC 检测 / WebRTC check";
+    document.getElementById("intro").textContent="仅检测 WebRTC / WebRTC only";
+    document.getElementById("measurement-scope").textContent="点击开始后，在本浏览器进行一次 WebRTC 探测。不读取字体、时区或语言，不修改浏览器设置。";
+    document.getElementById("measurement-scope-en").textContent="Runs one WebRTC probe in this browser after you click. It does not inspect fonts, time zone or language, or change browser settings.";
+    document.getElementById("score-note").textContent="只显示探测状态，不给出账号评分或网络安全保证。失败、超时、不支持都保留为未知。";
+    document.getElementById("score-note-en").textContent="Shows probe status, not an account score or a network safety guarantee. Failed, timed out and unsupported results remain unknown.";
+    document.getElementById("points-header").hidden=true;
+    start.textContent="开始 WebRTC 检测 / Start WebRTC check";
+  }
   let payload=null,started=false,sending=false;
   function show(data){
     document.getElementById("results").hidden=false;
@@ -251,17 +272,22 @@ All page resources are local. Results go only to this helper session, not to the
     const body=document.getElementById("rows");
     body.textContent="";
     let sum=0,known=0;
-    for(const definition of definitions){
+    for(const definition of definitions.filter(d=>!webRtcOnly||d.id==="webrtcLeak")){
       const value=data.signals.find(s=>s.id===definition.id);
       const row=document.createElement("tr");
       const contribution=value.status==="measured"?Math.round(value.risk*definition.weight):null;
       if(contribution!==null){sum+=contribution;known++;}
-      const texts=[definition.name,value.status==="measured"?"已测 / Measured":value.status==="error"?"失败 · 未知 / Error":"不可用 · 未知 / Unavailable",contribution===null?"—":String(contribution),value.display];
-      texts.forEach((text,index)=>{const cell=document.createElement("td");cell.textContent=text;if(index===1)cell.className=value.status==="measured"?"good":"unknown";if(index===3)cell.className="detail";row.appendChild(cell);});
+      const statusText={measured:"已测 / Measured",error:"失败 · 未知 / Error",unavailable:"不可用 · 未知 / Unavailable",timeout:"超时 · 未知 / Timed out",server_error:"STUN 失败 · 未知 / STUN failed",unsupported:"不支持 · 未知 / Unsupported"};
+      const texts=[definition.name,statusText[value.status]||"未知 / Unknown",contribution===null?"—":String(contribution),value.display];
+      texts.forEach((text,index)=>{const cell=document.createElement("td");cell.textContent=text;if(index===1)cell.className=value.status==="measured"?"good":"unknown";if(index===3)cell.className="detail";if(webRtcOnly&&index===2)cell.hidden=true;row.appendChild(cell);});
       body.appendChild(row);
     }
     document.getElementById("score").textContent=known===definitions.length?Math.min(100,sum)+" / 100":Math.min(100,sum)+" 已测小计 / measured subtotal";
     document.getElementById("coverage").textContent=known===definitions.length?"10 / 10 项已测；分数越低只表示本算法命中较少。 / All 10 checks measured; a lower value only means fewer matches in this algorithm.":known+" / 10 项已测；未知项未算作0，因此这不是完整分数。 / Unknown checks are not zero, so this is not a complete score.";
+    if(webRtcOnly){
+      document.getElementById("score").textContent=known?"探测已返回 / Probe returned":"结果未知 / Result unknown";
+      document.getElementById("coverage").textContent="本次只检测 WebRTC；不代表 DNS 无泄露或账号可用。 / This checks only WebRTC, not DNS privacy or account availability.";
+    }
   }
   async function send(){
     if(!payload||sending)return;
@@ -284,6 +310,7 @@ All page resources are local. Results go only to this helper session, not to the
     state.textContent="正在读取本浏览器环境… / Measuring this browser…";
     try{
       const signals=await Promise.all(definitions.map(async definition=>{
+        if(webRtcOnly&&definition.id!=="webrtcLeak")return Object.assign({id:definition.id},unavailable("本次仅检测 WebRTC / WebRTC-only session"));
         let outcome;
         try{outcome=await definition.run();}catch{outcome=failed();}
         if(outcome.status==="measured"&&(!Number.isFinite(outcome.risk)||outcome.risk<0||outcome.risk>1))outcome=failed();

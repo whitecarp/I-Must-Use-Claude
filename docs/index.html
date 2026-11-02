@@ -1,29 +1,28 @@
 <!doctype html>
-<html lang="zh-CN" data-lang="zh">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>我一定要用上Claude</title>
+<title>I Must Use Claude</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="我一定要用上Claude · I Must Use Claude：大肥鱼环境助手、大肥鱼翻译、两地时钟，三个鲸鱼主题的 Windows 小工具。Three whale-themed Windows companions for using Claude.">
+<meta name="description" content="我一定要用上Claude · I Must Use Claude：大肥鱼环境助手、大肥鱼翻译、两地时钟，四个鲸鱼主题的 Windows 小工具。Four whale-themed Windows companions for using Claude.">
 <meta name="theme-color" content="#FBF7EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1B28" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="我一定要用上Claude · I Must Use Claude">
-<meta property="og:description" content="先了解使用环境，再看懂 Claude 的回复，也记住自己那边几点。三个鲸鱼主题的 Windows 小工具。">
+<meta property="og:description" content="先了解使用环境，再看懂 Claude 的回复，也记住自己那边几点。四个鲸鱼主题的 Windows 小工具。">
 <meta property="og:image" content="https://whitecarp.github.io/I-Must-Use-Claude/images/hero.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 70'%3E%3Cpath d='M86 37C83 32 76 25 78.5 19C81 13.5 88 15 89.5 24C92 15 99 13.5 98.5 20C98 29 91 38 86.5 44Z' fill='%236AB4E3'/%3E%3Cpath d='M86.5 44C80 48 75 55 66 59C55 65 43 67 32 67C19 67 11 63 8 57C6 53 5 49 5 45C5 27 20 16 39 16C56 16 67 24 76 33C79 36 83 38 86 37Z' fill='%2387C8EE' stroke='%23468CBE' stroke-width='2.5'/%3E%3Cellipse cx='29.75' cy='41.75' rx='4.5' ry='5' fill='%232C4661'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>
-  // Pick the language before anything paints: saved choice first, then the browser's first language.
+  // Pick the language before anything paints: saved choice first, English by default.
   (function () {
     var lang = null;
     try { lang = localStorage.getItem("imuc-lang"); } catch (e) {}
     if (lang !== "zh" && lang !== "en") {
-      var first = (navigator.languages && navigator.languages[0]) || navigator.language || "";
-      lang = /^zh/i.test(first) ? "zh" : "en";
+      lang = "en";
     }
     var root = document.documentElement;
     root.setAttribute("data-lang", lang);
@@ -714,21 +713,21 @@ select {
     <div class="wrap hero__grid">
       <div class="hero__copy">
         <p class="eyebrow">
-          <span data-l="zh">Windows 10 / 11 · 三个鲸鱼主题小工具 · 预览版</span>
-          <span data-l="en">Windows 10 / 11 · Three whale-themed companions · Preview</span>
+          <span data-l="zh">Windows 10 / 11 · 四个鲸鱼主题小工具 · 预览版</span>
+          <span data-l="en">Windows 10 / 11 · Four whale-themed companions · Preview</span>
         </p>
         <h1 id="hero-title">
           <span data-l="zh"><span class="nb">我一定要</span><wbr><span class="nb">用上<span class="claude">Claude</span></span></span>
           <span data-l="en"><span class="nb">I Must Use</span> <span class="nb claude">Claude</span></span>
         </h1>
-        <p class="lede" data-l="zh"><strong>了解使用环境，看懂 Claude 的回复，记住自己那边几点。</strong>三个小工具各自独立运行，下载 EXE 双击就能用，用哪个下哪个。</p>
-        <p class="lede" data-l="en"><strong>Understand your local setup. Read Claude comfortably. Keep your home time in view.</strong>Three small apps that each run on their own. Download an EXE, double-click it, and keep only what you need.</p>
+        <p class="lede" data-l="zh"><strong>了解使用环境，看懂 Claude 的回复，记住自己那边几点。</strong>四个小工具各自独立运行，用哪个下哪个；打包助手另需配套同名配置文件。</p>
+        <p class="lede" data-l="en"><strong>Understand your local setup. Read Claude comfortably. Keep your home time in view.</strong>Four small apps that each run on their own. Download what you need; Pack Helper includes a matching config file.</p>
         <div class="cta-row">
-          <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe">
+          <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe">
             <svg aria-hidden="true"><use href="#i-download"/></svg>
-            <span><span data-l="zh">下载环境助手</span><span data-l="en">Download Environment Helper</span><span class="btn__meta">WhaleEnvironmentHelper.exe · 0.5.0</span></span>
+            <span><span data-l="zh">下载环境助手</span><span data-l="en">Download Environment Helper</span><span class="btn__meta">WhaleEnvironmentHelper.exe · 0.7.0</span></span>
           </a>
-          <a class="btn" href="#tools"><span data-l="zh">认识三个工具</span><span data-l="en">Explore the tools</span></a>
+          <a class="btn" href="#tools"><span data-l="zh">认识四个工具</span><span data-l="en">Explore the tools</span></a>
         </div>
         <ul class="facts">
           <li><svg aria-hidden="true"><use href="#spark"/></svg><span data-l="zh">English / 中文界面</span><span data-l="en">English / 中文 interface</span></li>
@@ -752,7 +751,7 @@ select {
   <section class="section" id="tools" aria-labelledby="tools-title" style="padding-top:clamp(24px,4vw,48px)">
     <div class="wrap">
       <header class="section-head">
-        <p class="eyebrow"><span data-l="zh">三个工具</span><span data-l="en">Three tools</span></p>
+        <p class="eyebrow"><span data-l="zh">四个工具</span><span data-l="en">Four tools</span></p>
         <h2 id="tools-title"><span data-l="zh">从环境助手开始</span><span data-l="en">Start with the Environment Helper</span></h2>
         <p data-l="zh">先弄清自己的使用环境，再用熟悉的语言读懂 Claude，最后把家里的时间放在桌面一角。</p>
         <p data-l="en">Check your setup first, then read Claude in your own language, and keep home time in a corner of your desktop.</p>
@@ -767,7 +766,7 @@ select {
           <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-helper"/></svg>
           <h3 id="card-helper">
             <span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span>
-            <span class="sub"><span data-l="zh">Whale Environment Helper · 0.5.0</span><span data-l="en">大肥鱼环境助手 · 0.5.0</span></span>
+            <span class="sub"><span data-l="zh">Whale Environment Helper · 0.7.0</span><span data-l="en">大肥鱼环境助手 · 0.7.0</span></span>
           </h3>
           <p class="tool-card__line"><span data-l="zh">先测清楚，再动设置。</span><span data-l="en">Measure first, then adjust.</span></p>
           <ul class="ticks">
@@ -791,7 +790,7 @@ select {
             </div>
           </div>
           <div class="tool-card__actions">
-            <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe">
+            <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe">
               <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载环境助手</span><span data-l="en">Download Helper</span>
             </a>
             <a class="more" href="#helper"><span data-l="zh">看看它怎么工作</span><span data-l="en">See how it works</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
@@ -845,6 +844,10 @@ select {
     </div>
   </section>
 
+  <div class="wrap">
+    <p class="note-line"><span data-l="zh">还有第四个工具：<a href="#pack">大肥鱼打包助手 0.1.0</a>，在本机整理源码和媒体交接包。</span><span data-l="en">Also available: <a href="#pack">Whale Pack Helper 0.1.0</a>, for local source and media handoff packages.</span></p>
+  </div>
+
   <!-- ===== 01 helper ===== -->
   <section class="feature feature--band" id="helper" aria-labelledby="helper-title">
     <div class="wrap">
@@ -894,7 +897,7 @@ select {
         <div class="feature__visual feature__visual--sticky">
           <div class="appwin" id="helper-win" role="img" aria-labelledby="helper-win-cap">
             <div class="appwin__bar">
-              <span><span data-l="zh">大肥鱼环境助手 0.5.0 预览版</span><span data-l="en">Whale Environment Helper 0.5.0 Preview</span></span>
+              <span><span data-l="zh">大肥鱼环境助手 0.7.0 预览版</span><span data-l="en">Whale Environment Helper 0.7.0 Preview</span></span>
               <span class="appwin__ctrls" aria-hidden="true"><span>–</span><span>□</span><span>×</span></span>
             </div>
             <div class="appwin__body">
@@ -937,7 +940,7 @@ select {
           </ul>
         </div>
         <div class="ledger__col ledger__col--keep">
-          <h3><svg aria-hidden="true"><use href="#i-lock"/></svg><span data-l="zh">始终保持原样</span><span data-l="en">Always left alone</span></h3>
+          <h3><svg aria-hidden="true"><use href="#i-lock"/></svg><span data-l="zh">一键优化不会改</span><span data-l="en">Not changed by Optimize</span></h3>
           <ul>
             <li><span data-l="zh">网络、代理、DNS</span><span data-l="en">Network, proxy and DNS</span></li>
             <li><span data-l="zh">Claude 登录、聊天与凭据</span><span data-l="en">Claude login, chats and credentials</span></li>
@@ -983,8 +986,22 @@ select {
         </figure>
       </div>
 
-      <p class="fineprint" data-l="zh"><strong>分数只是参考。</strong>评分参考 <a href="https://github.com/LinXiaoTao/FuckClaude">LinXiaoTao/FuckClaude</a> 的环境启发式规则，不是 Claude 官方账号资格评分，也不保证解除访问限制。助手检测的是浏览器页面，不是 Claude Desktop 内嵌环境；不能修复网络路线或账号限制。</p>
-      <p class="fineprint" data-l="en"><strong>The score is a reference.</strong> It follows a third-party heuristic adapted from <a href="https://github.com/LinXiaoTao/FuckClaude">LinXiaoTao/FuckClaude</a>. It is not an official Claude eligibility score or a guarantee of access. The helper measures the browser page, not Claude Desktop's embedded environment, and does not fix network routing or account restrictions.</p>
+      <div class="maint">
+        <div class="maint__copy">
+          <h3><span data-l="zh">网络与 DNS · 新增</span><span data-l="en">Network &amp; DNS · New</span></h3>
+          <p data-l="zh">在助手内查看 DNS 解析器、进度及超时、取消或空结果，无需打开浏览器。这只测量助手 HTTPS／默认代理路径，不代表浏览器独立 DoH 或全系统无泄露。</p>
+          <p data-l="en">See DNS resolvers, progress and explicit timeout, cancellation or empty-result states inside the helper, without opening a browser. This measures the helper's HTTPS/default-proxy path, not browser-specific DoH or every application.</p>
+          <p class="note-line"><span data-l="zh">CuteCloud DNS 修改需单独预览、私密备份、确认应用，再重新检测；可保留后续冲突修改并撤回。浏览器 WebRTC 为单独可选检测。</span><span data-l="en">CuteCloud DNS changes need a separate preview, private backup, confirmation and recheck, with conflict-aware undo. Browser WebRTC is an optional separate check.</span></p>
+        </div>
+        <div class="maint__copy">
+          <h3><span data-l="zh">已有工具继续保留</span><span data-l="en">Existing tools stay available</span></h3>
+          <p data-l="zh">维护清理、Codex 代理配置、关闭程序入口与环境助手专属图标继续保留。代理或 DNS 设置不是一键优化时自动修改的内容。</p>
+          <p data-l="en">Maintenance, Codex proxy configuration, close-app controls and the dedicated helper icon are retained. Proxy and DNS changes are separate from Optimize.</p>
+        </div>
+      </div>
+
+      <p class="fineprint" data-l="zh"><strong>分数只是参考。</strong>评分参考 <a href="https://github.com/LinXiaoTao/FuckClaude">LinXiaoTao/FuckClaude</a> 的环境启发式规则，不是 Claude 官方账号资格评分，也不保证解除访问限制。评分检测的是浏览器页面，不是 Claude Desktop 内嵌环境。独立的 DNS／代理工具只处理受支持的本地设置，不保证网络路线畅通或账号可用。</p>
+      <p class="fineprint" data-l="en"><strong>The score is a reference.</strong> It follows a third-party heuristic adapted from <a href="https://github.com/LinXiaoTao/FuckClaude">LinXiaoTao/FuckClaude</a>. It is not an official Claude eligibility score or a guarantee of access. The score measures the browser page, not Claude Desktop's embedded environment. Separate DNS/proxy tools address supported local settings; they do not guarantee network routing or account access.</p>
     </div>
   </section>
 
@@ -1131,21 +1148,50 @@ select {
     </div>
   </section>
 
+  <!-- ===== 04 pack helper ===== -->
+  <section class="feature" id="pack" aria-labelledby="pack-title">
+    <div class="wrap">
+      <div class="feature__grid">
+        <div class="feature__copy">
+          <p class="eyebrow"><span class="num">04</span><span data-l="zh">大肥鱼打包助手 · 0.1.0</span><span data-l="en">Whale Pack Helper · 0.1.0</span></p>
+          <h2 id="pack-title"><span data-l="zh">整理给 Claude 的交接文件</span><span data-l="en">Prepare a clear handoff</span></h2>
+          <p class="feature__intro" data-l="zh">选择源码、图片或视频，查看文件清单，可选填写交接说明，在本机生成每个不超过 29,000,000 字节的文件。</p>
+          <p class="feature__intro" data-l="en">Choose source files, images or video, review the list and optionally add handoff notes. Prepare files locally, each capped at 29,000,000 bytes.</p>
+          <ul class="chips">
+            <li><span data-l="zh">原文件不变</span><span data-l="en">Originals kept intact</span></li>
+            <li><span data-l="zh">打包前审核</span><span data-l="en">Review before packaging</span></li>
+            <li><span data-l="zh">不上传文件</span><span data-l="en">No file uploads</span></li>
+          </ul>
+        </div>
+        <div class="feature__copy">
+          <h3><span data-l="zh">EXE 与配置放在一起</span><span data-l="en">Keep the EXE and config together</span></h3>
+          <p data-l="zh">下载配套 ZIP 并解压，或分别下载 EXE 与同名 .exe.config，放在同一文件夹。源码过滤会跳过常见运行库、构建产物和疑似密钥；分享前仍需检查结果。</p>
+          <p data-l="en">Extract the paired ZIP, or download the EXE and matching .exe.config into the same folder. Source filtering skips common runtime/build output and suspected secrets; review the result before sharing it.</p>
+          <p class="note-line"><span data-l="zh">普通打包及 PNG/JPEG/BMP 使用内置组件；视频压缩和 WebP 解码需要本机已有 FFmpeg，不会自动下载。</span><span data-l="en">Ordinary packaging and PNG/JPEG/BMP use built-in components. Video compression and WebP decoding need existing local FFmpeg; nothing is downloaded automatically.</span></p>
+          <div class="tool-card__actions">
+            <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载配套 ZIP</span><span data-l="en">Download paired ZIP</span></a>
+            <a class="more" href="https://github.com/whitecarp/I-Must-Use-Claude/tree/main/apps/whale-pack-helper"><span data-l="zh">源码与用法</span><span data-l="en">Source &amp; usage</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== download ===== -->
   <section class="section download" id="download" aria-labelledby="download-title">
     <div class="wrap">
       <header class="section-head">
-        <p class="eyebrow"><span data-l="zh">下载 · v0.3.0-preview</span><span data-l="en">Download · v0.3.0-preview</span></p>
+        <p class="eyebrow"><span data-l="zh">下载 · v0.4.0-preview</span><span data-l="en">Download · v0.4.0-preview</span></p>
         <h2 id="download-title"><span data-l="zh">下载 EXE，双击打开</span><span data-l="en">Download an EXE and double-click it</span></h2>
-        <p data-l="zh">三个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。</p>
-        <p data-l="en">Each app runs on its own, so get only what you need. The translator includes its runtime; offline language packs are optional downloads inside the app.</p>
+        <p data-l="zh">各个软件独立运行，用哪个下哪个。打包助手的 EXE 和配置需配套。翻译器 0.9.0 与时钟 0.3.0 继续使用 v0.3.0-preview 的原下载。</p>
+        <p data-l="en">Each app runs on its own. Pack Helper needs its paired config. Translator 0.9.0 and Clock 0.3.0 retain their original v0.3.0-preview downloads.</p>
       </header>
       <ol class="dl-list">
         <li class="dl dl--feature">
           <span class="num">01</span>
           <span class="dl__name"><b><span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span></b><code>WhaleEnvironmentHelper.exe</code></span>
-          <span class="dl__ver">0.5.0</span>
-          <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载</span><span data-l="en">Download</span></a>
+          <span class="dl__ver">0.7.0</span>
+          <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载</span><span data-l="en">Download</span></a>
         </li>
         <li class="dl">
           <span class="num">02</span>
@@ -1158,6 +1204,12 @@ select {
           <span class="dl__name"><b><span data-l="zh">两地时钟</span><span data-l="en">Two-Zone Clock</span></b><code>HomeTimeClock.exe</code></span>
           <span class="dl__ver">0.3.0</span>
           <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载</span><span data-l="en">Download</span></a>
+        </li>
+        <li class="dl">
+          <span class="num">04</span>
+          <span class="dl__name"><b><span data-l="zh">大肥鱼打包助手</span><span data-l="en">Whale Pack Helper</span></b><code>WhalePackHelper.exe + .exe.config</code><a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config"><span data-l="zh">同名配置</span><span data-l="en">Matching config</span></a> · <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip">ZIP</a></span>
+          <span class="dl__ver">0.1.0</span>
+          <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载 EXE</span><span data-l="en">Download EXE</span></a>
         </li>
       </ol>
       <div class="dl-notes">
@@ -1173,8 +1225,8 @@ select {
         </div>
         <div>
           <h3><span data-l="zh">检查更新</span><span data-l="en">Updates</span></h3>
-          <p data-l="zh">只在你点击时检查和下载；文件必须与 GitHub 提供的 SHA-256 一致。软件不会自行替换或运行新版，旧版和设置都保留。</p>
-          <p data-l="en">Checks and downloads run only when you ask. Files must match GitHub's SHA-256 digest. The app never replaces itself or runs the new EXE; your existing app and settings stay.</p>
+          <p data-l="zh">环境助手、翻译器和时钟只在你点击时检查和下载；打包助手暂未加入更新器。文件必须与 GitHub 提供的 SHA-256 一致。软件不会自行替换或运行新版，旧版和设置都保留。</p>
+          <p data-l="en">Helper, Translator and Clock check/download only when you ask. Pack Helper has no updater yet. Files must match GitHub's SHA-256 digest. The app never replaces itself or runs the new EXE; your existing app and settings stay.</p>
         </div>
       </div>
     </div>
@@ -1201,12 +1253,12 @@ select {
         <div class="limit">
           <span class="limit__icon"><svg aria-hidden="true"><use href="#i-laptop"/></svg></span>
           <h3><span data-l="zh">数据留在本机</span><span data-l="en">Your data stays local</span></h3>
-          <p><span data-l="zh">配置备份和术语词典保存在本机，翻译记录关闭即清空。测量页的 WebRTC 检查会联系 Google STUN，只回传候选数量，不回传 IP。</span><span data-l="en">Backups and the glossary stay on your computer, and translation history clears on exit. The measurement page's WebRTC check contacts Google STUN and returns candidate counts, never IP addresses.</span></p>
+          <p><span data-l="zh">配置备份和术语词典保存在本机，翻译记录关闭即清空。DNS 在线测量会联系外部检测服务；可选 WebRTC 检查联系 Google STUN，回传候选数量。</span><span data-l="en">Backups and the glossary stay local; session history clears on exit. Online DNS measurement contacts an external test service. Optional WebRTC contacts Google STUN and reports candidate counts.</span></p>
         </div>
         <div class="limit">
           <span class="limit__icon"><svg aria-hidden="true"><use href="#i-flask"/></svg></span>
           <h3><span data-l="zh">仍是预览版</span><span data-l="en">Still a preview</span></h3>
-          <p><span data-l="zh">已通过隔离模拟测试和构建检查，独立 Windows 虚拟机端到端验收仍待完成。</span><span data-l="en">Validated with isolated fixtures and build checks. Independent Windows VM end-to-end acceptance is still pending.</span></p>
+          <p><span data-l="zh">0.7.0 整合版已通过 1,668 项隔离检查及最终构建核验；独立 Windows 虚拟机端到端验收仍待完成。</span><span data-l="en">The 0.7.0 integration passed 1,668 isolated checks and its final build verification. Independent Windows VM end-to-end acceptance is still pending.</span></p>
         </div>
       </div>
     </div>
@@ -1220,7 +1272,7 @@ select {
         <svg viewBox="0 0 100 70" aria-hidden="true"><use href="#whale"/></svg>
         <span data-l="zh">我一定要用上Claude</span><span data-l="en">I Must Use Claude</span>
       </a>
-      <p><span data-l="zh">三个鲸鱼主题的 Windows 小工具，陪你用 Claude。</span><span data-l="en">Three whale-themed Windows companions for using Claude.</span></p>
+      <p><span data-l="zh">四个鲸鱼主题的 Windows 小工具，陪你用 Claude。</span><span data-l="en">Four whale-themed Windows companions for using Claude.</span></p>
     </div>
     <nav class="footer__nav" aria-label="Project links">
       <a href="https://github.com/whitecarp/I-Must-Use-Claude"><span data-l="zh">GitHub 仓库</span><span data-l="en">GitHub repository</span></a>

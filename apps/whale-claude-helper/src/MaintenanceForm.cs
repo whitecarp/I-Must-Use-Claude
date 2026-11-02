@@ -41,13 +41,13 @@ namespace WhaleClaudeHelper {
             }
             Font=new Font("Microsoft YaHei UI",10f);AutoScaleMode=AutoScaleMode.Dpi;
             BackColor=Theme.Cream;ForeColor=Theme.Ink;ClientSize=new Size(970,760);MinimumSize=new Size(930,720);
-            StartPosition=FormStartPosition.CenterParent;Build();
+            StartPosition=FormStartPosition.CenterParent;Theme.SetWindowIcon(this,true);Build();
             FormClosing+=delegate(object sender,FormClosingEventArgs e){if(busy){e.Cancel=true;SetStatus(T("正在完成操作。可取消检查，修改操作请等待结果。","An operation is running. Checks can be cancelled; wait for changes to finish."));}};
         }
         private RepairEngine NewRepair(){return new RepairEngine(configRoot,Path.Combine(Ui.DataRoot,"Backups","Configuration"));}
         private void Build(){
             var old=Controls.Cast<Control>().ToArray();Controls.Clear();foreach(var c in old)c.Dispose();
-            Text=T("维护与清理 · 大肥鱼环境助手 0.4.0","Maintenance & cleanup · Whale Environment Helper 0.4.0")+(demo?" · Demo":"");
+            Text=T("维护与清理 · 大肥鱼环境助手 0.7.0","Maintenance & cleanup · Whale Environment Helper 0.7.0")+(demo?" · Demo":"");
             var root=Rows(95,-1,48);root.Padding=new Padding(22,16,22,10);
             var head=new Panel{Dock=DockStyle.Fill};head.Controls.Add(new WhaleBadge{Size=new Size(92,76)});
             head.Controls.Add(new Label{Text=T("检查环境，清理缓存","Check your setup. Clear caches."),Font=new Font(Font.FontFamily,20,FontStyle.Bold),Location=new Point(108,7),Size=new Size(670,39)});
@@ -163,7 +163,7 @@ namespace WhaleClaudeHelper {
         private void ShowDemo(){ShowDiagnostics(DiagnosticsService.DemoReport());configText.Text=T("示例：发现 ANTHROPIC_BASE_URL / ANTHROPIC_MODEL 覆盖项。\r\n没有读取本机配置。","Sample: ANTHROPIC_BASE_URL / ANTHROPIC_MODEL overrides found.\r\nNo local configuration was read.");ShowCaches(new List<CacheTarget>{new CacheTarget{Name="Code cache (sample)",Path=@"Example\.claude\cache",Bytes=2097152,Eligible=false,Warning=T("仅演示","Demo only")}});backups.Items.Add(T("示例备份 · 尚未执行清理","Sample backup · cleanup has not run"));SetStatus(T("演示模式 · 全部为示例数据","Demo mode · sample data only"));}
         private void SetStatus(string text){status.Text="● "+text;}
         private void Info(string text){MessageBox.Show(this,text,T("大肥鱼提示","Whale Helper"),MessageBoxButtons.OK,MessageBoxIcon.Information);}
-        private bool Review(string text){if(demo)return false;using(var d=new Form{Text=T("确认处理范围","Review the changes"),StartPosition=FormStartPosition.CenterParent,ClientSize=new Size(720,480),MinimumSize=new Size(650,420),Font=Font,BackColor=Theme.Cream,ForeColor=Theme.Ink}){var p=Rows(-1,50);p.Padding=new Padding(18);var box=ReadBox();box.Text=text;p.Controls.Add(Theme.Card(box,new Padding(0,0,0,10)),0,0);var a=Actions();var yes=Theme.Button(T("备份并应用","Back up & apply"),true);yes.Width=220;yes.DialogResult=DialogResult.OK;var no=Theme.Button(T("取消","Cancel"),false);no.Width=130;no.DialogResult=DialogResult.Cancel;a.Controls.Add(yes);a.Controls.Add(no);p.Controls.Add(a,0,1);d.Controls.Add(p);d.CancelButton=no;return d.ShowDialog(this)==DialogResult.OK;}}
+        private bool Review(string text){if(demo)return false;using(var d=new Form{Icon=this.Icon,ShowInTaskbar=false,Text=T("确认处理范围","Review the changes"),StartPosition=FormStartPosition.CenterParent,ClientSize=new Size(720,480),MinimumSize=new Size(650,420),Font=Font,BackColor=Theme.Cream,ForeColor=Theme.Ink}){var p=Rows(-1,50);p.Padding=new Padding(18);var box=ReadBox();box.Text=text;p.Controls.Add(Theme.Card(box,new Padding(0,0,0,10)),0,0);var a=Actions();var yes=Theme.Button(T("备份并应用","Back up & apply"),true);yes.Width=220;yes.DialogResult=DialogResult.OK;var no=Theme.Button(T("取消","Cancel"),false);no.Width=130;no.DialogResult=DialogResult.Cancel;a.Controls.Add(yes);a.Controls.Add(no);p.Controls.Add(a,0,1);d.Controls.Add(p);d.CancelButton=no;return d.ShowDialog(this)==DialogResult.OK;}}
         private void Result(bool ok,string backup,string detail){SetStatus(ok?T("操作完成。","Operation complete."):T("未全部完成，请查看结果。","Not fully completed; review the result."));Info((ok?T("操作完成。","Operation complete."):T("未全部完成。","Not fully completed."))+"\r\n"+detail+(String.IsNullOrEmpty(backup)?"":"\r\n\r\n"+T("备份：","Backup: ")+backup));}
         private static string SizeText(long n){return n<1048576?(n/1024d).ToString("0.0")+" KB":(n/1048576d).ToString("0.00")+" MB";}
     }

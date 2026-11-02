@@ -4,7 +4,7 @@
 
 <h1 align="center">我一定要用上Claude</h1>
 <p align="center"><strong>了解使用环境，看懂 Claude 的回复，记住自己那边几点。</strong></p>
-<p align="center">I Must Use Claude · 围绕 Claude 使用体验制作的三款鲸鱼主题 Windows 工具。</p>
+<p align="center">I Must Use Claude · 围绕 Claude 使用体验制作的四款鲸鱼主题 Windows 工具。</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-4E9BC0?style=flat-square" alt="Windows 10和11">
@@ -15,8 +15,8 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.3.0-preview"><strong>↓ 下载软件</strong></a>
-  &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识三个工具</a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.0-preview"><strong>↓ 下载软件</strong></a>
+  &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识工具</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
 </p>
 
@@ -28,23 +28,25 @@
 | :--- | :--- | :--- |
 | **大肥鱼环境助手** | **大肥鱼翻译** | **两地时钟** |
 | 先测浏览器环境，再处理命中的本地设置，最后复测。 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 即使电脑用了其他时区，也能看到原本地区的时间。 |
-| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) |
+| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) |
 
-**下载 EXE，双击打开。** 三个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
+**另新增 [大肥鱼打包助手 0.1.0](#04--整理给-claude-的交接文件)**，用于在本机整理给 Claude 的交接文件。
+
+**下载 EXE，双击打开。** 各个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
 <details>
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- 本次预览版包含环境助手 **0.5.0**、翻译器 **0.9.0**、两地时钟 **0.3.0**。
-- 目前提供三个 Windows EXE。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
+- 本次更新提供环境助手 **0.7.0** 与打包助手 **0.1.0**。翻译器 **0.9.0**、两地时钟 **0.3.0** 继续使用原 v0.3.0-preview 下载。
+- 提供 Windows EXE；打包助手还需要同名 `.exe.config` 放在 EXE 旁边，配套 ZIP 已包含两者。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
 
 </details>
 
 ### 在软件里检查更新
 
-三个软件都提供手动更新检查。点击后会查看本仓库的 GitHub 公开发布（包含预览版），显示可用版本，并让你选择位置保存对应软件的 EXE。
+环境助手、翻译器和时钟提供手动更新检查；打包助手 0.1.0 暂未加入此功能。点击后会查看本仓库的 GitHub 公开发布（包含预览版），显示可用版本，并让你选择位置保存对应软件的 EXE。
 
 <details>
 <summary><strong>更新下载如何工作</strong></summary>
@@ -73,6 +75,12 @@
 
 **实测基准 · 未知不算零分 · 修改前备份 · 提供撤回**
 
+### 网络与 DNS
+
+打开「网络与 DNS」，可直接在助手内测量 DNS 解析器，无需打开浏览器。结果描述助手 HTTPS／默认代理这条路径，不代表浏览器独立 DoH 或所有应用均无泄露。超时、取消和空结果会明确显示，不会当成安全结果。
+
+CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 → 重新检测」流程，并支持保留后续冲突修改的撤回。浏览器 WebRTC 是单独可选检测。已有的维护清理、Codex 代理配置、关闭程序入口和环境助手专属图标继续保留。
+
 ### 维护与清理
 
 在环境助手底部打开「维护与清理」。这些检查与清理操作独立于浏览器评分。
@@ -95,7 +103,7 @@
 
 清理、修复或恢复前，请正常退出 Claude 和 Claude Code。会话、官方登录数据、Cookie、Skills、插件、Hooks、MCP、自建规则及本地身份标识受到保护。配置修复移除的是**选中的认证覆盖项**，不删除官方登录数据。未知路径与链接文件会跳过；不会自动切换 CC Switch / Cockpit 的供应商接管。
 
-**预览状态：** 新版使用隔离模拟数据进行测试并构建，仍待独立 Windows 虚拟机端到端验收。没有在开发者的个人环境执行清理、配置修复或真实连接探测。
+**预览状态：** 0.7.0 整合版已通过 1,668 项隔离检查及最终构建核验。独立 Windows 虚拟机端到端验收仍待完成；模拟测试不代表你的浏览器或网络结果，测试不会在个人环境执行清理或配置修改。
 
 <details>
 <summary><strong>优化会改什么，保留什么</strong></summary>
@@ -103,7 +111,7 @@
 - 缺失或失败项目显示**未知**，不算 0 分。只有可处理本地项目有近期有效结果时才能优化；未命中的设置跳过。
 - 命中时可将时区设为 **UTC**、将被测 Chrome/Edge 的语言偏好设为**英语**，以及备份移除确切匹配的个人字体。
 - 时区修改影响整台电脑；移除个人字体可能使文档临时使用替代字体。
-- 系统字体受保护。网络、代理、DNS、Claude 登录、聊天与凭据均不修改。
+- 系统字体、Claude 登录、聊天与凭据受保护。「一键优化」不改网络、代理或 DNS；「网络与 DNS」和 Codex 代理配置是另行查看与确认的独立操作。
 - 修改前备份。撤回遇到后续独立修改时会保留新内容并提示冲突，避免直接覆盖。
 - 优化或撤回前请保存工作并正常退出 Claude、Chrome 和 Edge；前后检测使用相同浏览器和个人资料。
 
@@ -112,7 +120,7 @@
 <details>
 <summary><strong>分数含义与检测数据</strong></summary>
 
-评分参考 [LinXiaoTao/FuckClaude](https://github.com/LinXiaoTao/FuckClaude) 的环境启发式规则，**不是 Claude 官方账号资格评分，也不保证解除访问限制**。助手检测的是浏览器页面，不是 Claude Desktop 内嵌环境；不能修复网络路线或账号限制。
+评分参考 [LinXiaoTao/FuckClaude](https://github.com/LinXiaoTao/FuckClaude) 的环境启发式规则，**不是 Claude 官方账号资格评分，也不保证解除访问限制**。评分检测的是浏览器页面，不是 Claude Desktop 内嵌环境。独立的 DNS／代理工具只处理受支持的本地设置，不保证网络路线畅通或账号可用。
 
 测量页在本机提供。其中事先说明的 WebRTC 检查会联系 Google STUN，只回传候选数量，不回传原始 IP。配置备份留在本机，可能包含私人浏览器数据。请勿把备份、凭据、诊断目录或私人文件上传到仓库。
 
@@ -214,9 +222,23 @@
 
 ---
 
+## 04 · 整理给 Claude 的交接文件
+
+### 大肥鱼打包助手 · Whale Pack Helper
+
+在本机选择源码、图片或视频，查看文件清单，可选填写交接说明，再生成打包结果。原文件保持不变，每个输出文件不超过 **29,000,000 字节**。源码过滤会跳过常见构建／运行库目录和疑似密钥；分享前仍需检查结果。
+
+软件不上传文件、不连接 AI 服务。普通打包和 PNG/JPEG/BMP 处理使用自带组件；视频压缩和 WebP 解码需要本机已有 **FFmpeg**。
+
+[下载 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe) · [必需的同名配置](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config) · [两者配套 ZIP](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip)
+
+请把 `WhalePackHelper.exe.config` 与 `WhalePackHelper.exe` 放在一起。[源码和使用说明](apps/whale-pack-helper/README.md) 包含编译脚本、素材与测试。
+
+---
+
 ## 其他配套工具
 
-[Cockpit Tools](https://github.com/jlcodes99/cockpit-tools) 是独立的第三方桌面工具，可为其支持的客户端切换账号、查看额度；Claude 相关功能请以[项目最新发布](https://github.com/jlcodes99/cockpit-tools/releases)为准。它提供的 API 或网关接入与 Claude 官方订阅不同。本仓库仍只发布我们自己的三个 Windows EXE，不捆绑 Cockpit Tools。
+[Cockpit Tools](https://github.com/jlcodes99/cockpit-tools) 是独立的第三方桌面工具，可为其支持的客户端切换账号、查看额度；Claude 相关功能请以[项目最新发布](https://github.com/jlcodes99/cockpit-tools/releases)为准。它提供的 API 或网关接入与 Claude 官方订阅不同。本仓库不捆绑 Cockpit Tools。
 
 ## 查看源码
 
@@ -225,6 +247,7 @@
 | 环境助手 | [apps/whale-claude-helper](apps/whale-claude-helper/) | [构建说明](docs/BUILDING.md) |
 | 翻译器 | [apps/claude-live-translator](apps/claude-live-translator/) | [发布说明](RELEASE_NOTES.md) |
 | 时钟 | [apps/two-zone-clock](apps/two-zone-clock/) | [第三方声明](THIRD_PARTY_NOTICES.md) |
+| 打包助手 | [apps/whale-pack-helper](apps/whale-pack-helper/) | [用法与依赖](apps/whale-pack-helper/README.md) |
 
 离线翻译使用 CTranslate2、SentencePiece 和用户选装的 Argos 目录语言包。上游许可和署名保留于[第三方声明](THIRD_PARTY_NOTICES.md)。
 

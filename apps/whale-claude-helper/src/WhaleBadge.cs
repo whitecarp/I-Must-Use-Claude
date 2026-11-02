@@ -5,10 +5,13 @@ namespace WhaleClaudeHelper {
     // The mascot: a chubby milk-blue whale with a cream belly, pink cheeks and a little spout.
     // Drawn in code in a 100 x 70 design box, so it scales cleanly with the control.
     internal sealed class WhaleBadge : Control {
+        private static readonly Image Mascot=LoadMascot();
+        private static Image LoadMascot(){try{using(var stream=typeof(WhaleBadge).Assembly.GetManifestResourceStream("HelperMascot")){if(stream==null)return null;using(var original=Image.FromStream(stream))return new Bitmap(original);}}catch{return null;}}
         public WhaleBadge() { SetStyle(ControlStyles.SupportsTransparentBackColor | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true); BackColor = Color.Transparent; }
         protected override void OnPaint(PaintEventArgs e) { Draw(e.Graphics, Width, Height); }
 
         internal static void Draw(Graphics g, float width, float height) {
+            if(Mascot!=null){var saved=g.Save();g.InterpolationMode=InterpolationMode.HighQualityBicubic;g.PixelOffsetMode=PixelOffsetMode.HighQuality;float size=System.Math.Min(width,height);g.DrawImage(Mascot,new RectangleF((width-size)/2,(height-size)/2,size,size));g.Restore(saved);return;}
             GraphicsState state = g.Save();
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
