@@ -1,5 +1,37 @@
 # Release notes
 
+## v0.4.2-preview — Home-Time Clock 0.5.0 with Claude reset countdowns
+
+| App | Version | Download |
+| --- | --- | --- |
+| Whale Environment Helper | 0.7.0 | [WhaleEnvironmentHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleEnvironmentHelper.exe) |
+| Whale Translator | 0.9.1 | [WhaleTranslator.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleTranslator.exe) |
+| Two-Zone Clock | 0.5.0 | [HomeTimeClock.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/HomeTimeClock.exe) |
+| Whale Pack Helper | 0.1.1 | [WhalePackHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe) |
+
+- **Clock 0.5.0 now includes the session and weekly reset countdowns shown in the tool videos.** Keep Claude's Settings → Usage page visible, choose its window and displayed timezone in **Claude reset countdown…**, read the times and apply. A successful read selects the 60-second reading option; untick it before applying for a single read. Automatic reads stop when the clock closes.
+- **Paste and manual fallback:** supported Chinese/English Usage text can be pasted, or reset times entered manually. Failed, incomplete or ambiguous reads preserve the previous snapshot. The compact **本周 / This week** dropdown heading is supported, along with the aggregate **Weekly limits → All models** layout.
+- **Home time stays first:** the original region is large and above the compact target region. Local day/night colors, date/difference text, rounded controls and bilingual settings accompany the compact countdown card.
+- **Local reading, explicit limits:** the reader uses visible labels in the selected window; it does not log in, query an account API, or save the original Usage text. It stores parsed reset timestamps and observation metadata locally. `≈` is an estimate, and zero does not confirm restored quota. Progress bars show elapsed reference time, not quota consumption. [Clock guide](apps/two-zone-clock/README.md) · [Privacy](docs/PRIVACY.md).
+- **Four standalone EXEs again:** Translator **0.9.1**, Environment Helper **0.7.0** and Pack Helper **0.1.1** keep their app versions. Every release includes all four apps and a complete `whale-app-versions` marker. No configuration sidecar or convenience ZIP is required; translator models remain optional installs.
+
+**Signing:** these are **unsigned preview** files. SignPath Foundation review is pending, and Windows SmartScreen may still warn. Compare downloads with this release's [SHA-256 values](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview#sha-256). Hashes verify integrity, not publisher identity. [Signing policy](docs/CODE_SIGNING.md).
+
+<!-- release-validation:v0.4.2-preview:run-41537825771 -->
+**Validation:** [Build and disposable Windows acceptance](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41537825771) passed for source `91f70f9`: 1,166 clock checks, synthetic reader fixtures, the existing 49 workflow + 11 timezone checks, four visible app launches, and ten clock preview images. [Release run 41538274164](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41538274164) verified the portable translator runtime and downloaded all four uploaded EXEs back to compare versions and SHA-256 before publication. Clock fixtures/screenshots contain synthetic times, not a private Claude account. This does not establish compatibility with every real or future Claude UI. Published files remain unsigned previews.
+
+本次 **v0.4.2-preview** 提供四个单 EXE：环境助手 **0.7.0**、翻译器 **0.9.1**、两地时钟 **0.5.0**、打包助手 **0.1.1**。
+
+- **视频里展示的本轮和每周重置倒计时进入公开时钟版本。** 打开 Claude「设置 → 使用情况」并保持重置文字可见，在时钟「Claude 重置倒计时…」里选择页面时区与窗口，读取、核对后应用。读取成功会勾选每 60 秒读取；只想读一次可在应用前取消，自动读取只持续到关闭时钟。
+- **保留粘贴与手动方式。** 支持常见中英文用量文字、「本周 / This week」下拉标题和「每周限额 → 所有模型」布局。读取失败、不完整或有歧义时保留原倒计时。
+- **原本时间大且在上，目标时间小且在下。** 加入按地区当地时间变化的昼夜配色、圆角控件、日期时差与中英文倒计时设置。
+- **本机可见页面读取。** 不登录、不调用账号 API、不保存原始用量文字，只保存解析结果与读取元数据。估算归零不保证额度恢复，进度条不是额度用量。详见[时钟说明](apps/two-zone-clock/README.md)和[隐私说明](docs/PRIVACY.md)。
+- **继续附齐四款 EXE。** 其他三款软件版本不变，无需旁置配置文件或 ZIP；离线翻译模型仍由用户选装。文件仍为**未签名预览版**，签名审核尚未完成，SmartScreen 可能提示。
+
+源码 `91f70f9` 的[构建与临时 Windows 验收](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41537825771)已通过：1,166 项时钟检查、读取器合成夹具、既有 49 项流程与 11 项时区检查、四款窗口启动及十张时钟预览图。[发布运行 41538274164](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41538274164)核验便携翻译运行时，并将上传的四个 EXE 重新下载，版本与 SHA-256 一致后才公开。截图和测试使用模拟时间，没有读取私人账号；不代表已保证所有真实或未来 Claude 界面的读取兼容性。文件仍为未签名预览版。
+
+---
+
 ## v0.4.1-preview — four EXEs, manual updates and single-file Pack Helper
 
 | App | Version | Download |

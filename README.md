@@ -15,7 +15,7 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview"><strong>↓ Download the apps</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview"><strong>↓ Download the apps</strong></a>
   &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">Project page</a>
   &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
@@ -28,8 +28,8 @@
 | Check your setup | Understand her replies | Know what time it is at home | Prepare files for her |
 | :--- | :--- | :--- | :--- |
 | **Whale Environment Helper** | **Whale Translator** | **Two-Zone Clock** | **Whale Pack Helper** |
-| Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. | Package source, images and video locally, each file at most 29 MB. |
-| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe) |
+| Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep home time visible and count down to Claude's next session/weekly reset. | Package source, images and video locally, each file at most 29 MB. |
+| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe) |
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
@@ -37,7 +37,7 @@
 <summary><strong>Requirements, versions and language settings</strong></summary>
 
 - Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
-- **v0.4.1-preview** provides all four EXEs: Environment Helper **0.7.0**, Translator **0.9.1**, Two-Zone Clock **0.3.0**, and Pack Helper **0.1.1**.
+- **v0.4.2-preview** provides all four EXEs: Environment Helper **0.7.0**, Translator **0.9.1**, Two-Zone Clock **0.5.0**, and Pack Helper **0.1.1**.
 - Download the Windows EXEs. Pack Helper 0.1.1 needs no configuration sidecar or ZIP. GitHub's automatic source archives are for development, not the ready-to-run apps.
 - This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
 
@@ -54,7 +54,7 @@ These are **unsigned preview** EXEs. Windows SmartScreen may stop the first laun
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. Compare the result with the same file's line in [release SHA-256 checksums](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview#sha-256). Only a match shows the file is unchanged.
+2. Compare the result with the same file's line in [release SHA-256 checksums](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview#sha-256). Only a match shows the file is unchanged.
 3. If it matches, choose **More info → Run anyway** in the SmartScreen window. If it does not, delete the file and download it again from this repository's Releases.
 
 </details>
@@ -204,7 +204,7 @@ Offline quality depends on the package. Download the required directions and che
 
 ### Two-Zone Clock · 两地时钟
 
-Your computer may use another timezone. Your daily life does not have to. Keep your **original/home region** above your **target region**, in a small whale-themed desktop panel.
+Your computer may use another timezone. Your daily life does not have to. Keep your **original/home region** large and above your compact **target region**, with optional **Claude session and weekly reset countdowns** underneath.
 
 <p align="center"><img src="docs/images/clock-preview.svg" alt="Illustrated vertical clock panel with home and target regions" width="100%"></p>
 <p align="center"><sub>Static feature illustration with example times, not a software screenshot.</sub></p>
@@ -215,22 +215,30 @@ Your computer may use another timezone. Your daily life does not have to. Keep y
 2. Search directly in each selector. Choose a fixed **home region** and your **target region**, then save.
 3. Place the clock where you like. Your home time remains visible even if the computer timezone changes.
 
-**Searchable regions · Compact vertical layout · Time difference and day hints · Offline clock**
+**Searchable regions · Home time first · Day/night colors · Session and weekly reset countdowns**
 
 With both regions visible, see how far your target region is ahead or behind home, plus the relative day: yesterday, the same day, tomorrow, or a larger day difference. Daylight saving changes are included.
 
+### Show Claude's reset times
+
+1. In Claude, open **Settings → Usage** and keep the session and weekly reset labels visible. The reader supports Claude Desktop and a visible Claude page in Chrome, Edge or Firefox.
+2. Right-click the clock → **Claude reset countdown…**. Select the timezone used by that Usage page, select its window, then click **Read Usage page**.
+3. Review both times and click **Apply**. A successful read selects **Read every 60 seconds**; untick it before applying if you want a single read. Automatic reading lasts only until the clock closes and still needs that page visible.
+
+If the page cannot be read, use **Paste usage text** or **Manual** in the same window. Failed or ambiguous reads keep the previous countdown. The display estimates the time remaining from the page; reaching zero does not confirm that Claude has restored your quota. The bars show elapsed time against a five-hour/session or seven-day/week reference, **not used quota**. [Clock usage and build guide](apps/two-zone-clock/README.md).
+
 <details>
-<summary><strong>Existing app preview and display options</strong></summary>
+<summary><strong>Clock 0.5.0 preview and display options</strong></summary>
 
-<p align="center"><img src="docs/images/clock-offset-en.png" alt="Compact clock showing home and target times with a 13-hour difference" width="210"></p>
+<p align="center"><img src="docs/images/clock-reset-en.png" alt="Clock 0.5.0 with the home region above a smaller target region and sample session and weekly reset countdowns" width="210"></p>
 
-Offscreen preview from the compiled clock, with synthetic times and regions.
+Preview generated from the compiled clock on a disposable Windows runner, with synthetic times and regions; no Claude account was read for this image.
 
 - Search with English or Chinese names. Each region shows its time and date.
 - Choose 12/24-hour time, seconds, one or two clocks, always-on-top, and a locked position.
 - Drag the panel or return it to the lower-right corner. Settings persist between launches.
 - Daylight saving changes follow Windows timezone rules; accuracy depends on the Windows clock and those rules.
-- The app does **not** modify system time or timezone or check an account. Time display works offline; only a manually requested update check or download contacts GitHub.
+- The app does **not** modify system time or timezone, log in to Claude, or query an account API. It reads the chosen window locally; reset timestamps and their observation metadata are saved with your clock preferences, not the original Usage text. Time display works offline; only a manually requested update check or download contacts GitHub.
 - Choose a fixed home region rather than **Follow computer timezone** to keep home time independent of system changes.
 
 </details>
@@ -245,7 +253,7 @@ Package selected source files, images and video locally before handing them to C
 
 Local packing does not upload files or contact an AI service. Only a manually requested update check or download contacts GitHub. Ordinary packaging and PNG/JPEG/BMP processing use built-in components; video compression and WebP decoding need an existing local **FFmpeg**.
 
-[Download Pack Helper 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe)
+[Download Pack Helper 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe)
 
 One EXE, no configuration sidecar or ZIP. [Source and usage](apps/whale-pack-helper/README.md) include the build script, resources and tests.
 

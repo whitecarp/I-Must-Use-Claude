@@ -15,7 +15,7 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview"><strong>↓ 下载软件</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview"><strong>↓ 下载软件</strong></a>
   &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识工具</a>
   &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">项目主页</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
@@ -28,8 +28,8 @@
 | 了解当前使用环境 | 看懂她的回复 | 知道自己那边几点 | 整理给她的文件 |
 | :--- | :--- | :--- | :--- |
 | **大肥鱼环境助手** | **大肥鱼翻译** | **两地时钟** | **大肥鱼打包助手** |
-| 先测浏览器环境，再处理命中的本地设置，最后复测。 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 即使电脑用了其他时区，也能看到原本地区的时间。 | 在本机整理源码、图片和视频，每个文件不超过 29 MB。 |
-| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe) |
+| 先测浏览器环境，再处理命中的本地设置，最后复测。 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 显示原本地区的时间，以及 Claude 本轮和每周重置倒计时。 | 在本机整理源码、图片和视频，每个文件不超过 29 MB。 |
+| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe) |
 
 **下载 EXE，双击打开。** 各个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
@@ -37,7 +37,7 @@
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- **v0.4.1-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.1**、两地时钟 **0.3.0**、打包助手 **0.1.1**。
+- **v0.4.2-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.1**、两地时钟 **0.5.0**、打包助手 **0.1.1**。
 - 提供 Windows EXE；打包助手 0.1.1 无需旁置配置文件或 ZIP。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
 
@@ -54,7 +54,7 @@
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.1-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
+2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
 3. 一致后，在 SmartScreen 窗口点「更多信息」→「仍要运行」。不一致就删掉文件，重新从本仓库的 Releases 下载。
 
 </details>
@@ -204,7 +204,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 ### 两地时钟 · Two-Zone Clock
 
-上方是**原本地区**，下方是**目标地区**。小小的鲸鱼时钟陪在桌面，让你随时知道自己那边现在几点。
+上方大卡片显示**原本地区**，下方小卡片显示**目标地区**，底部还可显示 **Claude 本轮与每周重置倒计时**。小小的鲸鱼时钟陪在桌面，让你随时知道自己那边现在几点。
 
 <p align="center"><img src="docs/images/clock-preview.svg" alt="功能示意：上下排列的原本地区和目标地区时钟" width="100%"></p>
 <p align="center"><sub>静态功能示意图，其中时间仅作示例，不是当前实时时间。</sub></p>
@@ -215,22 +215,30 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 2. 直接在两个选择框里搜索，选定固定的**原本地区**和**目标地区**，保存。
 3. 把时钟放在方便看的位置。以后电脑时区变化，你原本地区的时间依然清楚。
 
-**地区直接搜索 · 小巧上下排列 · 时差与跨日提示 · 离线计时**
+**地区直接搜索 · 原本时间在上 · 昼夜配色 · 本轮与每周重置倒计时**
 
 同时显示两个地区时，可以直接看出目标地区比原本地区快或慢多久，以及昨天、同一天、明天或更大的跨日差。显示的时差会考虑夏令时。
 
+### 显示 Claude 的重置时间
+
+1. 在 Claude 打开**设置 → 使用情况**，保持本轮与每周重置文字可见。支持 Claude 桌面端，以及 Chrome、Edge、Firefox 中可见的 Claude 页面。
+2. 右键时钟 → **Claude 重置倒计时…**，选好用量页面使用的时区和对应窗口，再点**读取用量页**。
+3. 核对两个时间后点**应用**。读取成功会勾选**每 60 秒自动读取**；只想读一次，可以在应用前取消勾选。自动读取只在本次打开时钟期间生效，仍需保持用量页可见。
+
+读不到时，可在同一个窗口选择**粘贴用量文字**或**手动设置**。读取失败或时间有歧义时保留原倒计时。显示值按页面估算；归零不代表 Claude 额度已经恢复。进度条按本轮五小时、每周七天显示经过的时间比例，**不是已使用额度**。详见[时钟使用与构建说明](apps/two-zone-clock/README.md)。
+
 <details>
-<summary><strong>既有界面预览、显示选项与时区行为</strong></summary>
+<summary><strong>时钟 0.5.0 预览、显示选项与时区行为</strong></summary>
 
-<p align="center"><img src="docs/images/clock-offset-zh.png" alt="两地时钟显示原本和目标地区，并提示相差 13 小时" width="210"></p>
+<p align="center"><img src="docs/images/clock-reset-zh.png" alt="时钟 0.5.0：原本地区大卡片在上、目标地区小卡片在下，并显示示例本轮与每周重置倒计时" width="210"></p>
 
-用编译后的时钟离屏生成，时间和地区为模拟示例。
+在临时 Windows 运行环境中用编译后的时钟生成，时间和地区为模拟示例；没有为截图读取真实 Claude 账号。
 
 - 支持中英文搜索；每个地区显示各自的时间和日期。
 - 可选 12/24 小时制、秒数、单/双时钟、置顶与锁定位置。
 - 面板可以拖动，也能放回屏幕右下角；重新打开后保留设置。
 - 夏令时跟随 Windows 时区规则；准确度取决于 Windows 系统时钟及规则。
-- 软件**不修改电脑时间或时区**，不读取账号。显示时间不需要联网；只有主动检查或下载更新时才会访问 GitHub。
+- 软件**不修改电脑时间或时区**，不登录 Claude，不调用账号 API。它在本机读取所选窗口，将重置时刻和读取元数据随时钟设置保存，不保存原始用量文字。显示时间不需要联网；只有主动检查或下载更新时才会访问 GitHub。
 - 想让原本地区不随系统变化，请选固定地区，而不是「跟随电脑时区」。
 
 </details>
@@ -245,7 +253,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 本地打包不上传文件、不连接 AI 服务；只有用户主动检查或下载更新时才会访问 GitHub。普通打包和 PNG/JPEG/BMP 处理使用自带组件；视频压缩和 WebP 解码需要本机已有 **FFmpeg**。
 
-[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.1-preview/WhalePackHelper.exe)
+[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe)
 
 单个 EXE，无需旁置配置文件或 ZIP。[源码和使用说明](apps/whale-pack-helper/README.md) 包含编译脚本、素材与测试。
 
