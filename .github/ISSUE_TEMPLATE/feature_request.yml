@@ -1,0 +1,27 @@
+name: 功能建议 / Feature request
+description: 想让某个软件多做一件事，或换一种做法 / An idea for one of the apps
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: 哪个软件 / Which app
+      options:
+        - 大肥鱼环境助手 / Whale Environment Helper
+        - 大肥鱼翻译 / Whale Translator
+        - 两地时钟 / Two-Zone Clock
+        - 大肥鱼打包助手 / Whale Pack Helper
+        - 新工具 / A new tool
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 遇到了什么麻烦 / What gets in your way
+      description: 先说场景，再说想法 / Describe the situation before the idea
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 希望怎么改 / What you would like

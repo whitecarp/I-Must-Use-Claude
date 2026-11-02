@@ -1,8 +1,8 @@
-# 大肥鱼打包助手 0.1.0 / Whale Pack Helper
+# 大肥鱼打包助手 0.1.1 / Whale Pack Helper
 
-只在本机整理文件，不联网、不上传。Windows 10/11，.NET Framework 4.8 或更高版本。
+只在本机整理文件，不上传；唯一的联网是手动点「检查更新」（0.1.1 起）。Windows 10/11，.NET Framework 4.8 或更高版本。
 
-发布下载使用英文文件名：`WhalePackHelper.exe` 和 `WhalePackHelper.exe.config`，两者必须放在同一文件夹。也可下载配对 ZIP 并先解压；源码构建的输出名仍是 `大肥鱼打包助手.exe`。
+发布下载使用英文文件名 `WhalePackHelper.exe`。0.1.0 发布版还需要同名 `WhalePackHelper.exe.config` 放在同一文件夹（或下载配对 ZIP 后解压）；从 0.1.1 起，长路径开关写在程序里，单个 EXE 即可运行，配置文件可有可无。源码构建的输出名仍是 `大肥鱼打包助手.exe`。
 
 ## 使用
 
@@ -60,8 +60,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 
 Open the executable, switch to **English**, add files or folders, review processing modes and exclusions, optionally fill in the handoff, and select **Pack files**. Results are written to a new subfolder. Every output is checked against a strict **29,000,000-byte** ceiling; ZIPs are independently extractable. Originals remain untouched.
 
-Release downloads use `WhalePackHelper.exe` together with `WhalePackHelper.exe.config`. Keep both in the same folder, or extract the paired ZIP before launching. Source builds retain the Chinese executable name.
+Release downloads use `WhalePackHelper.exe`. The 0.1.0 release also needs `WhalePackHelper.exe.config` in the same folder (or extract the paired ZIP). From 0.1.1 the long-path switches are set in code, so the EXE runs on its own and the config file is optional. Source builds retain the Chinese executable name.
 
-This is a fully local utility. It does not upload files, call AI services, download FFmpeg, or access network shares. Secret detection is heuristic; review contents before sending. FFmpeg must already be installed or selected manually. HDR conversion is not supported in v0.1.0; use Original mode or convert to SDR separately.
+This is a local utility. It does not upload files, call AI services, download FFmpeg, or access network shares; from 0.1.1 the only network access is the manual Check updates button in Settings. Secret detection is heuristic; review contents before sending. FFmpeg must already be installed or selected manually. HDR conversion is not supported in v0.1.0; use Original mode or convert to SDR separately.
 
 Build with `build.ps1`; it uses the Windows Framework compiler with C# 5 and runs tests by default. All source files, assets, and test harnesses are included.

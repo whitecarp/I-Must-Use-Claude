@@ -37,6 +37,9 @@ internal static class UpdateCheckerTests {
         Check(!UpdateChecker.IsNewer(Parse(Release("0.9.9",preview:false)),"0.10.0",false),"update gate compares numeric components");
         TlsPolicy();
         Check(Parse(Release("0.9.0",app:"clock"))==null,"correct application asset only");
+        Check(UpdateChecker.AssetName("pack")=="WhalePackHelper.exe","pack helper asset name");
+        Check(UpdateChecker.SelectRelease(new JavaScriptSerializer().Serialize(new object[]{Release("0.1.1",app:"pack")}),"pack").Version=="0.1.1","pack helper releases select its own asset");
+        Check(UpdateChecker.SelectRelease(new JavaScriptSerializer().Serialize(new object[]{Release("0.1.1",app:"pack")}),"translator")==null,"pack helper asset is never offered to another app");
         Check(Parse(Release("0.9.0",digest:""))==null,"missing checksum rejected");
         Check(Parse(Release("0.9.0",digest:"md5:abcd"))==null,"wrong checksum algorithm rejected");
         Check(Parse(Release("0.9.0",state:"new"))==null,"unfinished upload rejected");

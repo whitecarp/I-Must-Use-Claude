@@ -35,6 +35,7 @@ MAX_FILES = 4096
 READ_SIZE = 256 * 1024
 STAGE_NAME = re.compile(r"[0-9]+-[0-9a-f]{32}\Z")
 PACKAGE_ID = re.compile(r"translate-[a-z0-9-]+_[a-z0-9-]+-[0-9_]+\Z")
+SHA256_HEX = re.compile(r"[0-9a-f]{64}\Z")
 
 
 class PackageError(Exception):
@@ -103,6 +104,32 @@ def normalize_catalog(document):
     if not output:
         raise PackageError("invalid_catalog")
     return sorted(output.values(), key=lambda item: (item["from_name"], item["to_name"], item["package_version"]))
+
+
+def pinned_sha256(package_id):
+    """Known-good SHA-256 of an official package version, or None when it is not pinned yet.
+
+    Pins live only in the bundled catalog (an optional "sha256" on a package row), so a
+    refreshed online catalog can add packages but can never replace or remove a pin."""
+    try:
+        document = read_json(BUNDLED_CATALOG, MAX_CATALOG)
+    except (ValueError, OSError):
+        return None
+    rows = document.get("packages") if isinstance(document, dict) else None
+    for row in rows if isinstance(rows, list) else []:
+        if not isinstance(row, dict) or "sha256" not in row:
+            continue
+        try:
+            row_id = metadata_info(row)["id"]
+        except (ValueError, TypeError, AttributeError):
+            continue
+        if row_id != package_id:
+            continue
+        value = row["sha256"]
+        if not isinstance(value, str) or not SHA256_HEX.match(value):
+            raise PackageError("invalid_catalog")
+        return value
+    return None
 
 
 def catalog():
@@ -450,9 +477,12 @@ def install(package_id, cancel=None, progress=None, reinstall=False):
     current = next((item for item in installed_packages() if item["id"] == package_id), None)
     if current and not reinstall:
         return dict(current, already_installed=True)
+    expected_digest = pinned_sha256(package_id)
     with staging() as stage:
         archive = stage / "download.argosmodel"
         digest = download(choice["download_url"], archive, cancel, progress)
+        if expected_digest is not None and digest != expected_digest:
+            raise PackageError("checksum_mismatch")
         return install_archive(archive, stage, choice, digest, cancel, progress, reinstall=reinstall)
 
 

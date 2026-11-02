@@ -46,6 +46,9 @@ CI also runs the clock's `-RunTests`, translator `tests/run-glossary-history.ps1
 
 ## Publishing an update
 
+From the next release, Pack Helper 0.1.1 is a single EXE: attach `WhalePackHelper.exe` on its own (the `.exe.config` and paired ZIP are no longer needed) and add `"pack"` to the version comment, for example `<!-- whale-app-versions: {"helper":"0.7.0","pack":"0.1.1"} -->`. The shared updater now recognises the `pack` asset. Notes for the earlier v0.4.0-preview release follow.
+
+
 For v0.4.0-preview, attach `WhaleEnvironmentHelper.exe`, `WhalePackHelper.exe`, `WhalePackHelper.exe.config` and `WhalePackHelper-0.1.0.zip` (the EXE/config pair). Translator 0.9.0 and Clock 0.3.0 remain linked to v0.3.0-preview. The Pack Helper is not part of the updater schema yet. Include a single-line machine-readable comment for the helper asset actually attached to this release:
 
 ```html
@@ -53,6 +56,14 @@ For v0.4.0-preview, attach `WhaleEnvironmentHelper.exe`, `WhalePackHelper.exe`, 
 ```
 
 The updater reads public published releases, including previews, validates the asset's repository URL, size and GitHub SHA-256 digest, and never overwrites or launches a download. Missing digests or version metadata are not accepted. Preview builds pass `currentPreview=true` to `UpdateChecker.Show` (the default); stable builds must pass `false`. A stable release with the same app version can replace a preview. Keep the artifact versions, this metadata and each app's current version in sync.
+
+## Language pack checksums
+
+The official Argos catalog has no checksums, so the translator can pin known-good SHA-256 values itself. To pin a package, download it once on a trusted machine, run `Get-FileHash <file> -Algorithm SHA256`, and add the lowercase hash as `"sha256"` to that package's row in `apps/claude-live-translator/backend/argos_catalog.json`. Installs of a pinned package are rejected when the download does not match (`checksum_mismatch`). Pins are read only from the bundled catalog, so a refreshed online catalog cannot remove them. Unpinned packages install as before.
+
+## Windows acceptance in CI
+
+The `acceptance` job in `.github/workflows/build.yml` runs on GitHub's disposable Windows runner. It changes the real Windows time zone with the helper, undoes it, checks that a later manual change is not overwritten, then builds the four apps, starts each one and keeps a screenshot artifact (`launch-screenshots`). `tests/run-e2e-timezone.ps1` refuses to run unless `GITHUB_ACTIONS=true` and `WHALE_E2E_ALLOW_SYSTEM_CHANGES=1`; do not run it on a personal computer.
 
 ## Project page
 

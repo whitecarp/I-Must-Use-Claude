@@ -27,7 +27,7 @@ namespace WhalePack {
         public MainForm(AppSettings settings) {
             this.settings = settings;
             if (String.IsNullOrWhiteSpace(settings.OutputDirectory)) settings.OutputDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "发给Claude");
-            Ui.Setup(this, T("大肥鱼打包助手", "Big Whale Pack Helper") + "  ·  0.1.0", 560, 640);
+            Ui.Setup(this, T("大肥鱼打包助手", "Big Whale Pack Helper") + "  ·  0.1.1", 560, 640);
             StartPosition = FormStartPosition.CenterScreen; AllowDrop = true;
             DragEnter += OnDragEnter; DragDrop += OnDragDrop; FormClosing += HandleClosing;
             Build(); ResumeLayout(false);
@@ -36,7 +36,7 @@ namespace WhalePack {
         private void Build() {
             SuspendLayout();
             foreach (Control c in Controls.Cast<Control>().ToArray()) c.Dispose(); Controls.Clear();
-            Text = T("大肥鱼打包助手", "Big Whale Pack Helper") + "  ·  0.1.0";
+            Text = T("大肥鱼打包助手", "Big Whale Pack Helper") + "  ·  0.1.1";
             PictureBox whale = new PictureBox { Image = Ui.LoadWhale(), SizeMode = PictureBoxSizeMode.Zoom, Location = new Point(20, 12), Size = new Size(100, 70) };
             Controls.Add(whale);
             Ui.Label(this, T("大肥鱼打包助手", "Big Whale Pack"), 130, 21, 300, 35, 19f, true, Theme.Ink);
@@ -67,7 +67,7 @@ namespace WhalePack {
             writeHandoff = new RoundCheckBox { Text = T("同时写交接说明", "Write handoff note"), Checked = settings.WriteHandoff, Bounds = new Rectangle(370, 524, 172, 30), Font = Ui.Font(8.4f, false), ForeColor = Theme.Ink }; Controls.Add(writeHandoff);
             handoff = Ui.Button(this, T("写交接说明…", "Handoff note…"), 20, 571, 154, 36, false, delegate { ShowHandoff(); });
             pack = Ui.Button(this, T("开始打包", "Start packing"), 384, 571, 156, 36, true, delegate { StartOrCancel(); });
-            Ui.Label(this, T("●  只在本机整理文件：不联网、不上传", "●  Local files only. No network. No uploads."), 22, 612, 518, 22, 8.5f, false, Theme.Muted);
+            Ui.Label(this, T("●  只在本机整理文件：不上传；只有手动检查更新时才联网", "●  Local files only. No uploads. Network only for manual update checks."), 22, 612, 518, 22, 8.5f, false, Theme.Muted);
             RenderItems(); RenderEstimates(); SetBusy(busy); ResumeLayout(false);
         }
         // Recreate at logical size, then restore the existing DPI once. This also keeps language switching stable at 150%.
@@ -265,7 +265,8 @@ namespace WhalePack {
                 Ui.Label(form, T("查找顺序：程序目录 → PATH → 下方手动路径", "Search: app folder → PATH → selected path below"), 20, 52, 440, 25, 8.5f, false, Theme.Muted);
                 TextBox path = new TextBox { Text = settings.FfmpegPath, ReadOnly = true, Bounds = new Rectangle(20, 88, 340, 28), Font = Ui.Font(8.5f, false) }; form.Controls.Add(path);
                 Ui.Button(form, T("选择…", "Browse…"), 370, 85, 90, 32, false, delegate { if (PickFfmpeg()) path.Text = settings.FfmpegPath; });
-                Ui.Label(form, T("只运行本机文件；不会下载、联网或上传。\n设置和交接草稿只保存在本机。", "Only local files are used. No downloads or uploads.\nSettings and draft notes stay on this computer."), 20, 131, 440, 48, 9f, false, Theme.Muted);
+                Ui.Label(form, T("只用本机文件：不下载 FFmpeg，不上传。\n只有点「检查更新」时才会联网访问 GitHub。", "Local files only: no FFmpeg download, no uploads.\nNetwork only when you choose Check updates."), 20, 131, 440, 48, 9f, false, Theme.Muted);
+                Ui.Button(form, T("检查更新…", "Check updates…"), 20, 193, 150, 32, false, delegate { WhaleCommon.UpdateChecker.Show(form, "pack", "0.1.1", settings.Language == "en"); });
                 Ui.Button(form, T("完成", "Done"), 350, 193, 110, 32, true, delegate { form.Close(); }); form.ResumeLayout(false); form.ShowDialog(this);
             }
             ReestimateVideos();

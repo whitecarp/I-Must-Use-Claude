@@ -29,6 +29,7 @@ namespace WhaleCommon {
                 case "translator": return "WhaleTranslator.exe";
                 case "clock": return "HomeTimeClock.exe";
                 case "helper": return "WhaleEnvironmentHelper.exe";
+                case "pack": return "WhalePackHelper.exe";
                 default: throw new ArgumentException("Unknown application.");
             }
         }

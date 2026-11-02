@@ -7,14 +7,17 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("Offline file preparation and handoff helper")]
 [assembly: AssemblyCompany("大肥鱼")]
 [assembly: AssemblyProduct("大肥鱼打包助手")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.1.1.0")]
+[assembly: AssemblyFileVersion("0.1.1.0")]
 [assembly: TargetFramework(".NETFramework,Version=v4.8", FrameworkDisplayName=".NET Framework 4.8")]
 
 namespace WhalePack {
     internal static class Program {
         [STAThread]
         private static void Main() {
+            // Long-path handling no longer depends on the .exe.config sidecar (same switches as the translator launcher).
+            AppContext.SetSwitch("Switch.System.IO.UseLegacyPathHandling", false);
+            AppContext.SetSwitch("Switch.System.IO.BlockLongPaths", false);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             try { Application.Run(new MainForm(SettingsStore.Load())); }
