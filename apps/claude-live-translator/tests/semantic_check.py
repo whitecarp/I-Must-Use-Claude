@@ -53,11 +53,15 @@ OLD_PROTECTED = re.compile(r"https?://[^\s]+|www\.[^\s]+|`[^`\n]+`", re.I)
 # Mirror GlossaryStore.Defaults(), without reading the user's saved dictionary.
 # test_semantic_check.py checks these entries against the C# defaults for drift.
 DEFAULT_NAMES = (
-    "Claude", "Claude Code", "Claude Desktop", "Codex", "Skills", "Anthropic",
-    "OpenAI", "ChatGPT", "Gemini", "DeepSeek", "GitHub", "Git", "MCP", "API",
-    "CLI", "SDK", "JSON", "YAML", "TOML", "Markdown", "Python", "JavaScript",
-    "TypeScript", "PowerShell", "Node.js", "Docker", "React", "UTF-8",
-    "Cockpit Tools", "CC Switch", "Opus", "Sonnet", "Haiku",
+    "Claude", "Claude Code", "Claude Desktop", "Claude in Chrome", "Claude Agent SDK",
+    "Codex", "Anthropic", "OpenAI", "ChatGPT", "DeepSeek", "GitHub", "Git", "MCP",
+    "API", "CLI", "SDK", "JSON", "YAML", "TOML", "Markdown", "Python", "JavaScript",
+    "TypeScript", "PowerShell", "Node.js", "Docker", "UTF-8", "Cockpit Tools", "CC Switch",
+)
+# Names that are also everyday words keep exact case (GlossaryStore.ExactCaseNames).
+DEFAULT_EXACT_NAMES = (
+    "Skills", "Artifacts", "Hooks", "Opus", "Sonnet", "Haiku", "Fable", "Gemini",
+    "React", "Cursor", "Copilot",
 )
 DEFAULT_PHRASES = (
     ("context window", "上下文窗口"), ("system prompt", "系统提示词"),
@@ -80,11 +84,10 @@ DEFAULT_REVERSE = (
 
 def default_glossary():
     rows = [dict(source=name, replacement=name, target="*") for name in DEFAULT_NAMES]
-    for source, replacement in DEFAULT_PHRASES:
-        rows.append(dict(source=source, replacement=replacement, target="zh-CN"))
-        initial = source[0].upper() + source[1:]
-        if initial != source:
-            rows.append(dict(source=initial, replacement=replacement, target="zh-CN"))
+    rows.extend(dict(source=name, replacement=name, target="*", matchCase=True) for name in DEFAULT_EXACT_NAMES)
+    # Terms ignore case, so one row covers "context window" and "Context window".
+    rows.extend(dict(source=source, replacement=replacement, target="zh-CN")
+                for source, replacement in DEFAULT_PHRASES)
     rows.extend(dict(source=source, replacement=replacement, target="en")
                 for source, replacement in DEFAULT_REVERSE)
     return rows
@@ -121,7 +124,7 @@ def check(case, text):
     norm = (lambda s: s.lower()) if direction == "zh_en" else (lambda s: s)
     missing = [" / ".join(group) for group in groups if not any(norm(term) in hay for term in group)]
     # Brand names must retain their exact spelling and case in both directions.
-    missing.extend(name for name in DEFAULT_NAMES if name in source and name not in text)
+    missing.extend(name for name in DEFAULT_NAMES + DEFAULT_EXACT_NAMES if name in source and name not in text)
     present = [term for term in avoid if norm(term) in hay]
     return missing, present
 

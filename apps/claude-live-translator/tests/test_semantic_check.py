@@ -18,12 +18,16 @@ class SemanticCheckTests(unittest.TestCase):
         names = re.search(r'foreach\(string name in new\[\]\{(.*?)\}\)', source, re.S)
         self.assertIsNotNone(names, 'C# name-default syntax changed; review semantic defaults')
         self.assertEqual(tuple(re.findall(r'"([^"]+)"', names.group(1))), semantic.DEFAULT_NAMES)
+        store = (ROOT / 'src' / 'Glossary.cs').read_text(encoding='utf-8-sig')
+        exact = re.search(r'ExactCaseNames=\{(.*?)\};', store, re.S)
+        self.assertIsNotNone(exact, 'C# exact-case name syntax changed; review semantic defaults')
+        self.assertEqual(tuple(re.findall(r'"([^"]+)"', exact.group(1))), semantic.DEFAULT_EXACT_NAMES)
         for label, expected in (('phrases', semantic.DEFAULT_PHRASES), ('reverse', semantic.DEFAULT_REVERSE)):
             block = re.search(r'string\[,] ' + label + r'=\{(.*?)\};', source, re.S)
             self.assertIsNotNone(block, 'C# phrase-default syntax changed; review semantic defaults')
             self.assertEqual(tuple(re.findall(r'\{"([^"]+)","([^"]+)"\}', block.group(1))), expected)
         rows = semantic.default_glossary()
-        self.assertEqual(len(rows), 76)
+        self.assertEqual(len(rows), 66)
         self.assertEqual(len(semantic.g.validated_entries(rows)), len(rows))
 
     def test_old_way_accepts_and_ignores_dictionary_for_code_and_links(self):

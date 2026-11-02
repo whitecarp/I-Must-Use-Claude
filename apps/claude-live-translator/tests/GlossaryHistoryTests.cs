@@ -23,13 +23,20 @@ internal static class GlossaryHistoryTests {
             Check(!String.IsNullOrWhiteSpace(fixture)&&Path.GetFileName(fixture).StartsWith("glossary-history-fixture-",StringComparison.Ordinal),"isolated fixture directory required");
             Check(!Directory.Exists(fixture),"fixture must start empty");
             var defaults=GlossaryStore.Load();
-            Check(defaults.Count>3&&defaults.Count<=100,"expanded starter glossary available within shared worker capacity");
+            Check(defaults.Count>3&&defaults.Count<=GlossaryStore.MaxEntries,"expanded starter glossary available within shared worker capacity");
             Check(EntriesText(GlossaryStore.Validate(defaults))==EntriesText(defaults),"all starter terms already pass normalization and validation");
             foreach(string brand in new[]{"Claude","Claude Code","Codex","Skills","GitHub","MCP"}){
                 var term=Find(defaults,brand,"*");Check(term!=null&&term.replacement==brand,"starter glossary preserves "+brand+" in every language");
             }
             Check(Find(defaults,"context window","zh-CN")!=null&&Find(defaults,"context window","zh-CN").replacement=="上下文窗口","English technical phrase has Simplified Chinese target");
             Check(Find(defaults,"上下文窗口","en")!=null&&Find(defaults,"上下文窗口","en").replacement=="context window","Chinese technical phrase has English target");
+            foreach(string name in GlossaryStore.ExactCaseNames){var term=Find(defaults,name,"*");Check(term!=null&&term.matchCase,"everyday-word name "+name+" keeps exact case");}
+            Check(!Find(defaults,"Claude","*").matchCase&&!Find(defaults,"context window","zh-CN").matchCase,"names and phrases ignore case by default");
+            Check(Find(defaults,"Context window","zh-CN")==null,"one ignore-case row replaces capitalised phrase copies");
+            foreach(string name in new[]{"Claude in Chrome","Claude Agent SDK","Artifacts","Hooks","Fable","Cursor","Copilot"})Check(Find(defaults,name,"*")!=null,"starter glossary includes "+name);
+            bool duplicate=false;try{GlossaryStore.Validate(new[]{new GlossaryEntry{source="Claude",replacement="a",target="*"},new GlossaryEntry{source="claude",replacement="b",target="*"}});}catch(InvalidOperationException){duplicate=true;}
+            Check(duplicate,"ignore-case terms that differ only in case are duplicates");
+            Check(GlossaryStore.Validate(new[]{new GlossaryEntry{source="Apple",replacement="苹果公司",target="*",matchCase=true},new GlossaryEntry{source="apple",replacement="苹果",target="*"}}).Count==2,"an exact-case term may sit beside an ignore-case one");
             Check(!Directory.Exists(fixture),"reading defaults does not create files");
             var custom=new List<GlossaryEntry>{
                 new GlossaryEntry{source="Claude",replacement="克劳德自定义",target="*"},
@@ -49,6 +56,17 @@ internal static class GlossaryHistoryTests {
             GlossaryStore.Save(new[]{new GlossaryEntry{source="Skills",replacement="技能",target="zh-CN"}});
             Check(GlossaryStore.Load()[0].replacement=="技能","UTF-8 glossary survives read-back");
             Check(GlossaryStore.Load().Count==1,"reading a saved custom glossary leaves deleted starter terms absent");
+            string legacy="{\"version\":1,\"entries\":[{\"source\":\"context window\",\"replacement\":\"上下文窗口\",\"target\":\"zh-CN\"},{\"source\":\"Context window\",\"replacement\":\"上下文窗口\",\"target\":\"zh-CN\"},"+
+                "{\"source\":\"Apple\",\"replacement\":\"苹果公司\",\"target\":\"*\"},{\"source\":\"apple\",\"replacement\":\"苹果\",\"target\":\"*\"},{\"source\":\"Skills\",\"replacement\":\"技能\",\"target\":\"zh-CN\"}]}";
+            File.WriteAllText(GlossaryStore.FilePath,legacy,new UTF8Encoding(false));
+            var migrated=GlossaryStore.Load();
+            Check(migrated.Count==4&&!Find(migrated,"context window","zh-CN").matchCase&&Find(migrated,"Context window","zh-CN")==null,"version 1 capitalised copies fold into one ignore-case row");
+            Check(Find(migrated,"Apple","*").matchCase&&Find(migrated,"apple","*").matchCase,"version 1 rows that differ in meaning keep exact case");
+            Check(Find(migrated,"Skills","zh-CN").matchCase,"version 1 everyday-word names keep exact case");
+            Check(File.ReadAllText(GlossaryStore.FilePath)==legacy,"reading a version 1 file does not rewrite it");
+            GlossaryStore.Save(migrated);
+            Check(File.ReadAllText(GlossaryStore.FilePath).Contains("\"version\":2")&&Find(GlossaryStore.Load(),"Apple","*").matchCase,"saving writes version 2 and keeps Match case");
+            GlossaryStore.Save(new[]{new GlossaryEntry{source="Skills",replacement="技能",target="zh-CN"}});
             if(!String.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DAFEIYU_FIXTURE_BACKEND"))){
                 // Match UTF-8 Windows CI consoles. Framework Process creates an AutoFlush
                 // stdin writer, which may emit a BOM before our explicit UTF-8 payload bytes.
@@ -67,12 +85,15 @@ internal static class GlossaryHistoryTests {
                         Check(worker.Translate("上下文窗口","auto:en",offline).GetAwaiter().GetResult()=="context window","reverse technical phrase reaches "+(offline?"offline":"online")+" worker");
                     }
                     Check(worker.Translate(technical,"auto:ja",false).GetAwaiter().GetResult()==technical,"Chinese fixed terms do not leak into Japanese target");
+                    string mixedCase="Open claude code, check the CONTEXT WINDOW and improve your skills with Skills.";
+                    foreach(bool offline in new[]{false,true})
+                        Check(worker.Translate(mixedCase,"auto:zh-CN",offline).GetAwaiter().GetResult()=="Open Claude Code, check the 上下文窗口 and improve your skills with Skills.","defaults ignore case but leave everyday words alone in "+(offline?"offline":"online")+" fixture");
                 }
             }
             string before=File.ReadAllText(GlossaryStore.FilePath);
             bool refused=false;try{GlossaryStore.Save(new[]{new GlossaryEntry{source="",replacement="x",target="*"}});}catch(InvalidOperationException){refused=true;}
             Check(refused&&File.ReadAllText(GlossaryStore.FilePath)==before,"invalid edit preserves previous dictionary");
-            var full=new List<GlossaryEntry>();for(int i=0;i<100;i++)full.Add(new GlossaryEntry{source="CustomTerm"+i,replacement="CustomValue"+i,target="*"});
+            var full=new List<GlossaryEntry>();for(int i=0;i<GlossaryStore.MaxEntries;i++)full.Add(new GlossaryEntry{source="CustomTerm"+i,replacement="CustomValue"+i,target="*"});
             string fullBefore=EntriesText(full);refused=false;try{GlossaryStore.MergeRecommended(full);}catch(InvalidOperationException){refused=true;}
             Check(refused&&EntriesText(full)==fullBefore&&File.ReadAllText(GlossaryStore.FilePath)==before,"overflow refuses the merge without partial edit or save");
             string corrupt="{\"entries\":\"invalid\"}";File.WriteAllText(GlossaryStore.FilePath,corrupt,new UTF8Encoding(false));
@@ -116,6 +137,7 @@ internal static class GlossaryHistoryTests {
                 Call(glossary,"AddRecommended");
                 var staged=(List<GlossaryEntry>)Call(glossary,"ReadRows");
                 Check(staged.Count>1&&Find(staged,"Claude","*").replacement=="我的助手","editor stages recommendations while retaining custom replacement");
+                Check(Find(staged,"Skills","*")!=null&&Find(staged,"Skills","*").matchCase&&!Find(staged,"Claude Code","*").matchCase,"editor round-trips the Match case column");
                 Check(File.ReadAllText(GlossaryStore.FilePath)==editorBefore,"adding recommendations in editor does not save them");
             }
             Check(File.ReadAllText(GlossaryStore.FilePath)==editorBefore,"closing editor without Save discards staged recommendations");

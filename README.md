@@ -176,7 +176,7 @@ Open **⚙ → Saved replies** to search the original and translated text, filte
 <summary><strong>Glossary, saved replies and offline use</strong></summary>
 
 - Google online mode detects the source language and supports 17 target languages. Only selections in the chosen window are translated; selections elsewhere are ignored.
-- Glossary entries can apply to one target language or all languages, online and offline. Matching is case-sensitive; longer phrases take priority. Links and code keep their original text.
+- Glossary entries can apply to one target language or all languages, online and offline. Terms ignore case unless **Match case** is ticked; built-in names that are also everyday words, such as Skills or Sonnet, keep it on. Longer phrases take priority. Links and code keep their original text.
 - Recent translations hold up to 20 successful results within a bounded memory budget. Closing the app clears them. Only replies you explicitly save persist as Markdown; the glossary and notebook preferences are separate local files.
 - Saved replies contain the save time, source-window title, translation method/language, tag, note, translation and original text. The notebook does not upload them. Deleting in the notebook asks for confirmation and removes the corresponding Markdown file; unsaving from the translation card also removes it. External edits are checked before an update or deletion, so refresh first if the file changed.
 - You can pause selection translation, paste text manually, copy a translation, or pin the window on top.

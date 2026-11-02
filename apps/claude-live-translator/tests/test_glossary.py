@@ -15,8 +15,11 @@ import google_worker
 import offline_worker
 
 
-def entry(source, replacement, target='*'):
-    return dict(source=source, replacement=replacement, target=target)
+def entry(source, replacement, target='*', match_case=None):
+    row = dict(source=source, replacement=replacement, target=target)
+    if match_case is not None:
+        row['matchCase'] = match_case
+    return row
 
 
 class GlossaryTests(unittest.TestCase):
@@ -63,10 +66,33 @@ class GlossaryTests(unittest.TestCase):
         for engine in (GoogleTranslator(lambda text, direction: text, 0), OfflineTranslator(lambda text, direction: text)):
             self.assertEqual(engine.translate(source, 'en_zh', [entry('Claude', '鲸鱼')]), expected)
 
-    def test_longest_literal_case_and_identifier_boundary(self):
+    def test_longest_literal_ignores_case_by_default_and_keeps_identifier_boundary(self):
         engine = GoogleTranslator(lambda text, direction: text, 0)
         glossary = [entry('Claude', 'C'), entry('Claude Code', 'CC'), entry('A+B', 'sum')]
-        self.assertEqual(engine.translate('Claude Code Claude ClaudeX claude A+B', 'auto:en', glossary), 'CC C ClaudeX claude sum')
+        self.assertEqual(engine.translate('Claude Code claude code CLAUDE ClaudeX claudex claude A+B', 'auto:en', glossary),
+                         'CC CC C ClaudeX claudex C sum')
+
+    def test_match_case_entries_leave_other_spellings_alone(self):
+        glossary = [entry('Skills', 'Skills', match_case=True), entry('context window', '上下文窗口', 'zh-CN')]
+        for engine in (GoogleTranslator(lambda t, d: t, 0), OfflineTranslator(lambda t, d: t)):
+            self.assertEqual(engine.translate('Open Skills; improve your skills. Context Window, CONTEXT WINDOW.', 'en_zh', glossary),
+                             'Open Skills; improve your skills. 上下文窗口, 上下文窗口.')
+
+    def test_exact_case_entry_beats_ignore_case_entry_for_the_same_word(self):
+        glossary = [entry('apple', '苹果'), entry('Apple', '苹果公司', match_case=True)]
+        engine = GoogleTranslator(lambda t, d: t, 0)
+        self.assertEqual(engine.translate('Apple sells apple juice. APPLE.', 'en_zh', glossary), '苹果公司 sells 苹果 juice. 苹果.')
+
+    def test_longer_ignore_case_phrase_beats_shorter_exact_name(self):
+        glossary = [entry('Claude', 'Claude', match_case=True), entry('claude code', 'CC')]
+        engine = OfflineTranslator(lambda t, d: t)
+        self.assertEqual(engine.translate('Claude Code, CLAUDE CODE, Claude, claude', 'en_zh', glossary), 'CC, CC, Claude, claude')
+
+    def test_replacement_spans_reports_the_matched_entry(self):
+        entries = validated_entries([entry('Claude Code', 'CC'), entry('Skills', 'S', match_case=True)])
+        text = 'claude code skills Skills'
+        self.assertEqual([(a, b, r) for a, b, r in replacement_spans(text, entries, 'zh-CN', [])],
+                         [(0, 11, 'CC'), (19, 25, 'S')])
 
     def test_target_specific_overrides_all_and_ignores_other_languages(self):
         glossary = [entry('Skills', 'Skills'), entry('Skills', '技能', 'zh-CN'), entry('Skills', 'スキル', 'ja')]
@@ -91,12 +117,21 @@ class GlossaryTests(unittest.TestCase):
         self.assertEqual(engine.translate('请用大肥鱼继续', 'zh_en', [entry('大肥鱼','Whale')]), '请用Whale继续')
 
     def test_malformed_and_oversized_dictionaries_rejected(self):
-        bad = [ {}, 'wrong', [entry('a','b')]*101, [entry('a','b'),entry('a','c')],
+        bad = [ {}, 'wrong', [entry('t%d' % i, 'b') for i in range(201)], [entry('a','b'),entry('a','c')],
+                [entry('Claude','x'), entry('claude','y')], [entry('a','b',match_case='yes')],
                 [entry('a\nb','c')], [entry('a','')], [entry('a'*65,'b')], [entry('a','b','url://x')] ]
         for value in bad:
             with self.assertRaises(ValueError): validated_entries(value)
         with self.assertRaisesRegex(TranslationError, 'invalid_glossary'):
             GoogleTranslator(lambda t,d:t,0).translate('sample','en_zh',{})
+
+    def test_case_rules_for_duplicates_and_capacity(self):
+        self.assertEqual(len(validated_entries([entry('t%d' % i, 'b') for i in range(200)])), 200)
+        both_exact = validated_entries([entry('Skills', 'S', match_case=True), entry('skills', 's', match_case=True)])
+        self.assertEqual([row[3] for row in both_exact], [True, True])
+        mixed = validated_entries([entry('Apple', '苹果公司', match_case=True), entry('apple', '苹果')])
+        self.assertEqual([row[3] for row in mixed], [True, False])
+        self.assertEqual(validated_entries([entry('Claude', 'x'), entry('claude', 'y', 'zh-CN')])[1][2], 'zh')
 
     def test_google_errors_not_retried_as_fragments(self):
         calls=[]
