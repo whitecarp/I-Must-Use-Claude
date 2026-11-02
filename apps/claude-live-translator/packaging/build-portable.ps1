@@ -1,6 +1,6 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$Version = '0.9.0',
+    [string]$Version = '0.9.4',
     [string]$ApplicationExe = 'ClaudeChinese.exe',
     [string]$OutputName = '大肥鱼翻译.exe',
     [string]$VCRedistDirectory = '',
@@ -173,11 +173,27 @@ if (-not $StageOnly) {
         try {
             foreach ($entry in $entries) {
                 $source = Join-Path $stageDirectory $entry.Path.Replace('/','\')
-                [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$source,$entry.Path,[IO.Compression.CompressionLevel]::Optimal) | Out-Null
+                [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip,$source,$entry.Path,[IO.Compression.CompressionLevel]::NoCompression) | Out-Null
             }
         } finally { $zip.Dispose() }
     } finally { $zipStream.Dispose() }
-    $payloadHash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $archiveHash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $archiveBytes = (Get-Item -LiteralPath $zipPath).Length
+    $compressionSource = Join-Path $packagingDirectory 'NativeCompression.cs'
+    Add-Type -Path $compressionSource
+    $compressedPath = Join-Path $buildDirectory 'payload.lzms'
+    $compressTimer = [Diagnostics.Stopwatch]::StartNew()
+    $archiveData = [IO.File]::ReadAllBytes($zipPath)
+    $compressedData = [DafeiyuPortable.NativeCompression]::Compress($archiveData)
+    [IO.File]::WriteAllBytes($compressedPath,$compressedData)
+    $compressTimer.Stop()
+    # Verify the exact serialized payload before embedding it into the launcher.
+    $restoredData = [DafeiyuPortable.NativeCompression]::Decompress([IO.File]::ReadAllBytes($compressedPath),$archiveBytes)
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try { $restoredHash = [BitConverter]::ToString($sha.ComputeHash($restoredData)).Replace('-','').ToLowerInvariant() } finally { $sha.Dispose() }
+    if ($restoredHash -ne $archiveHash) { throw 'Compressed payload round-trip verification failed.' }
+    $archiveData=$null; $compressedData=$null; $restoredData=$null
+    $payloadHash = (Get-FileHash -LiteralPath $compressedPath -Algorithm SHA256).Hash.ToLowerInvariant()
     $metadataPath = Join-Path $buildDirectory 'PortableBuildInfo.cs'
     $assemblyVersion = if (($Version.Split('.')).Count -eq 3) { $Version + '.0' } else { $Version }
     $metadata = @"
@@ -189,6 +205,8 @@ using System.Reflection;
 namespace DafeiyuPortable { internal static class PortableBuildInfo {
  internal const string Version="$Version";
  internal const string PayloadSha256="$payloadHash";
+ internal const string ArchiveSha256="$archiveHash";
+ internal const long ArchiveBytes=$archiveBytes;
  internal const string ManifestSha256="$manifestHash";
 } }
 "@
@@ -198,13 +216,18 @@ namespace DafeiyuPortable { internal static class PortableBuildInfo {
     $iconPath = Join-Path $projectDirectory 'icon.ico'
     if (-not (Test-Path -LiteralPath $iconPath -PathType Leaf)) { throw 'The application icon is missing.' }
     $launcherManifest = Join-Path $packagingDirectory 'PortableLauncher.manifest'
-    & $compiler /nologo /optimize+ /target:winexe /platform:x64 "/out:$outputPath" "/win32icon:$iconPath" "/win32manifest:$launcherManifest" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Web.Extensions.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll "/resource:$zipPath,payload.zip" "/resource:$manifestPath,payload.manifest.json" (Join-Path $packagingDirectory 'PortableLauncher.cs') $metadataPath
+    & $compiler /nologo /optimize+ /target:winexe /platform:x64 "/out:$outputPath" "/win32icon:$iconPath" "/win32manifest:$launcherManifest" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Web.Extensions.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll "/resource:$compressedPath,payload.lzms" "/resource:$manifestPath,payload.manifest.json" (Join-Path $packagingDirectory 'PortableLauncher.cs') $compressionSource $metadataPath (Join-Path $projectDirectory 'src\WindowIcon.cs') (Join-Path $projectDirectory 'src\WhaleBadge.cs') "/resource:$projectDirectory\resources\window-icon.ico,Dafeiyu.WindowIcon.ico"
     if ($LASTEXITCODE -ne 0) { throw 'Portable launcher compilation failed.' }
     $receipt['OutputPath']=$outputPath
     $receipt['OutputBytes']=(Get-Item -LiteralPath $outputPath).Length
     $receipt['OutputSha256']=(Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash.ToLowerInvariant()
     $receipt['PayloadSha256']=$payloadHash
-    $receipt['PayloadBytes']=(Get-Item -LiteralPath $zipPath).Length
+    $receipt['PayloadBytes']=(Get-Item -LiteralPath $compressedPath).Length
+    $receipt['Compression']='Windows-LZMS-64MiB-blocks'
+    $receipt['CompressionMilliseconds']=$compressTimer.ElapsedMilliseconds
+    $receipt['ArchiveBytes']=$archiveBytes
+    $receipt['ArchiveSha256']=$archiveHash
+    if ($receipt['OutputBytes'] -ge 30000000) { throw 'Portable EXE exceeds the 30 MB distribution budget.' }
 }
 $criticalInputs = [ordered]@{ 'ClaudeChinese.exe'=$applicationSource; 'backend/offline_worker.py'=(Join-Path $projectDirectory 'backend\offline_worker.py'); 'backend/google_worker.py'=(Join-Path $projectDirectory 'backend\google_worker.py'); 'backend/glossary.py'=(Join-Path $projectDirectory 'backend\glossary.py'); 'backend/package_manager.py'=(Join-Path $projectDirectory 'backend\package_manager.py'); 'backend/package_store.py'=(Join-Path $projectDirectory 'backend\package_store.py'); 'backend/argos_catalog.json'=(Join-Path $projectDirectory 'backend\argos_catalog.json'); 'backend/launcher.json'=(Join-Path $projectDirectory 'backend\launcher.json'); 'backend/MODEL-NOTICES.md'=(Join-Path $projectDirectory 'backend\MODEL-NOTICES.md') }
 $inputHashes = [ordered]@{}

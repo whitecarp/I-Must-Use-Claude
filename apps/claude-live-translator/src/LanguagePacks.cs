@@ -63,6 +63,7 @@ namespace ClaudeCompanion {
             return result;
         }
         internal OfflineRetryForm(List<LanguagePack> choices) {
+            SuspendLayout(); Ui.ApplyIcon(this);
             Text=Ui.T("改用离线翻译","Use offline translation");Font=new Font("Microsoft YaHei UI",10F);
             AutoScaleMode=AutoScaleMode.Dpi;ClientSize=new Size(430,240);BackColor=Theme.Cream;ForeColor=Theme.Ink;
             StartPosition=FormStartPosition.CenterParent;FormBorderStyle=FormBorderStyle.FixedDialog;MaximizeBox=false;MinimizeBox=false;ShowInTaskbar=false;
@@ -70,7 +71,7 @@ namespace ClaudeCompanion {
             layout.RowStyles.Add(new RowStyle(SizeType.Absolute,32));layout.RowStyles.Add(new RowStyle(SizeType.Percent,100));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,42));layout.RowStyles.Add(new RowStyle(SizeType.Absolute,42));
             layout.Controls.Add(new Label{Dock=DockStyle.Fill,Text=Ui.T("这段文字可以留在本机翻译","Translate this selection on your device"),Font=new Font(Font.FontFamily,12F,FontStyle.Bold)},0,0);
             layout.Controls.Add(new Label{Dock=DockStyle.Fill,Text=choices.Count==0?Ui.T("尚未安装对应目标语言的包。\r\n点「安装语言包」，自行选择原文 → 目标语言。","No installed pack matches your target language.\r\nInstall a pack for the source → target direction."):Ui.T("请确认原文语言对应的翻译方向。\r\n目标语言不变，刚才的原文无需重新划选。","Confirm the source → target direction below.\r\nYour target and original selection are retained."),ForeColor=Theme.Muted},0,1);
-            pairs=new ComboBox{Dock=DockStyle.Fill,DropDownStyle=ComboBoxStyle.DropDownList,BackColor=Color.White,AccessibleName=Ui.T("离线翻译方向","Offline translation direction")};
+            pairs=new ThemedComboBox{Dock=DockStyle.Fill,DropDownStyle=ComboBoxStyle.DropDownList,BackColor=Color.White,AccessibleName=Ui.T("离线翻译方向","Offline translation direction")};
             foreach(var pair in choices)pairs.Items.Add(pair);
             if(choices.Count>0){pairs.SelectedIndex=0;foreach(LanguagePack pair in pairs.Items)if(pair.Pair==Preferences.OfflinePair)pairs.SelectedItem=pair;}else{pairs.Items.Add(Ui.T("没有对应的已安装语言包","No matching installed language pack"));pairs.SelectedIndex=0;pairs.Enabled=false;}
             layout.Controls.Add(pairs,0,2);
@@ -78,8 +79,25 @@ namespace ClaudeCompanion {
             confirm=Theme.Button(Ui.T("翻译这段","Translate selection"),true);confirm.Width=175;confirm.Enabled=choices.Count>0;confirm.DialogResult=DialogResult.OK;
             var install=Theme.Button(Ui.T("安装语言包","Install packs"),choices.Count==0);install.Width=170;install.DialogResult=DialogResult.Retry;
             actions.Controls.Add(confirm);actions.Controls.Add(install);layout.Controls.Add(actions,0,3);Controls.Add(layout);AcceptButton=confirm;
+            AutoScaleDimensions=new SizeF(96F,96F);ResumeLayout(true);
+            Shown+=delegate{
+                // Framework WinForms can scale the form before late-created child controls.
+                // Apply absolute design metrics once against the actual device DPI.
+                layout.Padding=new Padding(Theme.Scale(this,20));
+                layout.RowStyles[0].Height=Theme.Scale(this,32);
+                layout.RowStyles[2].Height=Theme.Scale(this,42);
+                layout.RowStyles[3].Height=Theme.Scale(this,46);
+                PackLayout.FitButton(confirm,this,175);PackLayout.FitButton(install,this,150);
+            };
         }
         internal void RenderPreview(string path){TopMost=false;Opacity=0;Show();Application.DoEvents();using(var bitmap=new Bitmap(Width,Height)){DrawToBitmap(bitmap,new Rectangle(Point.Empty,Size));bitmap.Save(path);}Close();}
+    }
+
+    internal static class PackLayout {
+        internal static void FitButton(Button button,Control host,int minimum) {
+            button.Width=Math.Max(Theme.Scale(host,minimum),TextRenderer.MeasureText(button.Text,button.Font).Width+Theme.Scale(host,30));
+            button.Height=Theme.Scale(host,38);
+        }
     }
 
     internal static class PackService {
@@ -139,6 +157,7 @@ namespace ClaudeCompanion {
         private bool busy,closing;
         private readonly bool preview;
         public LanguagePacksForm(bool isPreview=false){
+            SuspendLayout();Ui.ApplyIcon(this);AutoScaleMode=AutoScaleMode.Dpi;
             preview=isPreview;Text=Ui.T("大肥鱼 · 离线语言包","Whale · Offline language packs");Size=new Size(740,580);MinimumSize=new Size(640,480);StartPosition=FormStartPosition.CenterParent;
             Font=new Font("Microsoft YaHei UI",10F);BackColor=Theme.Cream;ForeColor=Theme.Ink;
             var root=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=1,RowCount=6,Padding=new Padding(20)};
@@ -146,7 +165,7 @@ namespace ClaudeCompanion {
             var top=new Panel{Dock=DockStyle.Fill};top.Controls.Add(new WhaleBadge{Size=new Size(75,64),Location=Point.Empty});
             top.Controls.Add(new Label{AutoSize=true,Location=new Point(85,4),Font=new Font(Font.FontFamily,15,FontStyle.Bold),Text=Ui.T("有网时下载，没网也能读","Download now. Read anywhere.")});
             top.Controls.Add(new Label{AutoSize=true,Location=new Point(85,38),ForeColor=Theme.Muted,Font=new Font(Font.FontFamily,9),Text=Ui.T("按方向选装；来回需两个包。仅更新目录或下载时联网。","Install each direction. Only refresh and downloads use internet.")});root.Controls.Add(top,0,0);
-            var searchRow=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=2,Margin=new Padding(0)};searchRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,75));searchRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));
+            var searchRow=new TableLayoutPanel{Dock=DockStyle.Fill,ColumnCount=2,RowCount=1,Margin=new Padding(0)};searchRow.RowStyles.Add(new RowStyle(SizeType.Percent,100));searchRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,75));searchRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));
             searchRow.Controls.Add(new Label{Text=Ui.T("搜索语言","Search"),Dock=DockStyle.Fill,TextAlign=ContentAlignment.MiddleLeft},0,0);search.Dock=DockStyle.Fill;search.AccessibleName=Ui.T("搜索语言或代码","Search language or code");search.TextChanged+=delegate{Populate();};searchRow.Controls.Add(search,1,0);root.Controls.Add(searchRow,0,1);
             list.Dock=DockStyle.Fill;list.View=View.Details;list.FullRowSelect=true;list.MultiSelect=false;list.HideSelection=false;list.BorderStyle=BorderStyle.None;list.Columns.Add(Ui.T("翻译方向","Language direction"),340);list.Columns.Add(Ui.T("版本","Version"),80);list.Columns.Add(Ui.T("状态","Status"),130);list.SelectedIndexChanged+=delegate{UpdateButtons();};root.Controls.Add(list,0,2);
             progress.Dock=DockStyle.Fill;progress.Height=15;progress.Margin=new Padding(0,7,0,3);root.Controls.Add(progress,0,3);
@@ -157,6 +176,18 @@ namespace ClaudeCompanion {
             refresh.Click+=async delegate{await Execute("--refresh",null);};cancel.Click+=delegate{if(cancellation!=null)cancellation.Cancel();};
             Shown+=async delegate{if(!preview)await Execute("--list",null);};
             FormClosing+=delegate{closing=true;if(cancellation!=null)cancellation.Cancel();};UpdateButtons();
+            AutoScaleDimensions=new SizeF(96F,96F);ResumeLayout(true);
+            Shown+=delegate{
+                root.Padding=new Padding(Theme.Scale(this,20));
+                root.RowStyles[0].Height=Theme.Scale(this,75);root.RowStyles[1].Height=Theme.Scale(this,35);
+                root.RowStyles[3].Height=Theme.Scale(this,26);root.RowStyles[4].Height=Theme.Scale(this,48);root.RowStyles[5].Height=Theme.Scale(this,42);
+                searchRow.ColumnStyles[0].Width=Theme.Scale(this,85);
+                top.Controls[0].Size=new Size(Theme.Scale(this,75),Theme.Scale(this,64));
+                top.Controls[1].Location=new Point(Theme.Scale(this,85),Theme.Scale(this,4));
+                top.Controls[2].Location=new Point(Theme.Scale(this,85),Theme.Scale(this,38));
+                list.Columns[0].Width=Theme.Scale(this,340);list.Columns[1].Width=Theme.Scale(this,80);list.Columns[2].Width=Theme.Scale(this,130);
+                PackLayout.FitButton(install,this,210);PackLayout.FitButton(refresh,this,155);PackLayout.FitButton(cancel,this,165);
+            };
         }
         private void SetData(Dictionary<string,object> data){
             catalog=LanguagePack.ReadList(data,"catalog");var installed=LanguagePack.ReadList(data,"installed");var ids=new HashSet<string>();foreach(var p in installed)ids.Add(p.Id);

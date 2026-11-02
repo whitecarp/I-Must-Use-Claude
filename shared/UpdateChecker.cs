@@ -33,7 +33,14 @@ namespace WhaleCommon {
             }
         }
         public static void Show(IWin32Window owner, string app, string version, bool english, bool currentPreview = true) {
-            using(var form = new UpdateForm(app, version, english, currentPreview)) form.ShowDialog(owner);
+            using(var form = new UpdateForm(app, version, english, currentPreview)) {
+                form.ShowInTaskbar=false;
+                Icon appIcon=null;
+                try {
+                    try { var parent=owner as Form; appIcon=parent!=null&&parent.Icon!=null?(Icon)parent.Icon.Clone():Icon.ExtractAssociatedIcon(Application.ExecutablePath);form.Icon=appIcon; } catch { }
+                    form.ShowDialog(owner);
+                } finally { if(appIcon!=null)appIcon.Dispose(); }
+            }
         }
         internal static bool IsNewer(UpdateRelease candidate,string current,bool currentPreview) {
             var available=new Version(candidate.Version);var installed=new Version(current);

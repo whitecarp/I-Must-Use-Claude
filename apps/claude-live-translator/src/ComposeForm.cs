@@ -27,13 +27,16 @@ namespace ClaudeCompanion {
         private int revision;
         private Process helper;
         public ComposeForm(WindowChoice choice, bool preview = false) {
+            SuspendLayout();
+            Ui.ApplyIcon(this); AutoScaleDimensions=new SizeF(96F,96F); AutoScaleMode = AutoScaleMode.Dpi;
+            Font = new Font("Microsoft YaHei UI", 10);
             isPreview=preview;
             offline = Preferences.Offline;
             statusZh = offline ? "离线翻译仅在本机处理原文。确认英文后，点击发送。" : "原文会发送给 Google 翻译。确认英文后，点击发送。";
             statusEn = offline ? "Offline translation stays on this device. Review the English before sending." : "Your text will be sent to Google Translate. Review the English before sending.";
             target = choice; Size = new Size(590, 740); MinimumSize = new Size(540, 650);
-            BackColor = Theme.Cream; ForeColor = Theme.Ink; Font = new Font("Microsoft YaHei UI", 10);
-            StartPosition = FormStartPosition.CenterScreen; AutoScaleMode = AutoScaleMode.Dpi; TopMost = true;
+            BackColor = Theme.Cream; ForeColor = Theme.Ink;
+            StartPosition = FormStartPosition.CenterScreen; TopMost = true;
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 9, Padding = new Padding(22, 18, 22, 18) };
             foreach (float h in new float[] { 76, 32, 25 }) layout.RowStyles.Add(new RowStyle(SizeType.Absolute, h));
             layout.RowStyles.Add(new RowStyle(SizeType.Percent, 40)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 25)); layout.RowStyles.Add(new RowStyle(SizeType.Percent, 60)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46)); layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 45));
@@ -45,21 +48,22 @@ namespace ClaudeCompanion {
             targetLabel = new Label { Dock = DockStyle.Fill, ForeColor = Theme.Muted }; layout.Controls.Add(targetLabel, 0, 1);
             chineseLabel = LabelFor(""); layout.Controls.Add(chineseLabel, 0, 2);
             chinese = Editor(); chinese.TextChanged += delegate { ++revision; translatedFor = ""; send.Enabled = false; ClearOfflineRetry(); }; layout.Controls.Add(Card(chinese), 0, 3);
-            var translationActions=new FlowLayoutPanel{Dock=DockStyle.Fill,Margin=new Padding(0),WrapContents=false};
+            var translationActions=ActionRow();
             translate = ButtonFor("", true);translate.Width=180;translate.Click += async delegate { await Translate(); };
             offlineRetry=ButtonFor("",false);offlineRetry.Width=165;offlineRetry.Visible=false;offlineRetry.Click+=async delegate{await RetryOffline();};
-            translationActions.Controls.Add(translate);translationActions.Controls.Add(offlineRetry);layout.Controls.Add(translationActions,0,4);
+            translationActions.Controls.Add(translate,0,0);translationActions.Controls.Add(offlineRetry,1,0);layout.Controls.Add(translationActions,0,4);
             englishLabel = LabelFor(""); layout.Controls.Add(englishLabel, 0, 5);
             english = Editor(); english.TextChanged += delegate { UpdateSend(); }; layout.Controls.Add(Card(english), 0, 6);
-            var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, Margin = new Padding(0) };
+            var actions = ActionRow();
             copy = ButtonFor("", false); copy.Click += delegate { try { if (!String.IsNullOrWhiteSpace(english.Text)) { Clipboard.SetText(english.Text); SetStatus("英文已复制，可以手动粘贴。", "English copied. You can paste it manually."); } } catch { SetStatus("剪贴板忙，请重试。", "Clipboard is busy. Please try again."); } };
             send = ButtonFor("", true); send.Enabled = false; send.Width = 155; send.Click += async delegate { await Send(); };
-            actions.Controls.Add(copy); actions.Controls.Add(send); layout.Controls.Add(actions, 0, 7);
+            actions.Controls.Add(copy,0,0); actions.Controls.Add(send,1,0); layout.Controls.Add(actions, 0, 7);
             status = new Label { Dock = DockStyle.Fill, ForeColor = Theme.Muted }; layout.Controls.Add(status, 0, 8); Controls.Add(layout);
             Ui.LanguageChanged += OnLanguageChanged;
             RefreshLocalizedText();
             Shown += async delegate { if (!preview) await BindConversation(); };
             FormClosing += delegate { closed = true; ++revision; Ui.LanguageChanged -= OnLanguageChanged; wait.Dispose(); worker.Dispose(); if (helper != null) { try { helper.Kill(); } catch { } } };
+            ResumeLayout(true);
         }
         public void RenderPreview(string path) {
             targetStatusZh = "发送目标：规划重构 · 演示"; targetStatusEn = "Send target: Refactoring Plan · Demo"; targetTitle = ""; RefreshTargetLabel();
@@ -75,6 +79,19 @@ namespace ClaudeCompanion {
         private Control Card(Control child) { return Theme.Card(child, new Padding(0, 0, 0, 8)); }
         private TextBox Editor() { return new TextBox { Dock = DockStyle.Fill, Multiline = true, ScrollBars = ScrollBars.Vertical, AcceptsReturn = true, BackColor = Color.White, ForeColor = ForeColor, BorderStyle = BorderStyle.None, Font = new Font(Font.FontFamily, 12), Margin = new Padding(0), MaxLength = 32000 }; }
         private Button ButtonFor(string text, bool primary) { var b=Theme.Button(text,primary); b.Width=135; b.Margin=new Padding(0,4,10,4); return b; }
+        private TableLayoutPanel ActionRow() {
+            var row = new TableLayoutPanel { Dock = DockStyle.Fill, Margin = Padding.Empty, ColumnCount = 3, RowCount = 1 };
+            row.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            row.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); row.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize)); row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            return row;
+        }
+        private void FitButton(Button button, int minimumWidth) {
+            // Measure in design pixels, then use the already-scaled height on language changes.
+            using (var font = new Font(button.Font.FontFamily, button.Font.SizeInPoints * 96F / 72F, button.Font.Style, GraphicsUnit.Pixel)) {
+                int content = TextRenderer.MeasureText(button.Text, font, Size.Empty, TextFormatFlags.SingleLine).Width + 24;
+                button.Width = (int)Math.Ceiling(Math.Max(minimumWidth, content) * (button.Height / 38F));
+            }
+        }
         private void OnLanguageChanged() {
             if (closed || IsDisposed) return;
             if (InvokeRequired) { try { BeginInvoke((Action)RefreshLocalizedText); } catch { } return; }
@@ -95,6 +112,7 @@ namespace ClaudeCompanion {
             offlineRetry.Text=Ui.T("改用离线翻译","Use offline");
             copy.Text = Ui.T("复制英文", "Copy English");
             send.Text = Ui.T("发送到 Claude", "Send to Claude");
+            FitButton(translate,180); FitButton(offlineRetry,165); FitButton(copy,135); FitButton(send,155);
             RefreshTargetLabel();
             if (waitingTranslation) RefreshWaitStatus();
             else status.Text = Ui.T(statusZh, statusEn);
