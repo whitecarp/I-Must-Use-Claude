@@ -1,5 +1,37 @@
 # Release notes
 
+## v0.4.3-preview — Translator 0.9.4 glossary and saved replies
+
+Published **2026-11-02**, with four verified standalone EXEs. Translator **0.9.4** is **29,143,552 bytes (29.14 MB)**, including its runtime; language packs remain optional downloads.
+
+| App | Version | Download |
+| --- | --- | --- |
+| Whale Environment Helper | 0.7.0 | [WhaleEnvironmentHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleEnvironmentHelper.exe) |
+| Whale Translator | 0.9.4 | [WhaleTranslator.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleTranslator.exe) |
+| Two-Zone Clock | 0.5.0 | [HomeTimeClock.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/HomeTimeClock.exe) |
+| Whale Pack Helper | 0.1.1 | [WhalePackHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe) |
+
+- **76 starter glossary entries:** Claude/product names and common technical phrases include case and target-language variants. Existing saved dictionaries remain yours. In **⚙ → Glossary**, **Add built-in terms** fills nonconflicting gaps without replacing your translations; **Save** applies the changes. Terms work online and offline.
+- **Saved replies are explicit:** click **☆ Save** on a successful translation, choose a tag with the arrow, and browse it later in **⚙ → Saved replies**. Saving is never automatic. Each reply becomes a local Markdown file with its timestamp, source-window title, translation method/language, tag, note, translation and original text. The default folder is **Documents\大肥鱼收藏**, and **Location…** selects another local folder without moving old files.
+- **Search and edit locally:** search both texts, filter tags, save notes, copy the original/translation, and open the folder. Refresh uses the Markdown files as the source of truth, including external changes/deletions. File-change checks prevent stale overwrites. Deleting inside the notebook asks for confirmation; clicking a saved card again unsaves it. Both delete the corresponding Markdown file.
+- **History remains separate:** bounded session history is still memory-only and clears on exit. Only explicit favorites persist. The notebook itself makes no network requests, writes no content index/log, and does not send replies to Claude. Google online translation continues to send the selected text to Google; offline mode and its optional language packs keep their existing behavior. [Translator guide](apps/claude-live-translator/README.md) · [Privacy](docs/PRIVACY.md).
+- **Four EXEs, one toolbox release:** clock **0.5.0**, helper **0.7.0** and pack **0.1.1** retain their app versions. Every release includes all four standalone EXEs and complete `whale-app-versions` metadata. The translator includes its runtime; offline language packs remain optional installs.
+
+**Signing:** this is still an **unsigned preview**. SignPath review is pending; Windows SmartScreen may warn. Verify the [release SHA-256 values](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview#sha-256); hashes verify integrity, not publisher identity. See [code signing](docs/CODE_SIGNING.md).
+
+<!-- release-validation:v0.4.3-preview:41542652373 -->
+**Validation:** source commit `53fc1baedb5bc140c2e6b468868b1f201e6d91a6` passed [build and Windows acceptance](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41542153141), including all 22 translator regression suites (94 Python tests, 3 conditional skips), four visible app launches, and 16 synthetic bilingual 96-DPI translator previews. The additional 150% images are resampled size comparisons, not independent Windows DPI tests. [Release verification](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41542652373) confirmed fresh portable extraction, four pinned runtime imports, cache reuse, four EXE versions, and upload/download byte equality before publication. All four public downloads were then independently checked again against their advertised SHA-256 values. Tests use generated fixtures, not private conversations, a real Claude account or personal settings. Live Google translation and real offline-model inference were not part of this release acceptance.
+
+**已于 2026-11-02 发布：** 环境助手 **0.7.0**、翻译器 **0.9.4**、时钟 **0.5.0**、打包助手 **0.1.1**。四款附件已重新下载核对版本与 SHA-256；翻译器为 **29.14 MB**，含运行库，不含选装语言包。
+
+- **76 条内置术语**包括产品名称、技术词组及大小写/目标语言变体；已有个人词典保留。在 ⚙ → 术语词典点「补充内置词条」，只补未冲突的词，再点保存。在线、离线都生效。
+- **回复收藏本主动保存。** 点译文卡片「☆ 收藏」，箭头选标签，⚙ → 回复收藏本 查看。默认一条一个本机 Markdown，位于「文档\大肥鱼收藏」，包含保存时间、来源窗口、翻译方式和语言、标签、备注、译文和原文；可改保存位置，不自动搬移旧文件。
+- **文件是唯一内容依据。** 搜索两种文字、筛选标签、编辑备注、复制或打开文件夹；刷新采用外部修改/删除后的文件，冲突检查避免覆盖新改动。收藏本删除先确认，卡片取消收藏也会删除对应 Markdown。
+- **历史仍只在内存。** 关闭软件清空本次记录，只有主动收藏才持久保存；收藏本不联网、不另建内容索引或日志、不自动发给 Claude。Google 在线翻译仍发送所选文字，离线模式和选装语言包流程不变。
+- **四个 EXE 附齐，仍未签名。** 本次源码通过 22 组翻译器回归、四款程序启动与截图检查；单文件首次解压、运行库导入、缓存复用及公开附件哈希均通过。150% 图是放大对比，不代表独立的 Windows 150% 缩放验收；本次未测试真实 Google 请求或真实离线模型推理。
+
+---
+
 ## v0.4.2-preview — Home-Time Clock 0.5.0 with Claude reset countdowns
 
 | App | Version | Download |

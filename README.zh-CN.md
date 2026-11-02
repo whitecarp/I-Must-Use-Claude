@@ -15,7 +15,7 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview"><strong>↓ 下载软件</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview"><strong>↓ 下载软件</strong></a>
   &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识工具</a>
   &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">项目主页</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
@@ -29,7 +29,7 @@
 | :--- | :--- | :--- | :--- |
 | **大肥鱼环境助手** | **大肥鱼翻译** | **两地时钟** | **大肥鱼打包助手** |
 | 先测浏览器环境，再处理命中的本地设置，最后复测。 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 显示原本地区的时间，以及 Claude 本轮和每周重置倒计时。 | 在本机整理源码、图片和视频，每个文件不超过 29 MB。 |
-| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe) |
+| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe) |
 
 **下载 EXE，双击打开。** 各个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
@@ -37,7 +37,7 @@
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- **v0.4.2-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.1**、两地时钟 **0.5.0**、打包助手 **0.1.1**。
+- **v0.4.3-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.4**、两地时钟 **0.5.0**、打包助手 **0.1.1**。
 - 提供 Windows EXE；打包助手 0.1.1 无需旁置配置文件或 ZIP。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
 
@@ -54,7 +54,7 @@
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.2-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
+2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
 3. 一致后，在 SmartScreen 窗口点「更多信息」→「仍要运行」。不一致就删掉文件，重新从本仓库的 Releases 下载。
 
 </details>
@@ -147,8 +147,10 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 选择 Claude 窗口，划选一段想读的回复，在旁边对照原文和译文。继续和她交流，不用被语言打断。
 
-<p align="center"><img src="docs/images/translator-preview.svg" alt="功能示意：选择Claude窗口、划选文字、阅读译文" width="100%"></p>
-<p align="center"><sub>静态功能示意图，文字为示例内容，并非软件实测截图。</sub></p>
+0.9.4 下载文件为 **29.14 MB（29,143,552 字节）**，小于 30 MB。离线语言包由用户另外选装，不计入这个体积。
+
+<p align="center"><img src="docs/images/translator094-saved-zh.png" alt="大肥鱼翻译 0.9.4：译文主动收藏后显示已收藏与标签" width="560"></p>
+<p align="center"><sub>Windows CI 中实际编译的 0.9.4 程序，使用合成示例文字在 96 DPI（100%）离屏渲染；不是用户电脑上的交互验收。</sub></p>
 
 **三步开始**
 
@@ -156,19 +158,27 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 2. 选好目标语言，到 Claude 里按住鼠标左键划选文字，松开。
 3. 阅读或复制译文；需要中文提问时，打开「中文提问」，预览英文后再主动发送。
 
-**自动识别原文 · 可选离线包 · 个人术语表 · 本次翻译记录**
+**自动识别原文 · 可选离线包 · 76 条内置术语 · 回复收藏本**
 
-打开「术语词典」，保存名字和常用词的偏好译法。划选了新内容后，还能用「上一条／下一条」回看本次打开期间的译文，不怕刚才那段被替换。
+初始词典包含 **76 条词条**，覆盖 Claude 等产品名称与常用技术词组，数量包含大小写变体和不同目标语言的词条。已有词典可打开 **⚙ → 术语词典 → 补充内置词条**，保留自己的译法、补齐未冲突的词，再点**保存**；升级不会悄悄覆盖原词典。
+
+用「上一条／下一条」回看本次打开期间的译文。想在关闭后继续保留，就主动点译文卡片的 **☆ 收藏**；旁边的小箭头可选择或新建标签。再点 **★ 已收藏** 会取消收藏，并删除对应的 Markdown 文件。
+
+打开 **⚙ → 回复收藏本**，可以搜索原文和译文、按标签筛选、编辑备注、复制两种文字或打开文件夹。每条收藏独立保存成一个 Markdown 文件，默认位于**文档\大肥鱼收藏**。在收藏本的**保存位置…**按钮里修改保存目录；旧文件留在原处。在文件夹手动修改或删除后，点刷新，以文件为准。详见[翻译器使用说明](apps/claude-live-translator/README.md)。
+
+<p align="center"><img src="docs/images/translator094-notebook-zh.png" alt="中文回复收藏本，显示示例收藏、标签筛选、原文和备注编辑区" width="600"></p>
+<p align="center"><sub>同一轮 96 DPI CI 渲染的回复收藏本；图中的回复、标签和来源标题均为合成测试示例。</sub></p>
 
 <p align="center"><img src="docs/images/translator-glossary-zh.png" alt="术语词典界面，显示 Claude、Codex 和 Skills 示例词条" width="600"></p>
 <p align="center"><sub>使用示例词条离屏渲染；未读取个人词典或会话。</sub></p>
 
 <details>
-<summary><strong>术语词典、近期译文与离线使用</strong></summary>
+<summary><strong>术语词典、回复收藏与离线使用</strong></summary>
 
 - Google 在线模式自动识别原文，支持 17 种目标语言；只处理所选窗口中的划选，忽略其他窗口。
 - 术语可按目标语言或所有语言生效，支持在线和离线翻译。匹配区分大小写，较长词组优先；链接和代码保留原样。
-- 近期译文在有限内存中最多保留 20 条成功结果；关闭软件后清空，术语词典则单独保存在本机。
+- 近期译文在有限内存中最多保留 20 条成功结果，关闭软件后清空；只有主动收藏的回复才保存为 Markdown。术语词典和收藏本设置分别保存在本机。
+- 收藏包括保存时间、来源窗口标题、翻译方式和语言、标签、备注、译文及原文。收藏本不上传内容。在收藏本删除需要确认，删除的是对应 Markdown 文件；译文卡片取消收藏也会删除它。文件若在外部改动，更新或删除前会阻止覆盖，需先刷新。
 - 可以暂停划选、手动粘贴、复制译文，或把窗口置顶。
 - 「中文提问」允许先预览英文，再主动发送。不支持直接发送时可复制后手动粘贴；翻译完成不会自动给 Claude 发消息。
 - 有网时下载需要的离线语言包。每个包对应一个方向，例如英文 → 中文；反向需要另装。
@@ -194,7 +204,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 <details>
 <summary><strong>翻译隐私与可用性</strong></summary>
 
-在线模式会把所选文字发给 Google Translate 的免密钥网页接口。这不是 Gemini 或付费 Google Cloud Translation API，接口可能变化、失败或限流。离线翻译在本机完成；语言包仅在用户操作时下载。翻译记录只保留在本次运行的内存中，关闭软件即清空，不写入历史文件；用户保存的术语表与翻译记录分开。
+在线模式会把所选文字发给 Google Translate 的免密钥网页接口。这不是 Gemini 或付费 Google Cloud Translation API，接口可能变化、失败或限流。离线翻译在本机完成；语言包仅在用户操作时下载。本次历史记录只保留在内存里，关闭即清空。**收藏是单独的主动操作**：点击收藏后，才将该条原文和译文写入本机 Markdown。收藏本自身不联网；Windows 或其他服务对文件夹的同步由对应服务设置决定。
 
 离线质量取决于语言包。出行前请联网下载需要的方向，并在目标电脑上检查。把 EXE 复制到新电脑不会同时复制已安装的模型。
 
@@ -253,7 +263,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 本地打包不上传文件、不连接 AI 服务；只有用户主动检查或下载更新时才会访问 GitHub。普通打包和 PNG/JPEG/BMP 处理使用自带组件；视频压缩和 WebP 解码需要本机已有 **FFmpeg**。
 
-[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.2-preview/WhalePackHelper.exe)
+[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe)
 
 单个 EXE，无需旁置配置文件或 ZIP。[源码和使用说明](apps/whale-pack-helper/README.md) 包含编译脚本、素材与测试。
 
