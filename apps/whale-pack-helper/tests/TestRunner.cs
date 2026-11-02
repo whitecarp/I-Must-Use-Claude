@@ -7,6 +7,7 @@ namespace WhalePack.Tests {
     internal static class TestRunner {
         [STAThread]
         private static int Main(string[] args) {
+            Program.ConfigureRuntime();
             Console.OutputEncoding = Encoding.UTF8;
             try {
                 Application.EnableVisualStyles();
@@ -15,7 +16,8 @@ namespace WhalePack.Tests {
                 if (args.Length > 0 && args[0] == "--screenshots") return ScreenshotTests.Run(args);
                 int core = CoreTests.Run();
                 int media = MediaTests.Run();
-                Console.WriteLine("PASS: core=" + core + ", media=" + media);
+                int runtime = RuntimeAndUpdateTests.Run();
+                Console.WriteLine("PASS: core=" + core + ", media=" + media + ", runtime-update=" + runtime);
                 return 0;
             } catch (Exception ex) {
                 Console.Error.WriteLine("FAIL: " + ex);

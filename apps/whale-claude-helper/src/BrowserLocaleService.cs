@@ -28,13 +28,27 @@ namespace WhaleClaudeHelper {
         private readonly string backupRoot;
         private readonly Dictionary<string, string> roots;
 
-        public BrowserLocaleService(string backupRoot = null) {
+        public BrowserLocaleService(string backupRoot = null) : this(backupRoot, null) { }
+
+        // CI supplies fresh temporary profiles; the public constructor keeps the
+        // exact default stable-browser roots and process checks used by the UI.
+        internal BrowserLocaleService(string backupRoot, IDictionary<string, string> browserRoots) {
             string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             this.backupRoot = Path.GetFullPath(backupRoot ?? Path.Combine(local, "DafeiyuClaudeHelper", "Backups", "BrowserLocale"));
             roots = new Dictionary<string, string>(StringComparer.Ordinal) {
                 { "Chrome", Path.Combine(local, "Google", "Chrome", "User Data") },
                 { "Edge", Path.Combine(local, "Microsoft", "Edge", "User Data") }
             };
+            if (browserRoots != null) {
+                if (browserRoots.Count != 2 || !browserRoots.ContainsKey("Chrome") || !browserRoots.ContainsKey("Edge"))
+                    throw new ArgumentException("Only explicit Chrome and Edge roots are supported.", "browserRoots");
+                foreach (string browser in new[] { "Chrome", "Edge" }) {
+                    if (String.IsNullOrWhiteSpace(browserRoots[browser]) || !Path.IsPathRooted(browserRoots[browser]))
+                        throw new ArgumentException("Browser roots must be absolute.", "browserRoots");
+                    roots[browser] = Path.GetFullPath(browserRoots[browser]);
+                    RepairEngine.AssertPlainPath(roots[browser]);
+                }
+            }
         }
 
         public BrowserLocaleResult ApplyAll() { return ApplySelected(null); }

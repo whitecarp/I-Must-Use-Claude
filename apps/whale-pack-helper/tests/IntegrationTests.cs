@@ -48,7 +48,7 @@ namespace WhalePack.Tests {
                 Console.WriteLine("INTEGRATION: " + scenario);
                 var selected = scenario == "video" ? new List<InputItem> { items[0] } : scenario == "source" ? new List<InputItem> { items[1] } : items;
                 var settings = new AppSettings { OutputDirectory = System.IO.Path.Combine(root, scenario), FfmpegPath = ffmpeg, WriteHandoff = true,
-                    Handoff = new HandoffData { Project = "大肥鱼打包助手 0.1.0", Goal = "本机压缩、筛查与交接", Progress = "真实文件集成测试", Verified = "输出 ZIP 实际大小及独立解压、默认排除检查", Unverified = "Claude 上传（本程序不联网）", Next = "阅读交接说明与附件" } };
+                    Handoff = new HandoffData { Project = "大肥鱼打包助手 0.1.1", Goal = "本机压缩、筛查与交接", Progress = "真实文件集成测试", Verified = "输出 ZIP 实际大小及独立解压、默认排除检查", Unverified = "Claude 上传（未执行上传）", Next = "阅读交接说明与附件" } };
                 int last = -10;
                 PackageResult result = PackageEngine.Run(selected, settings, new MediaProcessor(), delegate(PackProgress p) { if (p.Percent >= last + 10) { Console.WriteLine("  " + p.Percent + "%"); last = p.Percent; } }, CancellationToken.None);
                 int count = 0;

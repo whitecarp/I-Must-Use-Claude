@@ -31,6 +31,9 @@ jobs:
           foreach ($suite in @('run-score-measurement-tests.ps1', 'run-network-dns-tests.ps1', 'run-dns-leak-measurement-tests.ps1', 'run-network-ui-tests.ps1', 'run-codex-proxy-tests.ps1', 'run-proxy-discovery-tests.ps1', 'run-process-close-tests.ps1', 'run-codex-proxy-ui-tests.ps1')) {
             & (Join-Path './apps/whale-claude-helper/tests' $suite)
           }
+      - name: Test browser locale injection with isolated constructors and JSON
+        shell: pwsh
+        run: ./tests/run-browser-locale-fixtures.ps1
       - name: Build and test Pack Helper with generated fixtures
         shell: pwsh
         run: ./apps/whale-pack-helper/build.ps1 -OutputDirectory "$env:RUNNER_TEMP/pack-helper-build"
@@ -72,14 +75,21 @@ jobs:
     name: Windows acceptance on a disposable runner
     runs-on: windows-latest
     needs: build
+    timeout-minutes: 20
+    env:
+      # Scripts also require GITHUB_ACTIONS=true and github-hosted Windows.
+      WHALE_E2E_ALLOW_SYSTEM_CHANGES: '1'
     steps:
       - uses: actions/checkout@v4
       - name: Change the real time zone with the helper, then undo it
         shell: pwsh
-        env:
-          WHALE_E2E_ALLOW_SYSTEM_CHANGES: '1'
         run: ./apps/whale-claude-helper/tests/run-e2e-timezone.ps1
+      - name: Apply, verify and undo temporary Windows workflow fixtures
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: ./tests/run-windows-acceptance.ps1
       - name: Build the four apps for a launch check
+        if: ${{ !cancelled() }}
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -90,6 +100,7 @@ jobs:
           # Pack Helper 0.1.1 must start without its old .exe.config sidecar.
           Get-ChildItem -LiteralPath "$env:RUNNER_TEMP/launch/pack" -Filter '*.exe.config' | Remove-Item -Force
       - name: Launch each app and keep a screenshot
+        if: ${{ !cancelled() }}
         shell: pwsh
         run: |
           $root = Join-Path $env:RUNNER_TEMP 'launch'
@@ -105,4 +116,11 @@ jobs:
         with:
           name: launch-screenshots
           path: ${{ runner.temp }}/launch-screenshots/*
-          if-no-files-found: ignore
+          if-no-files-found: warn
+      - name: Keep apply and rollback acceptance receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-acceptance-receipts
+          path: ${{ runner.temp }}/acceptance-results/*.json
+          if-no-files-found: warn

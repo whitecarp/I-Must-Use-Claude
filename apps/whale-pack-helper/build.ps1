@@ -12,13 +12,12 @@ $sharedArgs = @('/nologo', '/langversion:5', '/platform:anycpu', '/optimize+', '
 $exePath = Join-Path $OutputDirectory '大肥鱼打包助手.exe'
 & $compilerPath @sharedArgs /target:winexe ('/out:' + $exePath) ('/win32icon:' + (Join-Path $PSScriptRoot 'assets\icon.ico')) ('/win32manifest:' + (Join-Path $PSScriptRoot 'app.manifest')) @sourceFiles
 if ($LASTEXITCODE -ne 0) { throw 'Application compilation failed.' }
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'app.config') -Destination ($exePath + '.config') -Force
+# Runtime switches are initialized in Program.ConfigureRuntime; no product sidecar is emitted.
 if (-not $SkipTests) {
     $testFiles = @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'tests') -Filter '*.cs' | ForEach-Object FullName)
     $testExe = Join-Path $OutputDirectory 'WhalePack.Tests.exe'
-    & $compilerPath @sharedArgs /target:exe /main:WhalePack.Tests.TestRunner ('/out:' + $testExe) @sourceFiles @testFiles
+    & $compilerPath @sharedArgs /target:exe /main:WhalePack.Tests.TestRunner ('/out:' + $testExe) ('/win32manifest:' + (Join-Path $PSScriptRoot 'app.manifest')) @sourceFiles @testFiles
     if ($LASTEXITCODE -ne 0) { throw 'Test compilation failed.' }
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'app.config') -Destination ($testExe + '.config') -Force
     & $testExe
     if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
 }

@@ -1,6 +1,6 @@
 param(
     [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
-    [string]$Version = '0.9.0',
+    [string]$Version = '0.9.1',
     [string]$ApplicationExe = 'ClaudeChinese.exe',
     [string]$OutputName = '大肥鱼翻译.exe',
     [string]$VCRedistDirectory = '',

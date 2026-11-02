@@ -13,11 +13,14 @@ using System.Windows.Forms;
 
 namespace WhalePack {
     internal static class Program {
-        [STAThread]
-        private static void Main() {
-            // Long-path handling no longer depends on the .exe.config sidecar (same switches as the translator launcher).
+        internal static void ConfigureRuntime() {
+            // Set these before the first System.IO access, in both application and test entry points.
             AppContext.SetSwitch("Switch.System.IO.UseLegacyPathHandling", false);
             AppContext.SetSwitch("Switch.System.IO.BlockLongPaths", false);
+        }
+        [STAThread]
+        private static void Main() {
+            ConfigureRuntime();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             try { Application.Run(new MainForm(SettingsStore.Load())); }

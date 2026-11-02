@@ -1,0 +1,229 @@
+name: Build and verify release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'New toolbox tag (for example v0.4.1-preview)'
+        required: true
+        type: string
+      signing:
+        description: 'Required signing fails closed; unsigned builds are preview-only'
+        required: true
+        default: unsigned-preview
+        type: choice
+        options:
+          - unsigned-preview
+          - required
+      publish:
+        description: 'Publish after draft attachments pass download/read-back verification'
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: toolbox-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+      SIGNING_MODE: ${{ inputs.signing }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Require a tested commit and a new tag
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:RELEASE_TAG -notmatch '^v\d+\.\d+\.\d+(?:-[a-zA-Z0-9.-]+)?$') { throw 'Invalid release tag.' }
+          if ($env:SIGNING_MODE -eq 'unsigned-preview' -and $env:RELEASE_TAG -notmatch '-preview(?:[.-][a-zA-Z0-9.-]+)?$') { throw 'Unsigned releases require an explicit -preview tag.' }
+          if ($env:SIGNING_MODE -eq 'required') {
+            foreach ($name in @('SIGNPATH_API_TOKEN','SIGNPATH_ORGANIZATION_ID','SIGNPATH_PROJECT_SLUG','SIGNPATH_SIGNING_POLICY_SLUG')) {
+              if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) { throw "Required signing configuration missing: $name. No unsigned fallback." }
+            }
+          }
+          $runsJson = gh run list --repo $env:GH_REPO --workflow build.yml --commit $env:GITHUB_SHA --status success --limit 20 --json headSha,conclusion,event,databaseId
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect build CI.' }
+          $passed = @($runsJson | ConvertFrom-Json | Where-Object { $_.headSha -eq $env:GITHUB_SHA -and $_.conclusion -eq 'success' -and $_.event -in @('push','workflow_dispatch') })
+          if ($passed.Count -eq 0) { throw 'Run Build Windows apps successfully on this exact commit before releasing.' }
+          $existing = gh release list --repo $env:GH_REPO --limit 1000 --json tagName
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect existing releases.' }
+          if (@($existing | ConvertFrom-Json | Where-Object { $_.tagName -eq $env:RELEASE_TAG }).Count) { throw 'Release already exists. Inspect it manually; this workflow never overwrites attachments.' }
+          $tagRef = git ls-remote --tags "https://github.com/$env:GH_REPO.git" "refs/tags/$env:RELEASE_TAG"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect remote tags.' }
+          if ($tagRef) { throw 'Tag already exists; choose a new release tag.' }
+          "CI run: $($passed[0].databaseId); source: $env:GITHUB_SHA" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+          architecture: x64
+
+      - name: Prepare pinned portable Python and CPU dependencies
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $runtimeRoot = Join-Path $env:RUNNER_TEMP 'translator-runtime'
+          $pythonDir = Join-Path $runtimeRoot 'runtime/python'
+          $site = Join-Path $runtimeRoot 'runtime/venv/Lib/site-packages'
+          New-Item -ItemType Directory -Path $pythonDir,$site -Force | Out-Null
+          $archive = Join-Path $env:RUNNER_TEMP 'python-3.12.10-embed-amd64.zip'
+          $url = 'https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip'
+          # Official HTTPS download, cross-checked against its official .sigstore digest.
+          $expected = '4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3'
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -cne $expected) { throw 'Python embeddable archive checksum mismatch.' }
+          Expand-Archive -LiteralPath $archive -DestinationPath $pythonDir
+          python -m pip --isolated install --index-url https://pypi.org/simple --only-binary=:all: --no-compile --no-cache-dir --target $site -r apps/claude-live-translator/backend/requirements.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned portable dependencies could not be installed. Do not substitute versions silently.' }
+          "TRANSLATOR_RUNTIME=$runtimeRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Compile all four applications and package the translator
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $versions = Get-Content .github/release-versions.json -Raw | ConvertFrom-Json
+          $stage = Join-Path $env:RUNNER_TEMP 'unsigned-exes'
+          New-Item -ItemType Directory -Path $stage | Out-Null
+          $translatorBuild = Join-Path $env:RUNNER_TEMP 'translator-components'
+          ./apps/claude-live-translator/build.ps1 -OutputDirectory $translatorBuild
+          $ui = Join-Path $translatorBuild 'ClaudeChinese.exe'
+          $expectedUi = $versions.translator + '.0'
+          if ([Diagnostics.FileVersionInfo]::GetVersionInfo($ui).FileVersion -ne $expectedUi) { throw 'Translator component version does not match release-versions.json.' }
+          $portableRoot = Join-Path $env:RUNNER_TEMP 'portable-build'
+          ./apps/claude-live-translator/packaging/build-portable.ps1 -Version $versions.translator -ApplicationExe $ui -OutputName WhaleTranslator.exe -RuntimeRoot $env:TRANSLATOR_RUNTIME -BuildRoot $portableRoot
+          # Compiler warnings may share stdout with JSON; read the explicit receipt file.
+          $receiptFiles = @(Get-ChildItem -LiteralPath $portableRoot -Filter 'build-receipt.json' -File -Recurse)
+          if ($receiptFiles.Count -ne 1) { throw 'Expected one fresh portable-build receipt.' }
+          $portable = Get-Content -LiteralPath $receiptFiles[0].FullName -Raw | ConvertFrom-Json
+          Copy-Item -LiteralPath $portable.OutputPath -Destination (Join-Path $stage 'WhaleTranslator.exe')
+          $clockBuild = Join-Path $env:RUNNER_TEMP 'clock-build'
+          ./apps/two-zone-clock/build.ps1 -OutputDirectory $clockBuild -RunTests
+          Copy-Item -LiteralPath (Join-Path $clockBuild 'TwoZoneClock.exe') -Destination (Join-Path $stage 'HomeTimeClock.exe')
+          $helperBuild = Join-Path $env:RUNNER_TEMP 'helper-build'
+          ./apps/whale-claude-helper/build.ps1 -OutputDirectory $helperBuild
+          Copy-Item -LiteralPath (Join-Path $helperBuild '大肥鱼环境助手.exe') -Destination (Join-Path $stage 'WhaleEnvironmentHelper.exe')
+          $packBuild = Join-Path $env:RUNNER_TEMP 'pack-build'
+          ./apps/whale-pack-helper/build.ps1 -OutputDirectory $packBuild
+          Copy-Item -LiteralPath (Join-Path $packBuild '大肥鱼打包助手.exe') -Destination (Join-Path $stage 'WhalePackHelper.exe')
+          $receipts = Join-Path $env:RUNNER_TEMP 'release-receipts'
+          New-Item -ItemType Directory -Path $receipts | Out-Null
+          Copy-Item -LiteralPath $receiptFiles[0].FullName -Destination (Join-Path $receipts 'translator-build-receipt.json')
+
+      - name: Upload unsigned signing input (not a release attachment)
+        if: inputs.signing == 'required'
+        id: signing-input
+        uses: actions/upload-artifact@v4
+        with:
+          name: signing-input-${{ github.run_id }}
+          path: ${{ runner.temp }}/unsigned-exes/*.exe
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Sign all four EXEs (requires separately approved SignPath setup)
+        if: inputs.signing == 'required'
+        # Official v3 tag, verified 2026-11-01. No unsigned continuation on failure.
+        uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.signing-input.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 1200
+          output-artifact-directory: ${{ runner.temp }}/signed-exes
+
+      - name: Validate final versions, signatures and checksums
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $stageName = if ($env:SIGNING_MODE -eq 'required') { 'signed-exes' } else { 'unsigned-exes' }
+          $stage = Join-Path $env:RUNNER_TEMP $stageName
+          $bodyPath = Join-Path $env:RUNNER_TEMP 'release-body.md'
+          $versions = Get-Content .github/release-versions.json -Raw | ConvertFrom-Json
+          $metadata = $versions | ConvertTo-Json -Compress
+          $notice = if ($env:SIGNING_MODE -eq 'required') {
+            'Authenticode signatures were validated on all four release EXEs. Signing does not guarantee that Windows SmartScreen will stop showing reputation warnings.'
+          } else {
+            'Unsigned preview: these four EXEs have no Authenticode publisher signature. Windows SmartScreen may warn about an unknown publisher or an unfamiliar download. Do not disable Windows security protections.'
+          }
+          $appTable = "| App | Version | Purpose |`n| --- | --- | --- |`n| Whale Translator | $($versions.translator) | Selected-text translation; optional verified offline packs |`n| Home-time Clock | $($versions.clock) | Your original and target time zones |`n| Environment Helper | $($versions.helper) | Local maintenance, Codex proxy and network/DNS diagnostics |`n| Pack Helper | $($versions.pack) | Local file and media preparation |"
+          $body = "# Dafeiyu toolbox $env:RELEASE_TAG`n`n$notice`n`n$appTable`n`nFour standalone EXE downloads; no configuration sidecar or ZIP is required. The translator includes its runtime; offline model packs are optional downloads. Video/WebP work in Pack Helper requires FFmpeg on your computer.`n`nSource commit: $env:GITHUB_SHA`n`nSee [maintained release notes](https://github.com/$env:GH_REPO/blob/main/RELEASE_NOTES.md) and [privacy at this source commit](https://github.com/$env:GH_REPO/blob/$env:GITHUB_SHA/docs/PRIVACY.md).`n`n<!-- whale-app-versions: $metadata -->`n"
+          [IO.File]::WriteAllText($bodyPath, $body, (New-Object Text.UTF8Encoding($false)))
+          ./.github/scripts/validate-release.ps1 -AssetDirectory $stage -BodyPath $bodyPath -Tag $env:RELEASE_TAG -SigningMode $env:SIGNING_MODE -OutputDirectory (Join-Path $env:RUNNER_TEMP 'release-receipts/local') -WriteChecksumsToBody
+          "FINAL_ASSETS=$stage" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "RELEASE_BODY=$bodyPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Create draft with exactly four EXE attachments
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @('WhaleTranslator.exe','HomeTimeClock.exe','WhaleEnvironmentHelper.exe','WhalePackHelper.exe') | ForEach-Object { Join-Path $env:FINAL_ASSETS $_ }
+          $ghArguments = @('release','create',$env:RELEASE_TAG,'--repo',$env:GH_REPO,'--target',$env:GITHUB_SHA,'--title',"Dafeiyu toolbox $env:RELEASE_TAG",'--notes-file',$env:RELEASE_BODY,'--draft')
+          if ($env:RELEASE_TAG -match '-') { $ghArguments += '--prerelease' }
+          & gh @ghArguments @files
+          if ($LASTEXITCODE -ne 0) { throw 'Draft creation failed. Inspect GitHub before retrying; no overwrite will be attempted.' }
+
+      - name: Download the draft and verify the uploaded bytes
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $json = gh release view $env:RELEASE_TAG --repo $env:GH_REPO --json assets,body,isDraft,tagName,targetCommitish,isPrerelease
+          if ($LASTEXITCODE -ne 0) { throw 'Could not read back the draft.' }
+          $release = $json | ConvertFrom-Json
+          if (-not $release.isDraft -or $release.tagName -cne $env:RELEASE_TAG -or $release.targetCommitish -cne $env:GITHUB_SHA) { throw 'Draft identity does not match this build.' }
+          if ($env:SIGNING_MODE -eq 'unsigned-preview' -and -not $release.isPrerelease) { throw 'Unsigned release must be a prerelease.' }
+          $expected = @('WhaleTranslator.exe','HomeTimeClock.exe','WhaleEnvironmentHelper.exe','WhalePackHelper.exe')
+          if (@($release.assets).Count -ne 4) { throw 'Draft has unexpected/missing attachments.' }
+          foreach ($asset in $release.assets) {
+            if ($asset.name -cnotin $expected -or $asset.state -ne 'uploaded') { throw 'Draft attachment is unexpected or incomplete.' }
+          }
+          $download = Join-Path $env:RUNNER_TEMP 'downloaded-draft'
+          New-Item -ItemType Directory -Path $download | Out-Null
+          gh release download $env:RELEASE_TAG --repo $env:GH_REPO --dir $download --pattern '*.exe'
+          if ($LASTEXITCODE -ne 0) { throw 'Draft download failed; release remains a draft.' }
+          $body = Join-Path $env:RUNNER_TEMP 'downloaded-body.md'
+          [IO.File]::WriteAllText($body, $release.body, (New-Object Text.UTF8Encoding($false)))
+          $remote = ./.github/scripts/validate-release.ps1 -AssetDirectory $download -BodyPath $body -Tag $env:RELEASE_TAG -SigningMode $env:SIGNING_MODE -OutputDirectory (Join-Path $env:RUNNER_TEMP 'release-receipts/downloaded') -RequireBodyChecksums
+          $local = Get-Content (Join-Path $env:RUNNER_TEMP 'release-receipts/local/validation.json') -Raw | ConvertFrom-Json
+          foreach ($asset in $remote.Assets) {
+            $original = @($local.assets | Where-Object { $_.name -ceq $asset.name })
+            if ($original.Count -ne 1 -or $original[0].sha256 -cne $asset.sha256 -or $original[0].bytes -ne $asset.bytes) { throw "Uploaded bytes differ: $($asset.name)" }
+          }
+
+      - name: Publish verified draft
+        if: inputs.publish
+        run: |
+          gh release edit $env:RELEASE_TAG --repo $env:GH_REPO --draft=false
+          if ($LASTEXITCODE -ne 0) { throw 'Publish request failed. Inspect GitHub before retrying.' }
+          $json = gh release view $env:RELEASE_TAG --repo $env:GH_REPO --json isDraft,isPrerelease,tagName,url
+          if ($LASTEXITCODE -ne 0) { throw 'Could not verify publication.' }
+          $release = $json | ConvertFrom-Json
+          if ($release.isDraft -or $release.tagName -cne $env:RELEASE_TAG) { throw 'Publication read-back failed.' }
+          if ($env:SIGNING_MODE -eq 'unsigned-preview' -and -not $release.isPrerelease) { throw 'Preview publication flag changed unexpectedly.' }
+          $release.url | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - name: Retain validation and build receipts (Actions only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-validation-${{ github.run_id }}
+          path: ${{ runner.temp }}/release-receipts/
+          if-no-files-found: warn
+          retention-days: 30

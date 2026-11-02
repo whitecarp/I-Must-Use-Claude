@@ -111,7 +111,8 @@
       "links": [
         "https://argos-net.com/v1/translate-zh_en-1_9.argosmodel"
       ],
-      "code": "translate-zh_en"
+      "code": "translate-zh_en",
+      "sha256": "62e7af5a3a48b530e47b7b3e5c78c2de79073ecd815750d2bf3ab35b4a67da2d"
     },
     {
       "package_version": "1.9.6",
@@ -245,7 +246,8 @@
       "links": [
         "https://argos-net.com/v1/translate-en_zh-1_9.argosmodel"
       ],
-      "code": "translate-en_zh"
+      "code": "translate-en_zh",
+      "sha256": "433e7c4f034d87fbe2353161e05f18646d7999452f801a4e1f0378522b9850ab"
     },
     {
       "package_version": "1.9",

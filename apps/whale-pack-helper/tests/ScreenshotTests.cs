@@ -21,7 +21,7 @@ namespace WhalePack.Tests {
             bool native = args.Length > 3 && args[3] == "--native";
             foreach (string language in new string[] { "zh", "en" }) foreach (float scale in (native ? new float[] { 1f } : new float[] { 1f, 1.5f })) {
                 var settings = new AppSettings { Language = language, OutputDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\发给Claude", Handoff = new HandoffData {
-                    Project = "大肥鱼打包助手 0.1.0", Goal = language == "zh" ? "整理发给 Claude 的文件" : "Prepare a local handoff for Claude", Progress = language == "zh" ? "三组文件已完成打包" : "Three packaging scenarios completed", Verified = language == "zh" ? "实际大小、独立解压、敏感文件排除" : "Actual sizes, extraction, secret exclusions", Unverified = language == "zh" ? "Claude 上传（本程序不联网）" : "Claude uploads (offline application)", Next = language == "zh" ? "先读说明，再看附件" : "Read the handoff, then the attachments" } };
+                    Project = "大肥鱼打包助手 0.1.1", Goal = language == "zh" ? "整理发给 Claude 的文件" : "Prepare a local handoff for Claude", Progress = language == "zh" ? "三组文件已完成打包" : "Three packaging scenarios completed", Verified = language == "zh" ? "实际大小、独立解压、敏感文件排除" : "Actual sizes, extraction, secret exclusions", Unverified = language == "zh" ? "Claude 上传（未执行上传）" : "Claude uploads (not performed)", Next = language == "zh" ? "先读说明，再看附件" : "Read the handoff, then the attachments" } };
                 foreach (string state in new string[] { "empty", "loaded", "completed", "handoff" }) {
                     Form form;
                     if (state == "handoff") form = new HandoffForm(settings, result) { PreviewOnly = true };

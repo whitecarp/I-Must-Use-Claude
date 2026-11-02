@@ -111,7 +111,7 @@ namespace ClaudeCompanion {
             nextResult=Button("下一条","Next",false,74);nextResult.Height=30;nextResult.Click+=delegate{NavigateHistory(1);};
             historyPosition=new Label{AutoSize=false,Width=110,Height=30,TextAlign=ContentAlignment.MiddleLeft,ForeColor=Theme.Muted,Margin=new Padding(0,3,5,0),Font=new Font(Font.FontFamily,9F)};
             var glossary=Button("术语词典","Glossary",false,100);glossary.Height=30;glossary.Click+=delegate{EditGlossary();};
-            var updates=Button("检查更新","Check updates",false,132);updates.Height=30;updates.Click+=delegate{WhaleCommon.UpdateChecker.Show(this,"translator","0.9.0",Ui.English);};
+            var updates=Button("检查更新","Check updates",false,132);updates.Height=30;updates.Click+=delegate{WhaleCommon.UpdateChecker.Show(this,"translator","0.9.1",Ui.English);};
             readingTools.Controls.AddRange(new Control[]{previousResult,nextResult,historyPosition,glossary,updates});optionRows.Controls.Add(readingTools,0,2);
             translated=TextBox(14F,Theme.Ink);layout.Controls.Add(Theme.Card(translated,new Padding(0,4,0,4)),0,4);
             var originalLabel=Label("原文对照","Original selection");originalLabel.Dock=DockStyle.Fill;originalLabel.TextAlign=ContentAlignment.BottomLeft;layout.Controls.Add(originalLabel,0,5);
@@ -142,7 +142,7 @@ namespace ClaudeCompanion {
         private void RefreshLanguage(){
             if(closing)return;
             foreach(var update in labels)update();
-            Text=T("大肥鱼翻译 0.9.0","Whale Translator 0.9.0");
+            Text=T("大肥鱼翻译 0.9.1","Whale Translator 0.9.1");
             RefreshHistoryButtons();
             RefreshEngineLabels();
             chooseSource.AccessibleName=T("选择要翻译的程序窗口","Choose a program window to translate");direction.AccessibleName=T("目标语言","Target language");

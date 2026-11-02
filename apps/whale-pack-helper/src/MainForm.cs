@@ -231,7 +231,7 @@ namespace WhalePack {
             if (String.IsNullOrWhiteSpace(settings.OutputDirectory)) { MessageBox.Show(this, T("请选择输出文件夹。", "Choose an output folder."), Text, MessageBoxButtons.OK, MessageBoxIcon.Information); return; }
             bool needsFfmpeg = items.Any(delegate(InputItem i) { return i.Mode == ProcessingMode.CompressVideo || (i.Mode == ProcessingMode.ResizeImage && String.Equals(Path.GetExtension(i.Path), ".webp", StringComparison.OrdinalIgnoreCase)); });
             if (needsFfmpeg && String.IsNullOrEmpty(MediaProcessor.FindFfmpeg(settings))) {
-                MessageBox.Show(this, T("没有找到 ffmpeg.exe。请选择本机已有的 FFmpeg；本程序不会下载任何文件。", "ffmpeg.exe was not found. Select a local copy; this app will not download anything."), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, T("没有找到 ffmpeg.exe。请选择本机已有的 FFmpeg；本程序不会下载 FFmpeg。", "ffmpeg.exe was not found. Select a local copy; this app does not download FFmpeg."), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (!PickFfmpeg()) return;
             }
             SaveSettings(); cancellation = new CancellationTokenSource(); result = null; finalStatus = ""; SetBusy(true); estimateTitle.Text = T("开始整理文件…", "Preparing your files…");
