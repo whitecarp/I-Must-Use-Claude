@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>I Must Use Claude</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="我一定要用上Claude · I Must Use Claude：大肥鱼环境助手、大肥鱼翻译、两地时钟，四个鲸鱼主题的 Windows 小工具。Four whale-themed Windows companions for using Claude.">
+<meta name="description" content="我一定要用上Claude · I Must Use Claude：大肥鱼环境助手、大肥鱼翻译、两地时钟、大肥鱼打包助手，四个鲸鱼主题的 Windows 小工具。Four whale-themed Windows companions for using Claude.">
 <meta name="theme-color" content="#FBF7EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1B28" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
@@ -74,6 +74,31 @@
   --tape-b: #FBE1CE;
   --glow-a: #E4F1F8;
   --glow-b: #FCEBDD;
+  --fix: #D2643A;
+  --fix-deep: #A9461F;
+  --fix-wash: #FFEADB;
+  --fix-band: #FFF5EC;
+  --fix-btn: #AC4825;
+  --fix-btn-hover: #BE542A;
+  --fix-btn-edge: #79311D;
+  --fix-btn-text: #FFFFFF;
+  --fix-glow: rgba(121, 49, 29, .2);
+  --kraft: #C9975E;
+  /* The helper and Pack Helper windows are redrawn in the apps' own light palettes, in both page themes. */
+  --app-paper: #FFF9F1;
+  --app-card: #FFFFFF;
+  --app-line: #ECD5BF;
+  --app-ink: #433029;
+  --app-muted: #7D604F;
+  --app-accent: #AC4825;
+  --app-accent-edge: #79311D;
+  --app-on-accent: #FFFFFF;
+  --pk-paper: #FAF8F2;
+  --pk-line: #D4E7F2;
+  --pk-ink: #384E5F;
+  --pk-muted: #5A7282;
+  --pk-accent: #357AA6;
+  --pk-accent-edge: #285E82;
   --shadow: 0 1px 2px rgba(31, 58, 82, .06), 0 12px 32px -16px rgba(31, 58, 82, .28);
   --shadow-lg: 0 2px 4px rgba(31, 58, 82, .06), 0 26px 50px -22px rgba(31, 58, 82, .38);
 
@@ -97,6 +122,7 @@
     --night: #08121B; --night-2: #13222F; --night-ink: #E9F1F6; --night-soft: #9FB3C2; --sel: #2F5A8E;
     --home-row: #2A2516; --target-row: #142F47; --bubble: #1B3346; --bubble-line: #2E4E68;
     --tape-a: #3B6A8C; --tape-b: #6B4E3D; --glow-a: #15324A; --glow-b: #2A2233;
+    --fix: #F09A70; --fix-deep: #F4B08E; --fix-wash: #3A251C; --fix-band: #121F2C; --fix-btn: #F0A27A; --fix-btn-hover: #F5B490; --fix-btn-edge: #B4603A; --fix-btn-text: #2A160E; --fix-glow: rgba(0, 0, 0, .45); --kraft: #D9A86F;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px -16px rgba(0, 0, 0, .6);
     --shadow-lg: 0 2px 4px rgba(0, 0, 0, .3), 0 26px 50px -22px rgba(0, 0, 0, .75);
     color-scheme: dark;
@@ -111,6 +137,7 @@
   --night: #08121B; --night-2: #13222F; --night-ink: #E9F1F6; --night-soft: #9FB3C2; --sel: #2F5A8E;
   --home-row: #2A2516; --target-row: #142F47; --bubble: #1B3346; --bubble-line: #2E4E68;
   --tape-a: #3B6A8C; --tape-b: #6B4E3D; --glow-a: #15324A; --glow-b: #2A2233;
+  --fix: #F09A70; --fix-deep: #F4B08E; --fix-wash: #3A251C; --fix-band: #121F2C; --fix-btn: #F0A27A; --fix-btn-hover: #F5B490; --fix-btn-edge: #B4603A; --fix-btn-text: #2A160E; --fix-glow: rgba(0, 0, 0, .45); --kraft: #D9A86F;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 32px -16px rgba(0, 0, 0, .6);
   --shadow-lg: 0 2px 4px rgba(0, 0, 0, .3), 0 26px 50px -22px rgba(0, 0, 0, .75);
   color-scheme: dark;
@@ -135,11 +162,11 @@ body::before {
 }
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--link); text-underline-offset: .2em; }
-h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; color: var(--ink); }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; color: var(--ink); }
 p { margin: 0; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 10px; }
 [hidden] { display: none !important; }
-:root:not([data-lang="en"]) :is(h1, h2, h3) { word-break: keep-all; overflow-wrap: anywhere; }
+:root:not([data-lang="en"]) :is(h1, h2, h3, h4) { word-break: keep-all; overflow-wrap: anywhere; }
 .nb { white-space: nowrap; }
 /* Bilingual copy: both languages ship in the markup; the root attribute decides which one shows. */
 :root[data-lang="en"] [data-l="zh"], :root:not([data-lang="en"]) [data-l="en"] { display: none !important; }
@@ -554,6 +581,142 @@ select {
   .clockdemo__controls { width: 100%; }
 }
 
+/* ---------- helper identity: the app itself is terracotta since 0.6 ---------- */
+.is-fix { --btn-face: var(--fix-btn); --btn-face-hover: var(--fix-btn-hover); --btn-edge: var(--fix-btn-edge); --btn-text: var(--fix-btn-text); }
+.new-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px;
+  font-size: .76rem; font-weight: 800; line-height: 1.3; letter-spacing: .02em; text-transform: none;
+  color: var(--fix-deep); background: var(--fix-wash);
+}
+.new-pill svg { width: 12px; height: 12px; color: var(--fix); }
+.feature--fix { background: var(--fix-band); }
+
+/* picker: the helper is the wide card, the other three share a row */
+.picker { display: grid; gap: 20px; }
+.tool-card--hero {
+  display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-areas: "main art" "main flow"; gap: 18px clamp(24px, 3vw, 48px); align-items: start;
+  border-color: var(--fix); background: linear-gradient(135deg, var(--fix-wash), var(--card) 60%);
+  padding: clamp(24px, 3.4vw, 40px);
+}
+.fc-main { grid-area: main; display: flex; flex-direction: column; gap: 14px; min-width: 0; height: 100%; }
+.fc-art { grid-area: art; justify-self: center; width: min(230px, 72%); filter: drop-shadow(0 16px 18px var(--fix-glow)); }
+.fc-flow { grid-area: flow; border-color: var(--fix); }
+.tool-card--hero h3 { font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.3rem); }
+.tool-card--hero .tag { color: var(--fix-deep); background: var(--card); }
+.toolbox { display: grid; gap: 8px; }
+.toolbox__k { font-size: .82rem; font-weight: 800; color: var(--ink-soft); }
+.toolbox ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.toolbox li {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+  font-size: .86rem; font-weight: 800; line-height: 1.3; color: var(--ink); background: var(--card); border: 1px solid var(--line);
+}
+.toolbox li b { font-size: .72rem; color: var(--fix-btn-text); background: var(--fix-btn); border-radius: 999px; padding: 1px 7px; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 980px) {
+  .tool-card--hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "art" "main" "flow"; }
+  .fc-art { width: 150px; }
+}
+@media (max-width: 900px) { .trio { grid-template-columns: minmax(0, 1fr); } }
+
+/* windows redrawn in each app's own palette */
+.appwin--app, .appwin--pack { color: var(--app-ink); }
+.appwin--app { background: var(--app-paper); border-color: var(--app-line); }
+.appwin--app .appwin__bar { background: var(--app-card); border-color: var(--app-line); color: var(--app-muted); }
+.appwin--app .appwin__ctrls, .appwin--app .appwin__head span:not(.candy), .appwin--app .appwin__state, .appwin--app .appwin__detail { color: var(--app-muted); }
+.appwin--app .appwin__head strong, .appwin--app .appwin__score { color: var(--app-ink); }
+.appwin--app .appwin__card { background: var(--app-card); border-color: var(--app-line); box-shadow: 0 2px 0 var(--app-line); }
+.appwin--app .appwin__detail { border-color: var(--app-line); }
+.appwin--app .appwin__links { color: var(--app-accent); }
+.appwin--app .candy { background: var(--app-card); color: var(--app-ink); border-color: var(--app-line); box-shadow: 0 2px 0 var(--app-line); }
+.appwin--app .candy--primary { background: var(--app-accent); color: var(--app-on-accent); border-color: var(--app-accent); box-shadow: 0 2px 0 var(--app-accent-edge); }
+.appwin--app .candy.is-hot { outline-color: var(--sea); }
+.appwin--app .ph { border-color: var(--app-accent); color: var(--app-accent); }
+.appwin__mascot { width: 64px; height: 64px; flex: none; }
+.candy.is-off { opacity: .5; box-shadow: none; }
+
+/* Network & DNS */
+.netdns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: clamp(28px, 4vw, 56px); align-items: start; margin-top: clamp(52px, 7vw, 88px); }
+.netdns__copy { display: grid; gap: 14px; min-width: 0; }
+.netdns__copy h3 { font-size: clamp(1.5rem, 1.2rem + 1vw, 1.95rem); font-weight: 800; }
+.netdns__copy > p:not(.note-line):not(.eyebrow) { color: var(--ink-soft); }
+.netdns__visual { display: grid; gap: 14px; min-width: 0; }
+.mini-h { font-size: 1.08rem; margin-top: 6px; }
+.legend { margin: 0; display: grid; gap: 10px; }
+.legend > div { display: grid; grid-template-columns: minmax(0, 10.5em) minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.legend dt { justify-self: start; }
+.legend dd { margin: 0; color: var(--ink-soft); font-size: .95rem; line-height: 1.55; }
+.st {
+  display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .8rem; font-weight: 800; line-height: 1.35;
+  color: var(--ink-soft); background: var(--card); border: 1px dashed var(--ink-soft);
+}
+.st--seen { color: var(--sea-deep); background: var(--sea-wash); border: 1px solid var(--sea-wash); }
+.dnsbox { border: 1px solid var(--app-line); border-radius: 12px; background: var(--app-card); overflow: hidden; }
+.dnstable { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.dnstable caption { caption-side: top; text-align: left; font-weight: 800; color: var(--app-ink); padding: 8px 10px 6px; }
+.dnstable th { text-align: left; font-weight: 800; color: var(--app-muted); padding: 7px 10px; background: var(--app-paper); border-top: 1px solid var(--app-line); border-bottom: 1px solid var(--app-line); }
+.dnstable td { padding: 16px 10px; color: var(--app-muted); text-align: center; }
+.fix-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.fix-row__k { font-size: .8rem; font-weight: 800; color: var(--app-muted); }
+.fakeselect {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; flex: 1 1 150px; min-width: 0;
+  padding: .45em .8em; border-radius: 10px; border: 1px solid var(--app-line); background: var(--app-card); color: var(--app-muted); font-size: .8rem;
+}
+.fakeselect::after { content: "▾"; }
+.repair { display: grid; gap: 10px; padding: 16px 18px; border-radius: 18px; border: 1.5px dashed var(--fix); background: var(--card); }
+.repair__k { font-weight: 800; font-size: .92rem; color: var(--ink); }
+.repair__flow { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: rf; }
+.repair__flow li {
+  counter-increment: rf; display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 6px; border-radius: 999px;
+  font-size: .86rem; font-weight: 800; line-height: 1.3; color: var(--ink); background: var(--fix-wash);
+}
+.repair__flow li::before {
+  content: counter(rf); display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--fix-btn); color: var(--fix-btn-text); font-size: .74rem;
+}
+.repair__flow li.is-undo::before { content: "↺"; }
+@media (max-width: 940px) { .netdns { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .legend > div { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+
+/* the helper's other entries */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+.tile { display: grid; grid-template-columns: 48px minmax(0, 1fr); align-content: start; gap: 4px 16px; padding: 20px 22px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); min-width: 0; }
+.tile__icon { grid-row: span 2; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: var(--fix-wash); color: var(--fix-deep); }
+.tile__icon svg { width: 24px; height: 24px; }
+.tile h3 { font-size: 1.15rem; padding-top: 2px; }
+.tile p { color: var(--ink-soft); font-size: .95rem; }
+.tile code { font-family: var(--font-mono); font-size: .88em; }
+@media (max-width: 720px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
+
+/* Pack Helper window */
+.appwin--pack { background: var(--pk-paper); border-color: var(--pk-line); }
+.appwin--pack .appwin__bar { background: var(--app-card); border-color: var(--pk-line); color: var(--pk-muted); }
+.appwin--pack .appwin__ctrls, .appwin--pack .appwin__head span:not(.candy), .appwin--pack .appwin__detail { color: var(--pk-muted); }
+.appwin--pack .appwin__head strong { color: var(--pk-ink); }
+.appwin--pack .appwin__detail { border-color: var(--pk-line); }
+.appwin--pack .candy { background: var(--app-card); color: var(--pk-ink); border-color: var(--pk-line); box-shadow: 0 2px 0 var(--pk-line); }
+.appwin--pack .candy--primary { background: var(--pk-accent); color: var(--app-on-accent); border-color: var(--pk-accent); box-shadow: 0 2px 0 var(--pk-accent-edge); }
+.pack-whale { width: 80px; height: auto; flex: none; }
+.dropzone {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; padding: 14px;
+  border: 2px dashed var(--pk-line); border-radius: 14px; color: var(--pk-muted); font-weight: 800; font-size: .86rem; text-align: center;
+}
+.dropzone > span:first-child { flex-basis: 100%; }
+.pklist { background: var(--app-card); border: 1px solid var(--pk-line); border-radius: 14px; overflow: hidden; }
+.pklist__head { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; font-size: .8rem; color: var(--pk-muted); border-bottom: 1px solid var(--pk-line); }
+.pklist__head b { color: var(--pk-ink); }
+.pklist ul { list-style: none; margin: 0; padding: 0; }
+.pklist li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 0 10px; padding: 8px 12px; border-bottom: 1px solid var(--pk-line); font-size: .8rem; line-height: 1.45; }
+.pklist li:last-child { border-bottom: 0; }
+.pklist svg { grid-row: span 2; width: 18px; height: 18px; margin-top: 1px; color: var(--pk-accent); }
+.pk-name { font-weight: 800; color: var(--pk-ink); overflow-wrap: anywhere; }
+.pk-mode { color: var(--pk-muted); }
+.pklist li.is-out svg { color: var(--app-accent); }
+.pklist li.is-out .pk-name { color: var(--pk-muted); text-decoration: line-through; }
+.pkfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pk-out { flex: 1 1 150px; font-size: .8rem; color: var(--pk-muted); }
+.dl__alt { display: block; font-size: .82rem; color: var(--ink-soft); line-height: 1.5; }
+
 /* ---------- download ---------- */
 .download { background: var(--paper-deep); }
 .dl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
@@ -562,6 +725,7 @@ select {
   padding: 16px 18px 16px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 22px;
 }
 .dl--feature { border-color: var(--sea); box-shadow: 0 4px 0 var(--sea-wash); }
+.dl--feature.is-fix { border-color: var(--fix); box-shadow: 0 4px 0 var(--fix-wash); }
 .dl__name { min-width: 0; }
 .dl__name b { display: block; font-family: var(--font-display); font-size: 1.22rem; line-height: 1.25; }
 .dl__name code { font-family: var(--font-mono); font-size: .82rem; color: var(--ink-soft); overflow-wrap: anywhere; }
@@ -583,7 +747,7 @@ select {
 
 /* ---------- limits ---------- */
 .limits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
-.limit { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 4px 16px; align-items: start; }
+.limit { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 4px 16px; align-items: start; align-content: start; }
 .limit__icon {
   grid-row: span 2; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px;
   background: var(--sea-wash); color: var(--sea-deep);
@@ -668,6 +832,12 @@ select {
     </g>
     <path d="M48.5 12.5a10.5 10.5 0 1 0 6.5 18.6A9 9 0 0 1 48.5 12.5z" style="fill:var(--sea)"/>
   </symbol>
+  <symbol id="b-pack" viewBox="0 0 64 56">
+    <path d="M11 3h42a8 8 0 0 1 8 8v24a8 8 0 0 1-8 8H27l-10 9v-9h-6a8 8 0 0 1-8-8V11a8 8 0 0 1 8-8z" style="fill:var(--bubble);stroke:var(--bubble-line)" stroke-width="2"/>
+    <path d="M18 17.5l14-6 14 6v15.5l-14 6-14-6z" style="fill:var(--kraft)"/>
+    <path d="M18 17.5l14 6 14-6M32 23.5v15.5" fill="none" style="stroke:var(--bubble)" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M25 14.5l14 6" fill="none" style="stroke:var(--bubble)" stroke-width="2.2" stroke-linecap="round"/>
+  </symbol>
   <symbol id="spark" viewBox="-6 -6 12 12"><path d="M0-6L1.5-1.5L6 0L1.5 1.5L0 6L-1.5 1.5L-6 0L-1.5-1.5Z" fill="currentColor"/></symbol>
   <symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="currentColor" opacity=".14"/><path d="M6 10.4l2.6 2.6L14 7.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -679,6 +849,12 @@ select {
   <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M12 17l3.6-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.8" fill="currentColor"/></symbol>
   <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="10.5" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M2.5 19h19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
   <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3.5h6M10 3.5v6L5.2 17.6A2 2 0 0 0 6.9 20.6h10.2a2 2 0 0 0 1.7-3L14 9.5v-6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.6 15h8.8" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0zM12 17v4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3.5v8" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M7.2 6.8a7.3 7.3 0 1 0 9.6 0" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 9.2v5.6l4.6-2.8z" fill="currentColor"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="1.7" fill="currentColor"/><path d="M5 17l4.5-4.5 3 3L15 13l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11.6 12H20M17 12v3M20 12v2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
 </svg>
 
@@ -694,6 +870,7 @@ select {
       <a href="#helper"><span data-l="zh">环境助手</span><span data-l="en">Helper</span></a>
       <a href="#translator"><span data-l="zh">翻译</span><span data-l="en">Translator</span></a>
       <a href="#clock"><span data-l="zh">两地时钟</span><span data-l="en">Clock</span></a>
+      <a href="#pack"><span data-l="zh">打包</span><span data-l="en">Pack</span></a>
       <a href="#download"><span data-l="zh">下载</span><span data-l="en">Download</span></a>
     </nav>
     <div class="lang-switch" role="group" aria-label="Language / 语言">
@@ -720,10 +897,10 @@ select {
           <span data-l="zh"><span class="nb">我一定要</span><wbr><span class="nb">用上<span class="claude">Claude</span></span></span>
           <span data-l="en"><span class="nb">I Must Use</span> <span class="nb claude">Claude</span></span>
         </h1>
-        <p class="lede" data-l="zh"><strong>了解使用环境，看懂 Claude 的回复，记住自己那边几点。</strong>四个小工具各自独立运行，用哪个下哪个；打包助手另需配套同名配置文件。</p>
-        <p class="lede" data-l="en"><strong>Understand your local setup. Read Claude comfortably. Keep your home time in view.</strong>Four small apps that each run on their own. Download what you need; Pack Helper includes a matching config file.</p>
+        <p class="lede" data-l="zh"><strong>了解使用环境，看懂 Claude 的回复，记住自己那边几点。</strong>四个小工具各自独立运行，用哪个下哪个。</p>
+        <p class="lede" data-l="en"><strong>Understand your local setup. Read Claude comfortably. Keep your home time in view.</strong>Four small apps that each run on their own. Download only what you need.</p>
         <div class="cta-row">
-          <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe">
+          <a class="btn btn--primary is-fix" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe">
             <svg aria-hidden="true"><use href="#i-download"/></svg>
             <span><span data-l="zh">下载环境助手</span><span data-l="en">Download Environment Helper</span><span class="btn__meta">WhaleEnvironmentHelper.exe · 0.7.0</span></span>
           </a>
@@ -753,29 +930,48 @@ select {
       <header class="section-head">
         <p class="eyebrow"><span data-l="zh">四个工具</span><span data-l="en">Four tools</span></p>
         <h2 id="tools-title"><span data-l="zh">从环境助手开始</span><span data-l="en">Start with the Environment Helper</span></h2>
-        <p data-l="zh">先弄清自己的使用环境，再用熟悉的语言读懂 Claude，最后把家里的时间放在桌面一角。</p>
-        <p data-l="en">Check your setup first, then read Claude in your own language, and keep home time in a corner of your desktop.</p>
+        <p data-l="zh">先弄清自己的使用环境，再用熟悉的语言读懂 Claude，把家里的时间放在桌面一角；要交给 Claude 的文件，也能先在本机整理好。</p>
+        <p data-l="en">Check your setup first, read Claude in your own language, keep home time in a corner of your desktop, and package files for Claude on your own computer.</p>
       </header>
 
-      <div class="bento">
-        <article class="tool-card tool-card--feature" aria-labelledby="card-helper">
-          <div class="tool-card__top">
-            <span class="num">01</span>
-            <span class="tag"><svg aria-hidden="true"><use href="#spark"/></svg><span data-l="zh">从这里开始</span><span data-l="en">Start here</span></span>
+      <div class="picker">
+        <article class="tool-card tool-card--hero is-fix" aria-labelledby="card-helper">
+          <div class="fc-main">
+            <div class="tool-card__top">
+              <span class="num">01</span>
+              <span class="tag"><svg aria-hidden="true"><use href="#spark"/></svg><span data-l="zh">从这里开始</span><span data-l="en">Start here</span></span>
+            </div>
+            <h3 id="card-helper">
+              <span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span>
+              <span class="sub"><span data-l="zh">Whale Environment Helper · 0.7.0</span><span data-l="en">大肥鱼环境助手 · 0.7.0</span></span>
+            </h3>
+            <p class="tool-card__line"><span data-l="zh">先测清楚，再动设置。</span><span data-l="en">Measure first, then adjust.</span></p>
+            <ul class="ticks">
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">在你自己的浏览器里实测，缺失的项目显示“未知”，不算 0 分</span><span data-l="en">Measures in your own browser; missing checks stay unknown, never zero</span></span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">只处理命中的本地设置，改之前先备份</span><span data-l="en">Handles only matched local settings, with a backup first</span></span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">用同一浏览器复测看真实变化，也能撤回上次优化</span><span data-l="en">Measure again in the same browser, or undo the last optimization</span></span></li>
+            </ul>
+            <div class="toolbox">
+              <span class="toolbox__k"><span data-l="zh">同一个软件里还有</span><span data-l="en">Also in the same app</span></span>
+              <ul>
+                <li><span data-l="zh">网络与 DNS</span><span data-l="en">Network &amp; DNS</span><b><span data-l="zh">新</span><span data-l="en">New</span></b></li>
+                <li><span data-l="zh">维护与清理</span><span data-l="en">Maintenance &amp; cleanup</span></li>
+                <li><span data-l="zh">Codex 连接修复</span><span data-l="en">Codex connection repair</span></li>
+                <li><span data-l="zh">关闭占用程序</span><span data-l="en">Close blocking apps</span></li>
+              </ul>
+            </div>
+            <div class="tool-card__actions">
+              <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe">
+                <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载环境助手</span><span data-l="en">Download Helper</span>
+              </a>
+              <a class="more" href="#helper"><span data-l="zh">看看它怎么工作</span><span data-l="en">See how it works</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
           </div>
-          <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-helper"/></svg>
-          <h3 id="card-helper">
-            <span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span>
-            <span class="sub"><span data-l="zh">Whale Environment Helper · 0.7.0</span><span data-l="en">大肥鱼环境助手 · 0.7.0</span></span>
-          </h3>
-          <p class="tool-card__line"><span data-l="zh">先测清楚，再动设置。</span><span data-l="en">Measure first, then adjust.</span></p>
-          <ul class="ticks">
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">在你自己的浏览器里实测，缺失的项目显示“未知”，不算 0 分</span><span data-l="en">Measures in your own browser; missing checks stay unknown, never zero</span></span></li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">只处理命中的本地设置，改之前先备份</span><span data-l="en">Handles only matched local settings, with a backup first</span></span></li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">用同一浏览器复测看真实变化，也能撤回上次优化</span><span data-l="en">Measure again in the same browser, or undo the last optimization</span></span></li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">另有维护与清理：连接体检、官方配置、缓存日志、恢复备份</span><span data-l="en">Plus maintenance: connection checks, official configuration, caches &amp; logs, restore</span></span></li>
-          </ul>
-          <div class="flow">
+          <img class="fc-art" src="images/site-helper-mascot.webp" width="360" height="360"
+               data-alt-zh="戴橙色工作帽、举着扳手盾牌的蓝色小鲸鱼，环境助手的吉祥物。"
+               data-alt-en="A chubby blue whale in an orange work cap holding a wrench shield, the Environment Helper mascot."
+               alt="戴橙色工作帽、举着扳手盾牌的蓝色小鲸鱼，环境助手的吉祥物。">
+          <div class="flow fc-flow">
             <span class="flow__k"><span data-l="zh">在软件里依次点</span><span data-l="en">In the app, press in order</span></span>
             <div class="flow__row">
               <span class="candy candy--primary"><span data-l="zh">开始检测</span><span data-l="en">Measure first</span></span>
@@ -789,70 +985,84 @@ select {
               <span class="caption"><span data-l="zh">随时可用，恢复备份的设置</span><span data-l="en">Any time, from the backup</span></span>
             </div>
           </div>
-          <div class="tool-card__actions">
-            <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe">
-              <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载环境助手</span><span data-l="en">Download Helper</span>
-            </a>
-            <a class="more" href="#helper"><span data-l="zh">看看它怎么工作</span><span data-l="en">See how it works</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          </div>
         </article>
 
-        <article class="tool-card" aria-labelledby="card-translator">
-          <div class="tool-card__top">
-            <span class="num">02</span>
-            <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-translator"/></svg>
-          </div>
-          <h3 id="card-translator">
-            <span data-l="zh">大肥鱼翻译</span><span data-l="en">Whale Translator</span>
-            <span class="sub"><span data-l="zh">Whale Translator · 0.9.0</span><span data-l="en">大肥鱼翻译 · 0.9.0</span></span>
-          </h3>
-          <p class="tool-card__line"><span data-l="zh">用你熟悉的语言读 Claude。</span><span data-l="en">Read Claude in your language.</span></p>
-          <ul class="ticks">
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">划选 Claude 的回复，原文译文对照看</span><span data-l="en">Highlight a reply and read it beside the original</span></span></li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">中文提问先预览英文，再由你主动发送</span><span data-l="en">Write in Chinese, review the English, then send it yourself</span></span></li>
-          </ul>
-          <div class="tool-card__actions">
-            <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe">
-              <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载翻译器</span><span data-l="en">Download Translator</span>
-            </a>
-            <a class="more" href="#translator"><span data-l="zh">了解翻译</span><span data-l="en">Learn more</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          </div>
-        </article>
+        <div class="trio">
+          <article class="tool-card" aria-labelledby="card-translator">
+            <div class="tool-card__top">
+              <span class="num">02</span>
+              <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-translator"/></svg>
+            </div>
+            <h3 id="card-translator">
+              <span data-l="zh">大肥鱼翻译</span><span data-l="en">Whale Translator</span>
+              <span class="sub"><span data-l="zh">Whale Translator · 0.9.0</span><span data-l="en">大肥鱼翻译 · 0.9.0</span></span>
+            </h3>
+            <p class="tool-card__line"><span data-l="zh">用你熟悉的语言读 Claude。</span><span data-l="en">Read Claude in your language.</span></p>
+            <ul class="ticks">
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">划选 Claude 的回复，原文译文对照看</span><span data-l="en">Highlight a reply and read it beside the original</span></span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">中文提问先预览英文，再由你主动发送</span><span data-l="en">Write in Chinese, review the English, then send it yourself</span></span></li>
+            </ul>
+            <div class="tool-card__actions">
+              <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe">
+                <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载翻译器</span><span data-l="en">Download Translator</span>
+              </a>
+              <a class="more" href="#translator"><span data-l="zh">了解翻译</span><span data-l="en">Learn more</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </article>
 
-        <article class="tool-card" aria-labelledby="card-clock">
-          <div class="tool-card__top">
-            <span class="num">03</span>
-            <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-clock"/></svg>
-          </div>
-          <h3 id="card-clock">
-            <span data-l="zh">两地时钟</span><span data-l="en">Two-Zone Clock</span>
-            <span class="sub"><span data-l="zh">Two-Zone Clock · 0.3.0</span><span data-l="en">两地时钟 · 0.3.0</span></span>
-          </h3>
-          <p class="tool-card__line"><span data-l="zh">电脑时区变了，家里的时间还在。</span><span data-l="en">Keep your home time close.</span></p>
-          <ul class="ticks">
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">原本地区在上，目标地区在下，附时差与跨日提示</span><span data-l="en">Home region above, target below, with time difference and day hints</span></span></li>
-            <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">不改电脑时间，显示时间不需要联网</span><span data-l="en">Never changes system time; the clock works offline</span></span></li>
-          </ul>
-          <div class="tool-card__actions">
-            <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe">
-              <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载时钟</span><span data-l="en">Download Clock</span>
-            </a>
-            <a class="more" href="#clock"><span data-l="zh">了解时钟</span><span data-l="en">Learn more</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          </div>
-        </article>
+          <article class="tool-card" aria-labelledby="card-clock">
+            <div class="tool-card__top">
+              <span class="num">03</span>
+              <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-clock"/></svg>
+            </div>
+            <h3 id="card-clock">
+              <span data-l="zh">两地时钟</span><span data-l="en">Two-Zone Clock</span>
+              <span class="sub"><span data-l="zh">Two-Zone Clock · 0.3.0</span><span data-l="en">两地时钟 · 0.3.0</span></span>
+            </h3>
+            <p class="tool-card__line"><span data-l="zh">电脑时区变了，家里的时间还在。</span><span data-l="en">Keep your home time close.</span></p>
+            <ul class="ticks">
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">原本地区在上，目标地区在下，附时差与跨日提示</span><span data-l="en">Home region above, target below, with time difference and day hints</span></span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">不改电脑时间，显示时间不需要联网</span><span data-l="en">Never changes system time; the clock works offline</span></span></li>
+            </ul>
+            <div class="tool-card__actions">
+              <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe">
+                <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载时钟</span><span data-l="en">Download Clock</span>
+              </a>
+              <a class="more" href="#clock"><span data-l="zh">了解时钟</span><span data-l="en">Learn more</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </article>
+
+          <article class="tool-card" aria-labelledby="card-pack">
+            <div class="tool-card__top">
+              <span class="num">04</span>
+              <svg class="tool-icon" viewBox="0 0 64 56" aria-hidden="true"><use href="#b-pack"/></svg>
+            </div>
+            <h3 id="card-pack">
+              <span data-l="zh">大肥鱼打包助手</span><span data-l="en">Whale Pack Helper</span>
+              <span class="sub"><span data-l="zh">Whale Pack Helper · 0.1.0</span><span data-l="en">大肥鱼打包助手 · 0.1.0</span></span>
+            </h3>
+            <p class="tool-card__line"><span data-l="zh">整理给 Claude 的交接文件。</span><span data-l="en">Prepare a clear handoff.</span></p>
+            <ul class="ticks">
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">源码、图片和视频一起整理，每个文件不超过 29 MB</span><span data-l="en">Source, images and video in one go, each file at most 29 MB</span></span></li>
+              <li><svg aria-hidden="true"><use href="#i-check"/></svg><span><span data-l="zh">原文件不变，只在本机处理，不联网</span><span data-l="en">Originals untouched; everything stays on your computer</span></span></li>
+            </ul>
+            <div class="tool-card__actions">
+              <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip">
+                <svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载 ZIP</span><span data-l="en">Download ZIP</span>
+              </a>
+              <a class="more" href="#pack"><span data-l="zh">了解打包</span><span data-l="en">Learn more</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap">
-    <p class="note-line"><span data-l="zh">还有第四个工具：<a href="#pack">大肥鱼打包助手 0.1.0</a>，在本机整理源码和媒体交接包。</span><span data-l="en">Also available: <a href="#pack">Whale Pack Helper 0.1.0</a>, for local source and media handoff packages.</span></p>
-  </div>
-
   <!-- ===== 01 helper ===== -->
-  <section class="feature feature--band" id="helper" aria-labelledby="helper-title">
+  <section class="feature feature--fix" id="helper" aria-labelledby="helper-title">
     <div class="wrap">
       <div class="feature__grid">
-        <div class="feature__copy">
+        <div class="feature__copy is-fix">
           <p class="eyebrow"><span class="num">01</span><span data-l="zh">大肥鱼环境助手 · Whale Environment Helper</span><span data-l="en">Whale Environment Helper · 大肥鱼环境助手</span></p>
           <h2 id="helper-title"><span data-l="zh">先测清楚，再动设置</span><span data-l="en">Measure first, then adjust</span></h2>
           <p class="feature__intro" data-l="zh">先看浏览器实际报告了什么，再决定哪些设置值得调整。保留检测基准，先备份再处理，最后用复测结果确认变化。</p>
@@ -871,8 +1081,8 @@ select {
               <span class="step__n">2</span>
               <span class="step__body">
                 <span class="step__name"><span data-l="zh">一键优化</span><span data-l="en">Optimize</span></span>
-                <span class="step__text" data-l="zh">查看结果，保存工作并退出 Claude、Chrome、Edge，再点「一键优化」，只处理受支持的本地命中项。</span>
-                <span class="step__text" data-l="en">Review the results. Save your work, close Claude, Chrome and Edge, then choose Optimize to process supported local matches.</span>
+                <span class="step__text" data-l="zh">查看结果，保存工作并退出 Claude、Chrome、Edge（还开着的话，可以用「关闭占用程序」），再点「一键优化」，只处理受支持的本地命中项。</span>
+                <span class="step__text" data-l="en">Review the results. Save your work and close Claude, Chrome and Edge (Close blocking apps can ask them to exit), then choose Optimize to process supported local matches.</span>
               </span>
             </button></li>
             <li><button type="button" class="step" data-step="2" aria-pressed="false" aria-controls="helper-win">
@@ -895,14 +1105,14 @@ select {
         </div>
 
         <div class="feature__visual feature__visual--sticky">
-          <div class="appwin" id="helper-win" role="img" aria-labelledby="helper-win-cap">
+          <div class="appwin appwin--app" id="helper-win" role="img" aria-labelledby="helper-win-cap">
             <div class="appwin__bar">
               <span><span data-l="zh">大肥鱼环境助手 0.7.0 预览版</span><span data-l="en">Whale Environment Helper 0.7.0 Preview</span></span>
               <span class="appwin__ctrls" aria-hidden="true"><span>–</span><span>□</span><span>×</span></span>
             </div>
             <div class="appwin__body">
               <div class="appwin__head">
-                <svg viewBox="0 0 100 70" aria-hidden="true"><use href="#whale"/></svg>
+                <img class="appwin__mascot" src="images/site-helper-mascot.webp" width="360" height="360" alt="" loading="lazy">
                 <div>
                   <strong><span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span></strong>
                   <span><span data-l="zh">先检测 → 按命中项优化 → 再测一次</span><span data-l="en">Measure → optimize matched items → measure again</span></span>
@@ -921,6 +1131,9 @@ select {
               <p class="appwin__links">
                 <span data-l="zh">重新检测</span><span data-l="en">Measure again</span>
                 <span data-l="zh">维护与清理</span><span data-l="en">Maintenance &amp; cleanup</span>
+                <span data-l="zh">Codex 连接修复</span><span data-l="en">Codex connection repair</span>
+                <span data-l="zh">关闭占用程序</span><span data-l="en">Close blocking apps</span>
+                <span data-l="zh">网络与 DNS</span><span data-l="en">Network &amp; DNS</span>
                 <span data-l="zh">说明与许可</span><span data-l="en">Notes &amp; license</span>
                 <span data-l="zh">检查更新</span><span data-l="en">Check updates</span>
               </p>
@@ -949,6 +1162,76 @@ select {
           </ul>
         </div>
         <p class="ledger__foot"><span data-l="zh">优化或撤回前请保存工作，正常退出 Claude、Chrome 和 Edge；前后两次检测使用相同的浏览器和个人资料。</span><span data-l="en">Save your work and close Claude, Chrome and Edge before optimizing or undoing. Use the same browser and profile for both measurements.</span></p>
+      </div>
+
+      <div class="netdns" id="network">
+        <div class="netdns__copy">
+          <p class="eyebrow"><span class="new-pill"><svg aria-hidden="true"><use href="#spark"/></svg><span data-l="zh">0.7.0 新增</span><span data-l="en">New in 0.7.0</span></span></p>
+          <h3><span data-l="zh">网络与 DNS</span><span data-l="en">Network &amp; DNS</span></h3>
+          <p data-l="zh">点「检查网络」，助手会核对本机 CuteCloud 的 DNS 配置，并在软件里发起一次原生 DNS 实测，观察到的解析器直接列在窗口中，不打开浏览器。</p>
+          <p data-l="en">Choose Check network: the helper reads the local CuteCloud DNS configuration and runs a native DNS test, listing the observed resolvers in the window without opening a browser.</p>
+          <p class="note-line"><span data-l="zh">范围只是助手自己的 HTTPS／默认代理路径，不代表浏览器独立 DoH 或电脑上的所有应用。WebRTC 是另一个可选的浏览器检测。</span><span data-l="en">The scope is the helper's own HTTPS/default-proxy path, not browser-specific DoH or every app on the computer. WebRTC is a separate, optional browser check.</span></p>
+          <h4 class="mini-h"><span data-l="zh">结果怎么看</span><span data-l="en">Reading the result</span></h4>
+          <dl class="legend">
+            <div><dt class="st st--seen"><span data-l="zh">已测 · 有解析器</span><span data-l="en">Measured · resolvers seen</span></dt><dd><span data-l="zh">观察到本次探测的解析器，核对它们是否符合你的预期。</span><span data-l="en">Resolvers were seen for this probe. Check that they match what you expect.</span></dd></div>
+            <div><dt class="st"><span data-l="zh">部分结果</span><span data-l="en">Partial</span></dt><dd><span data-l="zh">有步骤没完成，不能当成完整检测。</span><span data-l="en">Some steps did not finish, so this is not a complete test.</span></dd></div>
+            <div><dt class="st"><span data-l="zh">无观察结果</span><span data-l="en">No observation</span></dt><dd><span data-l="zh">没有证据，不等于“没有泄露”。</span><span data-l="en">No evidence either way. It does not mean nothing leaked.</span></dd></div>
+            <div><dt class="st"><span data-l="zh">超时 · 服务异常 · 取消</span><span data-l="en">Timeout · service error · cancelled</span></dt><dd><span data-l="zh">结论未知，可以重新发起一次全新检测。</span><span data-l="en">The result is unknown. Start a fresh test.</span></dd></div>
+          </dl>
+        </div>
+        <div class="netdns__visual">
+          <div class="appwin appwin--app" role="img" aria-labelledby="net-cap">
+            <div class="appwin__bar">
+              <span><span data-l="zh">大肥鱼 · 网络与 DNS</span><span data-l="en">Whale Helper · Network &amp; DNS</span></span>
+              <span class="appwin__ctrls" aria-hidden="true"><span>–</span><span>□</span><span>×</span></span>
+            </div>
+            <div class="appwin__body">
+              <div class="appwin__head">
+                <img class="appwin__mascot" src="images/site-helper-mascot.webp" width="360" height="360" alt="" loading="lazy">
+                <div><strong><span data-l="zh">网络检测与修复</span><span data-l="en">Network check &amp; repair</span></strong></div>
+                <span class="candy"><span data-l="zh">English</span><span data-l="en">中文</span></span>
+              </div>
+              <div class="appwin__card">
+                <p class="appwin__state"><span data-l="zh">尚未检查。点击「检查网络」才读取配置并发起 DNS 实测请求；可选 WebRTC 按钮才打开浏览器。</span><span data-l="en">Not checked. Check network reads configuration and sends DNS test requests only when clicked; only the optional WebRTC button opens a browser.</span></p>
+              </div>
+              <div class="appwin__btns">
+                <span class="candy candy--primary"><span data-l="zh">检查网络</span><span data-l="en">Check network</span></span>
+                <span class="candy"><span data-l="zh">刷新 DNS 状态</span><span data-l="en">Refresh DNS status</span></span>
+                <span class="candy"><span data-l="zh">WebRTC（浏览器专项）</span><span data-l="en">WebRTC (browser check)</span></span>
+              </div>
+              <div class="dnsbox">
+                <table class="dnstable">
+                  <caption><span data-l="zh">真实 DNS 检测 · 助手原生请求</span><span data-l="en">Real DNS test · native helper requests</span></caption>
+                  <thead><tr><th scope="col"><span data-l="zh">解析器地址</span><span data-l="en">Resolver address</span></th><th scope="col"><span data-l="zh">地区</span><span data-l="en">Region</span></th><th scope="col"><span data-l="zh">机构</span><span data-l="en">Organization</span></th></tr></thead>
+                  <tbody><tr><td colspan="3"><span data-l="zh">等待用户开始检测</span><span data-l="en">Waiting for you to start</span></td></tr></tbody>
+                </table>
+              </div>
+              <div class="fix-row">
+                <span class="fix-row__k"><span data-l="zh">代理组</span><span data-l="en">Proxy group</span></span>
+                <span class="fakeselect"><span data-l="zh">检查得到的实际代理组</span><span data-l="en">Actual proxy groups from inspection</span></span>
+              </div>
+              <div class="fix-row">
+                <span class="candy is-off"><span data-l="zh">2  预览改动</span><span data-l="en">2  Preview changes</span></span>
+                <span class="candy is-off"><span data-l="zh">3  备份并应用…</span><span data-l="en">3  Back up &amp; apply…</span></span>
+                <span class="candy is-off"><span data-l="zh">撤回 DNS 改动…</span><span data-l="en">Undo DNS changes…</span></span>
+              </div>
+              <p class="appwin__detail"><span data-l="zh">尚无有效计划。预览不写入文件；每次检查、改组或切换语言后都需要重新预览。</span><span data-l="en">No current plan. Preview does not write files. Inspecting, changing groups, or switching language requires a new preview.</span></p>
+            </div>
+          </div>
+          <p class="caption" id="net-cap"><span data-l="zh">按软件界面文字重绘的初始状态，不含任何检测结果。</span><span data-l="en">The window's starting state, redrawn from the app's own text. No test result is shown.</span></p>
+          <div class="repair">
+            <p class="repair__k"><span data-l="zh">修改 CuteCloud 的 DNS，要单独确认</span><span data-l="en">Changing CuteCloud DNS takes its own confirmation</span></p>
+            <ol class="repair__flow">
+              <li><span data-l="zh">预览改动</span><span data-l="en">Preview the change</span></li>
+              <li><span data-l="zh">正常退出 CuteCloud</span><span data-l="en">Exit CuteCloud normally</span></li>
+              <li><span data-l="zh">备份并应用</span><span data-l="en">Back up and apply</span></li>
+              <li><span data-l="zh">自行正常启动</span><span data-l="en">Start it again yourself</span></li>
+              <li><span data-l="zh">重新检测</span><span data-l="en">Check again</span></li>
+              <li class="is-undo"><span data-l="zh">需要时撤回</span><span data-l="en">Undo if needed</span></li>
+            </ol>
+            <p class="caption"><span data-l="zh">只改识别出的 CuteCloud 配置里有限的 DNS 字段，完整备份只留在本机。撤回只恢复本工具改过的字段，保留之后的其他修改；其他客户端只给指导，不自动改写。</span><span data-l="en">Only a limited set of DNS fields in a recognized CuteCloud configuration is changed, and the full backup stays on your computer. Undo restores only the fields this tool changed and keeps later edits. Other clients get guidance, not automatic edits.</span></p>
+          </div>
+        </div>
       </div>
 
       <div class="maint">
@@ -986,17 +1269,16 @@ select {
         </figure>
       </div>
 
-      <div class="maint">
-        <div class="maint__copy">
-          <h3><span data-l="zh">网络与 DNS · 新增</span><span data-l="en">Network &amp; DNS · New</span></h3>
-          <p data-l="zh">在助手内查看 DNS 解析器、进度及超时、取消或空结果，无需打开浏览器。这只测量助手 HTTPS／默认代理路径，不代表浏览器独立 DoH 或全系统无泄露。</p>
-          <p data-l="en">See DNS resolvers, progress and explicit timeout, cancellation or empty-result states inside the helper, without opening a browser. This measures the helper's HTTPS/default-proxy path, not browser-specific DoH or every application.</p>
-          <p class="note-line"><span data-l="zh">CuteCloud DNS 修改需单独预览、私密备份、确认应用，再重新检测；可保留后续冲突修改并撤回。浏览器 WebRTC 为单独可选检测。</span><span data-l="en">CuteCloud DNS changes need a separate preview, private backup, confirmation and recheck, with conflict-aware undo. Browser WebRTC is an optional separate check.</span></p>
+      <div class="tiles">
+        <div class="tile">
+          <span class="tile__icon"><svg aria-hidden="true"><use href="#i-plug"/></svg></span>
+          <h3><span data-l="zh">Codex 连接修复</span><span data-l="en">Codex connection repair</span></h3>
+          <p><span data-l="zh">找到并验证本机实际在用的 HTTP、mixed 或 SOCKS 代理端口，预览对 <code>.codex/.env</code> 的改动，保留无关条目，私密备份后可以撤回。不假设固定端口。</span><span data-l="en">Finds and verifies the HTTP, mixed or SOCKS proxy endpoints actually running on this computer, previews the change to <code>.codex/.env</code>, keeps unrelated entries, and backs up privately so you can undo. No fixed port is assumed.</span></p>
         </div>
-        <div class="maint__copy">
-          <h3><span data-l="zh">已有工具继续保留</span><span data-l="en">Existing tools stay available</span></h3>
-          <p data-l="zh">维护清理、Codex 代理配置、关闭程序入口与环境助手专属图标继续保留。代理或 DNS 设置不是一键优化时自动修改的内容。</p>
-          <p data-l="en">Maintenance, Codex proxy configuration, close-app controls and the dedicated helper icon are retained. Proxy and DNS changes are separate from Optimize.</p>
+        <div class="tile">
+          <span class="tile__icon"><svg aria-hidden="true"><use href="#i-power"/></svg></span>
+          <h3><span data-l="zh">关闭占用程序</span><span data-l="en">Close blocking apps</span></h3>
+          <p><span data-l="zh">优化前浏览器或 Claude 还开着时，先请求它们正常退出；强制关闭受支持的程序需要再确认一次，不会悄悄结束你的工作。</span><span data-l="en">If a browser or Claude is still open, the helper first asks it to exit normally. Force-closing a supported app needs a second confirmation, so your work is never ended silently.</span></p>
         </div>
       </div>
 
@@ -1149,29 +1431,84 @@ select {
   </section>
 
   <!-- ===== 04 pack helper ===== -->
-  <section class="feature" id="pack" aria-labelledby="pack-title">
+  <section class="feature feature--flip" id="pack" aria-labelledby="pack-title">
     <div class="wrap">
       <div class="feature__grid">
         <div class="feature__copy">
-          <p class="eyebrow"><span class="num">04</span><span data-l="zh">大肥鱼打包助手 · 0.1.0</span><span data-l="en">Whale Pack Helper · 0.1.0</span></p>
-          <h2 id="pack-title"><span data-l="zh">整理给 Claude 的交接文件</span><span data-l="en">Prepare a clear handoff</span></h2>
-          <p class="feature__intro" data-l="zh">选择源码、图片或视频，查看文件清单，可选填写交接说明，在本机生成每个不超过 29,000,000 字节的文件。</p>
-          <p class="feature__intro" data-l="en">Choose source files, images or video, review the list and optionally add handoff notes. Prepare files locally, each capped at 29,000,000 bytes.</p>
+          <p class="eyebrow"><span class="num">04</span><span data-l="zh">大肥鱼打包助手 · Whale Pack Helper</span><span data-l="en">Whale Pack Helper · 大肥鱼打包助手</span><span class="new-pill"><svg aria-hidden="true"><use href="#spark"/></svg><span data-l="zh">新工具</span><span data-l="en">New</span></span></p>
+          <h2 id="pack-title"><span data-l="zh"><span class="nb">整理给 Claude</span><wbr><span class="nb">的交接文件</span></span><span data-l="en">Prepare a clear handoff</span></h2>
+          <p class="feature__intro" data-l="zh">选择源码、图片或视频，检查清单，可以再写一段交接说明，然后在本机打包。原文件不变，每个输出文件不超过 29,000,000 字节。</p>
+          <p class="feature__intro" data-l="en">Choose source folders, images or video, review the list, optionally write a handoff note, then package everything on your own computer. Originals stay untouched, and each output file is at most 29,000,000 bytes.</p>
+          <ol class="steps">
+            <li><div class="step"><span class="step__n">1</span><span class="step__body">
+              <span class="step__text" data-l="zh">把文件或文件夹拖进窗口，或点<kbd>选择文件</kbd><kbd>选择文件夹</kbd>。</span>
+              <span class="step__text" data-l="en">Drop files or folders into the window, or use <kbd>Choose files</kbd> / <kbd>Choose folder</kbd>.</span>
+            </span></div></li>
+            <li><div class="step"><span class="step__n">2</span><span class="step__body">
+              <span class="step__text" data-l="zh">检查每一行的处理方式。疑似密钥的文件默认排除，点明细可以复核。</span>
+              <span class="step__text" data-l="en">Check how each row will be handled. Files that look like secrets are excluded by default; open the details to review them.</span>
+            </span></div></li>
+            <li><div class="step"><span class="step__n">3</span><span class="step__body">
+              <span class="step__text" data-l="zh">需要的话点<kbd>写交接说明…</kbd>：项目、目标、做到哪了、已验证、还没验证、下一步，都可以留空。</span>
+              <span class="step__text" data-l="en">If you like, open <kbd>Handoff note…</kbd>: project, goal, progress, verified, not yet verified, next step. Every field can stay empty.</span>
+            </span></div></li>
+            <li><div class="step"><span class="step__n">4</span><span class="step__body">
+              <span class="step__text" data-l="zh">点<kbd>开始打包</kbd>。结果放进「发给Claude」下新建的文件夹，不会覆盖以前的结果。</span>
+              <span class="step__text" data-l="en">Choose <kbd>Start packing</kbd>. Results go into a new subfolder, so earlier results are never overwritten.</span>
+            </span></div></li>
+          </ol>
           <ul class="chips">
-            <li><span data-l="zh">原文件不变</span><span data-l="en">Originals kept intact</span></li>
-            <li><span data-l="zh">打包前审核</span><span data-l="en">Review before packaging</span></li>
-            <li><span data-l="zh">不上传文件</span><span data-l="en">No file uploads</span></li>
+            <li><span data-l="zh">原文件不变</span><span data-l="en">Originals untouched</span></li>
+            <li><span data-l="zh">每个文件 ≤29 MB</span><span data-l="en">Each file ≤29 MB</span></li>
+            <li><span data-l="zh">疑似密钥默认排除</span><span data-l="en">Suspected secrets excluded</span></li>
+            <li><span data-l="zh">不联网、不上传</span><span data-l="en">No network, no uploads</span></li>
           </ul>
-        </div>
-        <div class="feature__copy">
-          <h3><span data-l="zh">EXE 与配置放在一起</span><span data-l="en">Keep the EXE and config together</span></h3>
-          <p data-l="zh">下载配套 ZIP 并解压，或分别下载 EXE 与同名 .exe.config，放在同一文件夹。源码过滤会跳过常见运行库、构建产物和疑似密钥；分享前仍需检查结果。</p>
-          <p data-l="en">Extract the paired ZIP, or download the EXE and matching .exe.config into the same folder. Source filtering skips common runtime/build output and suspected secrets; review the result before sharing it.</p>
-          <p class="note-line"><span data-l="zh">普通打包及 PNG/JPEG/BMP 使用内置组件；视频压缩和 WebP 解码需要本机已有 FFmpeg，不会自动下载。</span><span data-l="en">Ordinary packaging and PNG/JPEG/BMP use built-in components. Video compression and WebP decoding need existing local FFmpeg; nothing is downloaded automatically.</span></p>
+          <p class="note-line"><span data-l="zh">普通打包和 PNG/JPEG/BMP 用内置组件；视频压缩和 WebP 解码需要本机已有 FFmpeg，软件不会自动下载。密钥筛查是启发式的，发送前仍请检查。</span><span data-l="en">Ordinary packaging and PNG/JPEG/BMP use built-in components. Video compression and WebP decoding need FFmpeg already on your computer; nothing is downloaded automatically. Secret screening is heuristic, so review the result before sending.</span></p>
           <div class="tool-card__actions">
-            <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载配套 ZIP</span><span data-l="en">Download paired ZIP</span></a>
+            <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载 ZIP（EXE + 配置）</span><span data-l="en">Download ZIP (EXE + config)</span></a>
             <a class="more" href="https://github.com/whitecarp/I-Must-Use-Claude/tree/main/apps/whale-pack-helper"><span data-l="zh">源码与用法</span><span data-l="en">Source &amp; usage</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </div>
+          <p class="caption"><span data-l="zh">EXE 要和同名的 <code>.exe.config</code> 放在同一文件夹，ZIP 里两者都有。</span><span data-l="en">Keep the EXE beside its matching <code>.exe.config</code>; the ZIP contains both.</span></p>
+        </div>
+
+        <div class="feature__visual">
+          <div class="appwin appwin--pack" role="img" aria-labelledby="pack-cap">
+            <div class="appwin__bar">
+              <span><span data-l="zh">大肥鱼打包助手</span><span data-l="en">Whale Pack Helper</span></span>
+              <span class="appwin__ctrls" aria-hidden="true"><span>–</span><span>□</span><span>×</span></span>
+            </div>
+            <div class="appwin__body">
+              <div class="appwin__head">
+                <img class="pack-whale" src="images/site-pack-whale.webp" width="400" height="280" alt="" loading="lazy">
+                <div>
+                  <strong><span data-l="zh">大肥鱼打包助手</span><span data-l="en">Whale Pack Helper</span></strong>
+                  <span><span data-l="zh">把文件整理成能直接发给 Claude 的样子</span><span data-l="en">Small attachments. A clear handoff.</span></span>
+                </div>
+                <span class="candy"><span data-l="zh">English</span><span data-l="en">中文</span></span>
+              </div>
+              <div class="dropzone">
+                <span><span data-l="zh">把文件或文件夹拖到这里</span><span data-l="en">Drop files or folders here</span></span>
+                <span class="candy"><span data-l="zh">选择文件</span><span data-l="en">Choose files</span></span>
+                <span class="candy"><span data-l="zh">选择文件夹</span><span data-l="en">Choose folder</span></span>
+              </div>
+              <div class="pklist">
+                <div class="pklist__head"><b><span data-l="zh">要发的东西 · 4 项</span><span data-l="en">Things to send · 4 items</span></b><span><span data-l="zh">清空</span><span data-l="en">Clear</span></span></div>
+                <ul>
+                  <li><svg aria-hidden="true"><use href="#i-folder"/></svg><span class="pk-name">my-project</span><span class="pk-mode"><span data-l="zh">源码文件夹 · 保留相对路径 · 跳过 bin、obj、node_modules</span><span data-l="en">Source folder · relative paths kept · bin, obj, node_modules skipped</span></span></li>
+                  <li><svg aria-hidden="true"><use href="#i-film"/></svg><span class="pk-name">screen-recording.mp4</span><span class="pk-mode"><span data-l="zh">2 段 · 短边≤720</span><span data-l="en">2 parts · short edge≤720</span></span></li>
+                  <li><svg aria-hidden="true"><use href="#i-image"/></svg><span class="pk-name">screenshot.png</span><span class="pk-mode"><span data-l="zh">最长边 ≤2560 · PNG 截图保留 PNG</span><span data-l="en">Longest edge ≤2560 · keep PNG screenshots</span></span></li>
+                  <li class="is-out"><svg aria-hidden="true"><use href="#i-key"/></svg><span class="pk-name">.env</span><span class="pk-mode"><span data-l="zh">疑似密钥 · 不会放进附件；点明细检查</span><span data-l="en">Possible secret · not included; open Details to review</span></span></li>
+                </ul>
+              </div>
+              <div class="pkfoot">
+                <span class="pk-out"><span data-l="zh">输出到：桌面\发给Claude</span><span data-l="en">Save to: Desktop\发给Claude</span></span>
+                <span class="candy"><span data-l="zh">写交接说明…</span><span data-l="en">Handoff note…</span></span>
+                <span class="candy candy--primary"><span data-l="zh">开始打包</span><span data-l="en">Start packing</span></span>
+              </div>
+              <p class="appwin__detail"><span data-l="zh">●  只在本机整理文件：不联网、不上传 · 每个附件 ≤29 MB，预留 1 MB 余量</span><span data-l="en">●  Local files only. No network. No uploads. · Each file ≤29 MB, with 1 MB to spare</span></p>
+            </div>
+          </div>
+          <p class="caption" id="pack-cap"><span data-l="zh">按软件界面文字重绘的示意，文件名都是示例。</span><span data-l="en">Redrawn from the app's own interface text; the file names are examples.</span></p>
         </div>
       </div>
     </div>
@@ -1181,35 +1518,35 @@ select {
   <section class="section download" id="download" aria-labelledby="download-title">
     <div class="wrap">
       <header class="section-head">
-        <p class="eyebrow"><span data-l="zh">下载 · v0.4.0-preview</span><span data-l="en">Download · v0.4.0-preview</span></p>
+        <p class="eyebrow"><span data-l="zh">下载</span><span data-l="en">Download</span></p>
         <h2 id="download-title"><span data-l="zh">下载 EXE，双击打开</span><span data-l="en">Download an EXE and double-click it</span></h2>
-        <p data-l="zh">各个软件独立运行，用哪个下哪个。打包助手的 EXE 和配置需配套。翻译器 0.9.0 与时钟 0.3.0 继续使用 v0.3.0-preview 的原下载。</p>
-        <p data-l="en">Each app runs on its own. Pack Helper needs its paired config. Translator 0.9.0 and Clock 0.3.0 retain their original v0.3.0-preview downloads.</p>
+        <p data-l="zh">各个软件独立运行，用哪个下哪个。环境助手和打包助手在 v0.4.0-preview；翻译器和时钟继续使用 v0.3.0-preview 的下载。</p>
+        <p data-l="en">Each app runs on its own, so get only what you need. Environment Helper and Pack Helper are in v0.4.0-preview; Translator and Clock keep their v0.3.0-preview downloads.</p>
       </header>
       <ol class="dl-list">
-        <li class="dl dl--feature">
+        <li class="dl dl--feature is-fix">
           <span class="num">01</span>
-          <span class="dl__name"><b><span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span></b><code>WhaleEnvironmentHelper.exe</code></span>
+          <span class="dl__name"><b><span data-l="zh">大肥鱼环境助手</span><span data-l="en">Whale Environment Helper</span></b><code>WhaleEnvironmentHelper.exe</code><span class="dl__alt">v0.4.0-preview</span></span>
           <span class="dl__ver">0.7.0</span>
           <a class="btn btn--primary" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载</span><span data-l="en">Download</span></a>
         </li>
         <li class="dl">
           <span class="num">02</span>
-          <span class="dl__name"><b><span data-l="zh">大肥鱼翻译</span><span data-l="en">Whale Translator</span></b><code>WhaleTranslator.exe</code></span>
+          <span class="dl__name"><b><span data-l="zh">大肥鱼翻译</span><span data-l="en">Whale Translator</span></b><code>WhaleTranslator.exe</code><span class="dl__alt">v0.3.0-preview</span></span>
           <span class="dl__ver">0.9.0</span>
           <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载</span><span data-l="en">Download</span></a>
         </li>
         <li class="dl">
           <span class="num">03</span>
-          <span class="dl__name"><b><span data-l="zh">两地时钟</span><span data-l="en">Two-Zone Clock</span></b><code>HomeTimeClock.exe</code></span>
+          <span class="dl__name"><b><span data-l="zh">两地时钟</span><span data-l="en">Two-Zone Clock</span></b><code>HomeTimeClock.exe</code><span class="dl__alt">v0.3.0-preview</span></span>
           <span class="dl__ver">0.3.0</span>
           <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载</span><span data-l="en">Download</span></a>
         </li>
         <li class="dl">
           <span class="num">04</span>
-          <span class="dl__name"><b><span data-l="zh">大肥鱼打包助手</span><span data-l="en">Whale Pack Helper</span></b><code>WhalePackHelper.exe + .exe.config</code><a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config"><span data-l="zh">同名配置</span><span data-l="en">Matching config</span></a> · <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip">ZIP</a></span>
+          <span class="dl__name"><b><span data-l="zh">大肥鱼打包助手</span><span data-l="en">Whale Pack Helper</span></b><code>WhalePackHelper-0.1.0.zip</code><span class="dl__alt"><span data-l="zh">v0.4.0-preview · ZIP 内含 EXE 和同名配置；也可分别下载 <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe">EXE</a> 和 <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config">.exe.config</a></span><span data-l="en">v0.4.0-preview · the ZIP holds the EXE and its matching config; or get the <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe">EXE</a> and <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe.config">.exe.config</a> separately</span></span></span>
           <span class="dl__ver">0.1.0</span>
-          <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper.exe"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载 EXE</span><span data-l="en">Download EXE</span></a>
+          <a class="btn" href="https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip"><svg aria-hidden="true"><use href="#i-download"/></svg><span data-l="zh">下载 ZIP</span><span data-l="en">Download ZIP</span></a>
         </li>
       </ol>
       <div class="dl-notes">
@@ -1253,7 +1590,7 @@ select {
         <div class="limit">
           <span class="limit__icon"><svg aria-hidden="true"><use href="#i-laptop"/></svg></span>
           <h3><span data-l="zh">数据留在本机</span><span data-l="en">Your data stays local</span></h3>
-          <p><span data-l="zh">配置备份和术语词典保存在本机，翻译记录关闭即清空。DNS 在线测量会联系外部检测服务；可选 WebRTC 检查联系 Google STUN，回传候选数量。</span><span data-l="en">Backups and the glossary stay local; session history clears on exit. Online DNS measurement contacts an external test service. Optional WebRTC contacts Google STUN and reports candidate counts.</span></p>
+          <p><span data-l="zh">配置备份、术语词典和打包结果都留在本机，翻译记录关闭即清空，打包助手不联网。DNS 实测会联系外部检测服务 Net.Coffee；可选 WebRTC 检查联系 Google STUN，只回传候选数量。</span><span data-l="en">Backups, the glossary and packaged files stay on your computer; session history clears on exit, and Pack Helper never goes online. The DNS test contacts the external Net.Coffee service. Optional WebRTC contacts Google STUN and reports only candidate counts.</span></p>
         </div>
         <div class="limit">
           <span class="limit__icon"><svg aria-hidden="true"><use href="#i-flask"/></svg></span>

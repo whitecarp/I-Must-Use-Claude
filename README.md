@@ -24,13 +24,11 @@
 
 ## Choose your companion
 
-| Check your setup | Understand her replies | Know what time it is at home |
-| :--- | :--- | :--- |
-| **Whale Environment Helper** | **Whale Translator** | **Two-Zone Clock** |
-| Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. |
-| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) |
-
-**Also new: [Whale Pack Helper 0.1.0](#04--prepare-a-clear-handoff)** prepares local handoff files for Claude.
+| Check your setup | Understand her replies | Know what time it is at home | Prepare files for her |
+| :--- | :--- | :--- | :--- |
+| **Whale Environment Helper** | **Whale Translator** | **Two-Zone Clock** | **Whale Pack Helper** |
+| Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep your original timezone visible when your computer uses another one. | Package source, images and video locally, each file at most 29 MB. |
+| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.3.0-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.0-preview/WhalePackHelper-0.1.0.zip) |
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 

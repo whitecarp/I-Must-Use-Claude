@@ -13,6 +13,8 @@ These assets illustrate the public project. They contain no private conversation
 | `translator-compose.png` | Existing 0.8.1 demonstration screenshot with fixed Chinese sample text and no connected chat. |
 | `clock-ui.png` | Existing compact clock screenshot; displayed dates and times are examples. |
 | `site-hero.webp` | Right-hand crop of `hero.png` (the illustration without the title lettering), resized for the project page. |
+| `site-helper-mascot.webp` | Downscaled copy of the Environment Helper's mascot (`apps/whale-claude-helper/assets/helper-mascot.png`) for the project page. |
+| `site-pack-whale.webp` | Copy of the Pack Helper's whale (`apps/whale-pack-helper/assets/whale.png`) with the flat white backdrop made transparent, for the project page. |
 | `site-clock-girl.webp` | Downscaled copy of the clock's existing whale-girl artwork (`apps/two-zone-clock/assets/whalegirl.png`) for the project page's clock demo. |
 | `helper-maintenance-en.png`, `helper-maintenance-zh.png` | 0.4.0 maintenance controls rendered offscreen with static demo data; no app window shown, real cache scanned, network probe sent, or settings changed. |
 
