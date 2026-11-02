@@ -12,6 +12,8 @@ These assets illustrate the public project. They contain no private conversation
 | `translator-offline-dialog.png` | Existing 0.8.1 demonstration screenshot of the offline retry confirmation. |
 | `translator-compose.png` | Existing 0.8.1 demonstration screenshot with fixed Chinese sample text and no connected chat. |
 | `clock-ui.png` | Existing compact clock screenshot; displayed dates and times are examples. |
+| `site-hero.webp` | Right-hand crop of `hero.png` (the illustration without the title lettering), resized for the project page. |
+| `site-clock-girl.webp` | Downscaled copy of the clock's existing whale-girl artwork (`apps/two-zone-clock/assets/whalegirl.png`) for the project page's clock demo. |
 | `helper-maintenance-en.png`, `helper-maintenance-zh.png` | 0.4.0 maintenance controls rendered offscreen with static demo data; no app window shown, real cache scanned, network probe sent, or settings changed. |
 
 The existing screenshots were copied without alterations. Their inclusion does not represent new app execution, a new translation test, or a system-settings test.
