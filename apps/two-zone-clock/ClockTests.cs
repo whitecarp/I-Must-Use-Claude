@@ -111,9 +111,9 @@ internal static class ClockTests {
         Assert(noon.Time == "12:00 PM", "12-hour noon format failed: " + noon.Time);
         Assert(midnight.Time == "12:00:00 AM", "12-hour midnight format failed: " + midnight.Time);
         Assert(seconds.Time == "00:00:09", "24-hour seconds format failed: " + seconds.Time);
-        Assert(seconds.Date == "01/02/2026  周五", "Displayed date/weekday did not follow the selected region: " + seconds.Date);
+        Assert(seconds.Date == "1月2日 周五", "Displayed date/weekday did not follow the selected region: " + seconds.Date);
         var english = ClockTime.Read(Instant("2026-01-01T18:30:09Z"), "India Standard Time", true, true, true);
-        Assert(english.Date == "01/02/2026  Fri", "English date/weekday did not follow the selected region: " + english.Date);
+        Assert(english.Date == "Fri, Jan 2", "English date/weekday did not follow the selected region: " + english.Date);
         Assert(english.Local.DateTime == seconds.Local.DateTime && english.Local.Offset == seconds.Local.Offset && english.Time == seconds.Time, "Changing language changed the represented local time");
     }
 
@@ -124,25 +124,245 @@ internal static class ClockTests {
     }
 
     private static void CheckTimeDifferences() {
-        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 14h behind · yesterday", "目标慢 14小时 · 昨天");
-        Difference("2026-07-01T12:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
-        Difference("2026-01-01T23:59:00Z", "Central Standard Time", "Singapore Standard Time", "To: 14h ahead · tomorrow", "目标快 14小时 · 明天");
-        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "China Standard Time", "To: same time · same day", "目标与原本同一时间 · 同一天");
-        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "India Standard Time", "To: 2h 30m behind · same day", "目标慢 2小时30分 · 同一天");
-        Difference("2026-01-01T00:00:00Z", "India Standard Time", "Nepal Standard Time", "To: 15m ahead · same day", "目标快 15分 · 同一天");
+        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "Central Standard Time", "14h behind · yesterday", "慢14小时 · 昨天");
+        Difference("2026-07-01T12:00:00Z", "Singapore Standard Time", "Central Standard Time", "13h behind", "慢13小时");
+        Difference("2026-01-01T23:59:00Z", "Central Standard Time", "Singapore Standard Time", "14h ahead · tomorrow", "快14小时 · 明天");
+        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "China Standard Time", "Same time", "同一时间");
+        Difference("2026-01-01T00:00:00Z", "Singapore Standard Time", "India Standard Time", "2h 30m behind", "慢2小时30分");
+        Difference("2026-01-01T00:00:00Z", "India Standard Time", "Nepal Standard Time", "15m ahead", "快15分");
 
         // The date label follows the target's calendar date relative to the source, not the PC date.
-        Difference("2026-01-01T15:59:00Z", "Singapore Standard Time", "Eastern Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
-        Difference("2026-01-01T16:00:00Z", "Singapore Standard Time", "Eastern Standard Time", "To: 13h behind · yesterday", "目标慢 13小时 · 昨天");
-        Difference("2026-12-31T16:00:00Z", "Singapore Standard Time", "Eastern Standard Time", "To: 13h behind · yesterday", "目标慢 13小时 · 昨天");
-        Difference("2026-01-01T10:00:00Z", "Dateline Standard Time", "Line Islands Standard Time", "To: 26h ahead · 2 days later", "目标快 26小时 · 晚 2 天");
-        Difference("2026-01-01T10:00:00Z", "Line Islands Standard Time", "Dateline Standard Time", "To: 26h behind · 2 days earlier", "目标慢 26小时 · 早 2 天");
+        Difference("2026-01-01T15:59:00Z", "Singapore Standard Time", "Eastern Standard Time", "13h behind", "慢13小时");
+        Difference("2026-01-01T16:00:00Z", "Singapore Standard Time", "Eastern Standard Time", "13h behind · yesterday", "慢13小时 · 昨天");
+        Difference("2026-12-31T16:00:00Z", "Singapore Standard Time", "Eastern Standard Time", "13h behind · yesterday", "慢13小时 · 昨天");
+        Difference("2026-01-01T10:00:00Z", "Dateline Standard Time", "Line Islands Standard Time", "26h ahead · 2 days later", "快26小时 · 晚2天");
+        Difference("2026-01-01T10:00:00Z", "Line Islands Standard Time", "Dateline Standard Time", "26h behind · 2 days earlier", "慢26小时 · 早2天");
 
         // Recalculate offsets on either side of both US DST transitions; do not cache base offsets.
-        Difference("2026-03-08T07:59:00Z", "Singapore Standard Time", "Central Standard Time", "To: 14h behind · same day", "目标慢 14小时 · 同一天");
-        Difference("2026-03-08T08:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
-        Difference("2026-11-01T06:59:00Z", "Singapore Standard Time", "Central Standard Time", "To: 13h behind · same day", "目标慢 13小时 · 同一天");
-        Difference("2026-11-01T07:00:00Z", "Singapore Standard Time", "Central Standard Time", "To: 14h behind · same day", "目标慢 14小时 · 同一天");
+        Difference("2026-03-08T07:59:00Z", "Singapore Standard Time", "Central Standard Time", "14h behind", "慢14小时");
+        Difference("2026-03-08T08:00:00Z", "Singapore Standard Time", "Central Standard Time", "13h behind", "慢13小时");
+        Difference("2026-11-01T06:59:00Z", "Singapore Standard Time", "Central Standard Time", "13h behind", "慢13小时");
+        Difference("2026-11-01T07:00:00Z", "Singapore Standard Time", "Central Standard Time", "14h behind", "慢14小时");
+    }
+
+    private static void CheckDayPhaseBoundaries() {
+        int[] hours = { 0, 4, 5, 7, 8, 16, 17, 18, 19, 23 };
+        DayPhase[] expected = { DayPhase.Night, DayPhase.Night, DayPhase.Dawn, DayPhase.Dawn, DayPhase.Day, DayPhase.Day, DayPhase.Dusk, DayPhase.Dusk, DayPhase.Night, DayPhase.Night };
+        for (int i = 0; i < hours.Length; i++)
+            Assert(WhaleTheme.ThemeForHour(hours[i]).Phase == expected[i], "Wrong local-hour phase at " + hours[i]);
+        // The two cards must use their own local hours, not the computer's hour.
+        var instant = Instant("2026-11-01T10:08:00Z");
+        var singapore = ClockTime.Read(instant, "Singapore Standard Time", true, false);
+        var eastern = ClockTime.Read(instant, "Eastern Standard Time", true, false);
+        Assert(WhaleTheme.ThemeForHour(singapore.Local.Hour).Phase == DayPhase.Dusk, "Singapore card did not use its local evening");
+        Assert(WhaleTheme.ThemeForHour(eastern.Local.Hour).Phase == DayPhase.Dawn, "US Eastern card did not use its local dawn");
+        foreach (int invalid in new[] { -1, 24 }) {
+            bool rejected = false;
+            try { WhaleTheme.ThemeForHour(invalid); } catch (ArgumentOutOfRangeException) { rejected = true; }
+            Assert(rejected, "Invalid hour was silently assigned a theme: " + invalid);
+        }
+    }
+
+    private static void CheckCountdownPresentation() {
+        var instant = Instant("2026-11-01T18:42:00Z");
+        Assert(ClockPresentation.SessionWindow == TimeSpan.FromHours(5), "Session progress window changed");
+        Assert(ClockPresentation.WeeklyWindow == TimeSpan.FromDays(7), "Weekly progress window changed");
+        foreach (bool weekly in new[] { false, true }) {
+            TimeSpan duration = weekly ? TimeSpan.FromDays(7) : TimeSpan.FromHours(5);
+            var reset = instant.Add(duration);
+            Assert(ClockPresentation.ElapsedFraction(reset, instant, weekly) == 0, "New progress cycle is not empty");
+            Assert(Math.Abs(ClockPresentation.ElapsedFraction(reset, instant.AddTicks(duration.Ticks / 2), weekly) - .5) < .000001, "Mid-cycle progress is not halfway");
+            Assert(ClockPresentation.ElapsedFraction(reset, reset, weekly) == 1, "Due progress cycle is not full");
+            Assert(ClockPresentation.ElapsedFraction(reset, reset.AddHours(1), weekly) == 1, "Expired progress exceeds the track");
+            Assert(ClockPresentation.ElapsedFraction(reset, instant.AddHours(-1), weekly) == 0, "Far-future progress becomes negative");
+        }
+        foreach (bool english in new[] { false, true }) {
+            Assert(ClockPresentation.Remaining(instant.AddHours(2).AddMinutes(13), instant, english) == (english ? "2h 13m" : "2小时13分"), "Hour/minute countdown formatting changed");
+            Assert(ClockPresentation.Remaining(instant.AddDays(2).AddHours(3), instant, english) == (english ? "2d 3h" : "2天3小时"), "Day/hour countdown formatting changed");
+            Assert(ClockPresentation.Remaining(instant.AddSeconds(1), instant, english) == (english ? "1m" : "1分"), "Positive sub-minute countdown displayed as already due");
+            Assert(ClockPresentation.Remaining(instant.AddHours(-1), instant, english) == (english ? "0m" : "0分"), "Expired countdown displayed a negative time");
+            Assert(ClockPresentation.LastRead(instant, english) == (english ? "Read Nov 1 18:42" : "上次 11月1日 18:42"), "Last-read label did not use the compact localized date");
+        }
+        Assert(ClockTime.Read(instant, "UTC", true, false, false).Date == "11月1日 周日", "Chinese display date still uses the numeric slash format");
+        Assert(ClockTime.Read(instant, "UTC", true, false, true).Date == "Sun, Nov 1", "English display date did not use weekday, month and day");
+        var midnight = Instant("2026-12-31T16:00:00Z");
+        Assert(ClockTime.Read(midnight, "Singapore Standard Time", true, false, false).Date == "1月1日 周五", "Localized date did not cross the year boundary");
+        Assert(ClockTime.Read(midnight, "Singapore Standard Time", true, false, true).Date == "Fri, Jan 1", "English localized date did not cross the year boundary");
+    }
+
+    private static void CheckAllClockSizeCombinations() {
+        string output = Path.Combine(Path.GetTempPath(), "TwoZoneClock-size-" + Guid.NewGuid().ToString("N") + ".png");
+        try {
+            using (var clock = new ClockForm(true, null)) {
+                var prefs = ResetField<Preferences>(clock, "prefs");
+                foreach (float scale in new[] { 1f, 1.25f, 1.5f })
+                foreach (bool english in new[] { false, true })
+                foreach (bool source in new[] { false, true })
+                foreach (bool seconds in new[] { false, true })
+                foreach (bool reset in new[] { false, true }) {
+                    prefs.English = english; prefs.ShowSource = source; prefs.ShowSeconds = seconds; prefs.ShowResetCountdown = reset;
+                    clock.RenderPreview(output, scale, Instant("2026-11-01T10:08:00Z"));
+                    // Frozen 0.4.x size limits, including its original 84px reset card.
+                    int oldWidth = (int)Math.Round((seconds ? 192 : 168) * scale);
+                    int oldHeight = (int)Math.Round(((source ? 176 : 104) + (reset ? 84 : 0)) * scale);
+                    using (var image = new Bitmap(output)) {
+                        string label = " at " + scale.ToString(CultureInfo.InvariantCulture) + ", source=" + source + ", seconds=" + seconds + ", reset=" + reset;
+                        Assert(image.Width == oldWidth, "Clock width changed" + label);
+                        Assert(image.Height <= oldHeight, "Clock grew beyond its old height" + label);
+                        Assert(image.Size == clock.ClientSize, "Preview bitmap size differs from the real layout" + label);
+                    }
+                }
+                Assert(!clock.Visible && !ResetField<bool>(clock, "autoReadReset"), "Size fixtures showed a window or activated Claude capture");
+            }
+        } finally { if (File.Exists(output)) File.Delete(output); }
+    }
+
+    private static Bitmap RenderTimeFixture(ClockForm clock, string time, RectangleF bounds, float pixels, bool right, float scale) {
+        var image = new Bitmap((int)Math.Ceiling((bounds.Right + 4) * scale), (int)Math.Ceiling((bounds.Bottom + 4) * scale));
+        using (var graphics = Graphics.FromImage(image)) {
+            graphics.Clear(WhaleTheme.Surface);
+            graphics.ScaleTransform(scale, scale);
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            typeof(ClockForm).GetMethod("DrawStableTime", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(clock, new object[] { graphics, time, bounds, pixels, right });
+        }
+        return image;
+    }
+
+    private static bool EqualPixels(Bitmap first, Bitmap second, Rectangle bounds) {
+        for (int y = Math.Max(0, bounds.Top); y < Math.Min(first.Height, bounds.Bottom); y++)
+            for (int x = Math.Max(0, bounds.Left); x < Math.Min(first.Width, bounds.Right); x++)
+                if (first.GetPixel(x, y).ToArgb() != second.GetPixel(x, y).ToArgb()) return false;
+        return true;
+    }
+
+    private static bool ContainsTimeInk(Bitmap image, Rectangle bounds) {
+        for (int y = Math.Max(0, bounds.Top); y < Math.Min(image.Height, bounds.Bottom); y++)
+            for (int x = Math.Max(0, bounds.Left); x < Math.Min(image.Width, bounds.Right); x++) {
+                var pixel = image.GetPixel(x, y);
+                if (pixel.R < 150 && pixel.G < 150 && pixel.B < 180) return true;
+            }
+        return false;
+    }
+
+    private static void CheckStableTimePixels() {
+        using (var clock = new ClockForm(true, null)) {
+            var prefs = ResetField<Preferences>(clock, "prefs"); prefs.ShowSeconds = true;
+            foreach (float scale in new[] { 1f, 1.25f, 1.5f })
+            foreach (bool twelveHour in new[] { false, true })
+            foreach (bool compact in new[] { false, true }) {
+                prefs.TwentyFourHours = !twelveHour;
+                var bounds = new RectangleF(4, 4, compact ? 84 : 169, compact ? 24 : 33);
+                float pixels = compact ? 16 : 27;
+                float secondStart, suffixStart;
+                using (var measure = new Bitmap(1, 1)) using (var graphics = Graphics.FromImage(measure)) using (var probe = WhaleTheme.NewDigitFont(pixels)) {
+                    float fittedSize = pixels * Math.Min(1, bounds.Width / ClockForm.DigitBlockWidth(graphics, probe, true, twelveHour));
+                    using (var font = WhaleTheme.NewDigitFont(fittedSize)) using (var format = new StringFormat(StringFormat.GenericTypographic)) {
+                        float block = ClockForm.DigitBlockWidth(graphics, font, true, twelveHour);
+                        float left = compact ? bounds.Right - block : bounds.Left;
+                        secondStart = left + ClockForm.DigitBlockWidth(graphics, font, false, false) + graphics.MeasureString(":", font, Int32.MaxValue, format).Width;
+                        suffixStart = left + ClockForm.DigitBlockWidth(graphics, font, true, false) + 2;
+                    }
+                }
+                var unchangedPrefix = new Rectangle(0, 0, (int)Math.Floor((secondStart - 2) * scale), (int)Math.Ceiling(bounds.Bottom * scale));
+                using (var baseline = RenderTimeFixture(clock, twelveHour ? "9:08:00 AM" : "09:08:00", bounds, pixels, compact, scale)) {
+                    Assert(ContainsTimeInk(baseline, unchangedPrefix), "Stable-time comparison has no hour/minute pixels");
+                    foreach (string second in new[] { "01", "08", "11", "28", "59" })
+                    using (var tick = RenderTimeFixture(clock, (twelveHour ? "9:08:" : "09:08:") + second + (twelveHour ? " AM" : ""), bounds, pixels, compact, scale)) {
+                        Assert(EqualPixels(baseline, tick, unchangedPrefix), "Changing seconds shifted the hour/minute pixels at " + scale + ", compact=" + compact + ", 12h=" + twelveHour);
+                        Assert(!EqualPixels(baseline, tick, new Rectangle(0, 0, baseline.Width, baseline.Height)), "Seconds fixture did not actually render the new second");
+                    }
+                    if (twelveHour) {
+                        var suffix = new Rectangle((int)Math.Ceiling(suffixStart * scale), 0, baseline.Width - (int)Math.Ceiling(suffixStart * scale), baseline.Height);
+                        Assert(ContainsTimeInk(baseline, suffix), "AM suffix is clipped or missing");
+                        using (var nextHour = RenderTimeFixture(clock, "10:08:00 AM", bounds, pixels, compact, scale))
+                            Assert(EqualPixels(baseline, nextHour, suffix), "AM suffix shifted when the hour gained its second digit");
+                    }
+                }
+            }
+        }
+    }
+
+    private static Bitmap RenderClockFixture(ClockForm clock, float scale, DateTimeOffset instant) {
+        typeof(ClockForm).GetField("scale", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(clock, scale);
+        ResetCall(clock, "ResizeClock");
+        var image = new Bitmap(clock.ClientSize.Width, clock.ClientSize.Height);
+        using (var graphics = Graphics.FromImage(image))
+            typeof(ClockForm).GetMethod("DrawFace", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(clock, new object[] { graphics, instant });
+        return image;
+    }
+
+    private static void AssertCardThemeAt(Bitmap actual, float scale, RectangleF card, RegionPalette palette, PointF logicalPoint, string message) {
+        using (var expected = new Bitmap(actual.Width, actual.Height)) using (var graphics = Graphics.FromImage(expected)) {
+            graphics.Clear(WhaleTheme.Surface); graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            graphics.ScaleTransform(scale, scale); WhaleTheme.DrawGradientCard(graphics, card, palette, 11);
+            int x = (int)Math.Round(logicalPoint.X * scale), y = (int)Math.Round(logicalPoint.Y * scale);
+            Assert(actual.GetPixel(x, y).ToArgb() == expected.GetPixel(x, y).ToArgb(), message + " at scale " + scale);
+        }
+    }
+
+    private static Bitmap RenderRowFixture(ClockForm clock, bool source, string value, float scale, DateTimeOffset instant) {
+        var prefs = ResetField<Preferences>(clock, "prefs");
+        var reading = ClockTime.Read(instant, source ? prefs.SourceTimeZoneId : prefs.TargetTimeZoneId, true, false, prefs.English);
+        reading.Time = value;
+        var image = new Bitmap((int)Math.Ceiling(200 * scale), (int)Math.Ceiling(100 * scale));
+        using (var graphics = Graphics.FromImage(image)) {
+            graphics.Clear(WhaleTheme.Surface); graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit; graphics.ScaleTransform(scale, scale);
+            typeof(ClockForm).GetMethod("DrawRow", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(clock, new object[] { graphics, 4, "", reading, source, instant });
+        }
+        return image;
+    }
+
+    private static Rectangle ChangedPixelBounds(Bitmap first, Bitmap second) {
+        int left = first.Width, top = first.Height, right = -1, bottom = -1;
+        for (int y = 0; y < first.Height; y++) for (int x = 0; x < first.Width; x++) {
+            if (first.GetPixel(x, y).ToArgb() == second.GetPixel(x, y).ToArgb()) continue;
+            left = Math.Min(left, x); top = Math.Min(top, y); right = Math.Max(right, x); bottom = Math.Max(bottom, y);
+        }
+        return right < left ? Rectangle.Empty : Rectangle.FromLTRB(left, top, right + 1, bottom + 1);
+    }
+
+    private static Rectangle RowTimeInk(ClockForm clock, bool source, float scale, DateTimeOffset instant) {
+        // Subtraction isolates actual time glyphs from titles, date text, icons and gradients.
+        using (var time = RenderRowFixture(clock, source, "12:34", scale, instant))
+        using (var empty = RenderRowFixture(clock, source, "", scale, instant))
+            return ChangedPixelBounds(time, empty);
+    }
+
+    private static void CheckSourcePrimaryPresentation() {
+        var instant = Instant("2026-11-01T10:08:00Z");
+        using (var clock = new ClockForm(true, null)) {
+            var prefs = ResetField<Preferences>(clock, "prefs");
+            prefs.SourceTimeZoneId = "Singapore Standard Time"; prefs.TargetTimeZoneId = "Eastern Standard Time";
+            prefs.TwentyFourHours = true; prefs.ShowSeconds = false; prefs.ShowResetCountdown = true;
+            var sourcePalette = WhaleTheme.ThemeForHour(ClockTime.Read(instant, prefs.SourceTimeZoneId, true, false).Local.Hour);
+            var targetPalette = WhaleTheme.ThemeForHour(ClockTime.Read(instant, prefs.TargetTimeZoneId, true, false).Local.Hour);
+            foreach (float scale in new[] { 1f, 1.25f, 1.5f }) foreach (bool english in new[] { false, true }) {
+                prefs.English = english; prefs.ShowSource = true;
+                using (var image = RenderClockFixture(clock, scale, instant)) {
+                    var sourceCard = new RectangleF(5, 48, 157, 62);
+                    AssertCardThemeAt(image, scale, sourceCard, sourcePalette, new PointF(159, 70), "Upper card did not belong to the original region");
+                    AssertCardThemeAt(image, scale, sourceCard, sourcePalette, new PointF(159, 100), "Original region did not retain the large 62px card");
+                    AssertCardThemeAt(image, scale, new RectangleF(5, 114, 157, 32), targetPalette, new PointF(159, 132), "Lower compact card did not belong to the target region");
+                }
+                var largeSource = RowTimeInk(clock, true, scale, instant);
+                var smallTarget = RowTimeInk(clock, false, scale, instant);
+                Assert(!largeSource.IsEmpty && !smallTarget.IsEmpty, "One of the two time displays was not rendered");
+                Assert(largeSource.Height >= smallTarget.Height * 1.4 && largeSource.Width >= smallTarget.Width * 1.4, "Original region did not use larger time digits than target region");
+                Assert(largeSource.Height >= 18 * scale && smallTarget.Height <= 18 * scale, "Large/small time glyph sizes no longer match the intended hierarchy");
+                prefs.ShowSource = false;
+                using (var image = RenderClockFixture(clock, scale, instant)) {
+                    AssertCardThemeAt(image, scale, new RectangleF(5, 48, 157, 62), targetPalette, new PointF(159, 100), "Hiding original region did not promote target to the large card");
+                }
+                var singleTarget = RowTimeInk(clock, false, scale, instant);
+                Assert(singleTarget.Size == largeSource.Size, "Single target did not restore the primary time font");
+                prefs.ShowResetCountdown = false;
+                var compactSingleTarget = RowTimeInk(clock, false, scale, instant);
+                Assert(compactSingleTarget.Height > smallTarget.Height && compactSingleTarget.Width > smallTarget.Width, "Single target without countdown incorrectly retained the secondary tiny time font");
+                prefs.ShowResetCountdown = true;
+            }
+            Assert(prefs.SourceTimeZoneId == "Singapore Standard Time" && prefs.TargetTimeZoneId == "Eastern Standard Time", "Visual hierarchy tests changed stored region identities");
+        }
     }
 
     private static T NamedControl<T>(Control owner, string name) where T : Control {
@@ -353,11 +573,12 @@ internal static class ClockTests {
         string previewPath = Path.Combine(Path.GetTempPath(), "TwoZoneClock-test-" + Guid.NewGuid().ToString("N") + ".png");
         try {
             using (var clock = new ClockForm(true, null)) {
+                var prefs = (Preferences)typeof(ClockForm).GetField("prefs", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(clock);
+                prefs.ShowResetCountdown=false;
                 clock.RenderPreview(previewPath);
                 using (var image = new Bitmap(previewPath)) {
-                    Assert(image.Width == 168 && image.Height == 176, "Default preview is not the compact vertically stacked 168 x 176 whalegirl clock with difference footer");
+                    Assert(image.Width == 168 && image.Height == 156, "Default preview is not the compact vertically stacked 168 x 156 whalegirl clock");
                 }
-                var prefs = (Preferences)typeof(ClockForm).GetField("prefs", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(clock);
                 string sourceId = prefs.SourceTimeZoneId, targetId = prefs.TargetTimeZoneId;
                 var language = MenuItem(clock.ContextMenuStrip.Items, "中文 / English");
                 MenuItem(language.DropDownItems, "English").PerformClick();
@@ -368,7 +589,7 @@ internal static class ClockTests {
                 Assert(prefs.SourceTimeZoneId == sourceId && prefs.TargetTimeZoneId == targetId, "Clock language menu changed the chosen time zones");
                 clock.RenderPreview(previewPath);
                 using (var image = new Bitmap(previewPath)) {
-                    Assert(image.Width == 168 && image.Height == 176, "English preview changed the compact clock dimensions");
+                    Assert(image.Width == 168 && image.Height == 156, "English preview changed the compact clock dimensions");
                 }
                 language = MenuItem(clock.ContextMenuStrip.Items, "中文 / English");
                 MenuItem(language.DropDownItems, "中文").PerformClick();
@@ -387,6 +608,68 @@ internal static class ClockTests {
         }
     }
 
+    private static T ResetField<T>(object instance,string name){return (T)instance.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic).GetValue(instance);}
+    private static void ResetCall(object instance,string name){instance.GetType().GetMethod(name,BindingFlags.Instance|BindingFlags.NonPublic).Invoke(instance,null);}
+    private static string IconData(Icon icon){if(icon==null)return "";using(var data=new MemoryStream()){icon.Save(data);return Convert.ToBase64String(data.ToArray());}}
+    private static void CheckWindowIcons(){
+        using(var expected=WhaleTheme.CreateIcon())using(var clock=new ClockForm(true,null)){
+            string branded=IconData(expected);Assert(branded.Length>0&&IconData(clock.Icon)==branded,"main clock icon differs from embedded clock artwork");
+            using(var regions=new RegionSettingsForm("UTC","UTC",true,true)){
+                Assert(IconData(regions.Icon)==branded,"region dialog still uses Windows default icon");
+                Assert(!regions.ShowInTaskbar,"region modal created a separate taskbar icon");
+            }
+            using(var resets=new ResetSettingsForm(new ResetSnapshot(),true,true,"UTC",null,false,true)){
+                Assert(IconData(resets.Icon)==branded,"reset dialog still uses Windows default icon");
+                Assert(!resets.ShowInTaskbar,"reset modal created a separate taskbar icon");
+            }
+            Assert(IconData(clock.Icon)==branded,"disposing a dialog disposed the parent clock icon");
+        }
+    }
+    private static void CheckResetIntegration(){
+        var frozen=Instant("2026-11-02T12:00:00Z");
+        var original=ResetCountdown.ParseUsageText("Usage\nCurrent session\n25% used\nResets in 2h\nWeekly limits\nAll models\nResets in 3 days",frozen,TimeZoneInfo.Utc);
+        var copied=ResetSettingsForm.Copy(original);copied.Source="Manual";Assert(original.Source=="Usage text","dialog mutates persisted snapshot before Apply");
+        Assert(copied.SessionEvidence==original.SessionEvidence&&copied.WeeklyEvidence==original.WeeklyEvidence&&!String.IsNullOrEmpty(copied.SessionEvidence),"dialog copy loses polling evidence");
+        var reread=ResetCountdown.ParseUsageText("Usage\nCurrent session\n35% used\nResets in 2h\nWeekly limits\nAll models\nResets in 2 days 23h 59m",frozen.AddMinutes(1),TimeZoneInfo.Utc);
+        var merged=ResetCountdown.MergeObserved(copied,reread);Assert(merged.SessionResetUtc==original.SessionResetUtc,"dialog-to-clock polling reanchors unchanged session label");
+        var sourcePreferences=new Preferences{Reset=original,ResetDisplayZoneId="Singapore Standard Time",ShowResetCountdown=false};
+        using(var writer=new StringWriter(CultureInfo.InvariantCulture)){
+            new XmlSerializer(typeof(Preferences)).Serialize(writer,sourcePreferences);
+            string xml=writer.ToString();Assert(!xml.Contains("RawText")&&!xml.Contains("ProcessId")&&!xml.Contains("StartTicks")&&!xml.Contains("Signature")&&!xml.Contains("Evidence")&&!xml.Contains(original.SessionEvidence),"captured window, raw text or evidence persisted");
+            using(var input=new StringReader(xml)){
+                var restored=(Preferences)new XmlSerializer(typeof(Preferences)).Deserialize(input);
+                Assert(restored.Reset.SessionResetUtc==original.SessionResetUtc&&restored.Reset.WeeklyResetUtc==original.WeeklyResetUtc&&restored.Reset.Estimated,"reset snapshot XML roundtrip lost state");
+                Assert(!restored.ShowResetCountdown&&restored.ResetDisplayZoneId=="Singapore Standard Time","reset display preferences lost");
+            }
+        }
+        string output=AppDomain.CurrentDomain.BaseDirectory;
+        using(var clock=new ClockForm(true,null)){
+            var prefs=ResetField<Preferences>(clock,"prefs");Assert(prefs.ShowResetCountdown,"new countdown entry is hidden by default");
+            Assert(MenuItem(clock.ContextMenuStrip.Items,"Claude 重置倒计时…")!=null,"countdown configuration menu missing");
+            Assert(!ResetField<bool>(clock,"autoReadReset"),"new clock starts reading windows without opt-in");
+            foreach(bool english in new[]{false,true}){
+                string file=Path.Combine(output,english?"clock-reset-en.png":"clock-reset-zh.png");clock.RenderResetPreview(file,english);
+                using(var image=new Bitmap(file))Assert(image.Width==168&&image.Height==228,"countdown preview unexpectedly widens or clips the clock");
+            }
+            var expiryNow=DateTimeOffset.UtcNow;
+            prefs.Reset=new ResetSnapshot{SessionResetUtc=expiryNow.AddHours(-1).ToString("o"),WeeklyResetUtc=expiryNow.AddHours(-1).ToString("o"),ObservedUtc=expiryNow.AddHours(-2).ToString("o"),Source="Manual"};
+            string expired=prefs.Reset.SessionResetUtc;clock.RenderPreview(Path.Combine(output,"clock-reset-expired.png"));Assert(prefs.Reset.SessionResetUtc==expired,"painting expired countdown rolls it forward");
+        }
+        foreach(bool english in new[]{false,true})using(var form=new ResetSettingsForm(original,true,english,"UTC",null,false,true)){
+            Assert(!form.Visible&&!form.AutoRead&&form.SourceWindow==null,"preview settings activated capture");
+            string before=form.Snapshot.SessionResetUtc;
+            var session=ResetField<DateTimePicker>(form,"sessionDate");session.Value=DateTime.Now.AddDays(30);
+            ResetField<CheckBox>(form,"sessionSet").Checked=true;ResetCall(form,"StageManualTimes");
+            Assert(form.Snapshot.SessionResetUtc==before,"rejected manual date overwrites previous countdown");
+            var paste=ResetField<TextBox>(form,"pasted");paste.Text="Usage\nCurrent session\nResets in 2 hr 30 min\nWeekly limits\nAll models\nResets in 3 days";ResetCall(form,"StageText");
+            Assert(form.Snapshot.Estimated&&ResetCountdown.ParseUtc(form.Snapshot.SessionResetUtc).HasValue&&ResetCountdown.ParseUtc(form.Snapshot.WeeklyResetUtc).HasValue,"pasted bilingual fixture did not populate both limits");
+            Assert(form.SourceWindow==null&&!form.AutoRead,"paste silently starts window monitoring");
+            form.Size=form.MinimumSize;form.RenderPreview(Path.Combine(output,english?"reset-settings-en.png":"reset-settings-zh.png"));
+            var root=(TableLayoutPanel)form.Controls[0];
+            var buttons=(FlowLayoutPanel)root.GetControlFromPosition(0,5);foreach(Control b in buttons.Controls)Assert(b.Left>=0&&b.Right<=buttons.ClientSize.Width&&b.Bottom<=buttons.ClientSize.Height,"reset settings action clipped: "+b.Text);
+        }
+    }
+
     [STAThread]
     public static void Main() {
         try { RunAll(); }
@@ -394,6 +677,8 @@ internal static class ClockTests {
     }
 
     private static void RunAll() {
+        checks+=ResetCountdownTests.Run();
+        ResetWindowReaderTests.Run();
         Check("2026-03-08T06:59:00Z", "Eastern Standard Time", "2026-03-08 01:59 -05:00", "EST");
         Check("2026-03-08T07:00:00Z", "Eastern Standard Time", "2026-03-08 03:00 -04:00", "EDT");
         Check("2026-11-01T05:59:00Z", "Eastern Standard Time", "2026-11-01 01:59 -04:00", "EDT");
@@ -407,12 +692,19 @@ internal static class ClockTests {
         Check("2026-01-01T18:30:00Z", "India Standard Time", "2026-01-02 00:00 +05:30", null);
         CheckLocalAndFormatting();
         CheckTimeDifferences();
+        CheckDayPhaseBoundaries();
+        CheckCountdownPresentation();
         CheckPreferences();
         CheckRegionSettings();
         CheckBilingualCatalog();
         CheckSearchAndLanguageControls();
         CheckNativeComboTyping();
         CheckCompactClockAndLanguageMenu();
+        CheckResetIntegration();
+        CheckWindowIcons();
+        CheckAllClockSizeCombinations();
+        CheckStableTimePixels();
+        CheckSourcePrimaryPresentation();
         Console.WriteLine(checks + " checks passed: selectable regions, DST, date rollover, time differences, local time, formatting, saved preferences, search, language, and settings controls.");
     }
 }

@@ -110,6 +110,17 @@ jobs:
             (Join-Path $root 'clock/TwoZoneClock.exe'),
             (Get-ChildItem -LiteralPath (Join-Path $root 'pack') -Filter '*.exe' | Where-Object Name -notlike 'WhalePack.Tests*' | Select-Object -First 1).FullName
           )
+      - name: Render clock reset previews with synthetic data only
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: ./.github/scripts/clock-previews.ps1 -Executable "$env:RUNNER_TEMP/launch/clock/TwoZoneClock.exe" -ScreenshotDirectory "$env:RUNNER_TEMP/clock-reset-previews"
+      - name: Keep clock reset previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clock-reset-previews
+          path: ${{ runner.temp }}/clock-reset-previews/*
+          if-no-files-found: warn
       - name: Keep launch screenshots
         if: always()
         uses: actions/upload-artifact@v4

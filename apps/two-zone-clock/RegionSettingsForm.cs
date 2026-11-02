@@ -166,7 +166,7 @@ namespace TwoZoneClock {
         private readonly System.Windows.Forms.Timer timer;
         private readonly Icon themedIcon;
         private readonly bool use24;
-        private readonly float themeScale;
+        private float themeScale;
         private bool renderingPreview, updating, english;
         private string selectedSourceId, selectedTargetId;
         private RegionChoice[] choices;
@@ -237,7 +237,7 @@ namespace TwoZoneClock {
             };
             timer = new System.Windows.Forms.Timer { Interval = 1000 };
             timer.Tick += delegate { RefreshTimes(); };
-            Shown += delegate { RefreshTimes(); timer.Start(); };
+            Shown += delegate { RefreshTimes(); timer.Start(); FocusSave(); };
             ApplyLanguage();
             source.TabIndex = 0; target.TabIndex = 1; language.TabIndex = 2;
             swap.TabIndex = 3; save.TabIndex = 4; cancel.TabIndex = 5;
@@ -271,7 +271,7 @@ namespace TwoZoneClock {
             Controls.Add(selector); return selector;
         }
         private Button CreateButton(string name, int x, int y, int width, bool primary = false) {
-            var button = new Button { Name = name, Location = new Point(x, y), Size = new Size(width, 30),
+            var button = new CandyButton { Name = name, Location = new Point(x, y), Size = new Size(width, 30),
                 BackColor = Color.White, ForeColor = ForeColor, FlatStyle = FlatStyle.Flat,
                 UseVisualStyleBackColor = false };
             WhaleTheme.StyleButton(button, primary);
@@ -316,20 +316,45 @@ namespace TwoZoneClock {
                 + (zone.IsDaylightSavingTime(instant) ? (english ? " · DST" : " · 夏令时") : "");
         }
         internal void RenderPreview(string path) { RenderSearchPreview(path, ""); }
+        internal void RenderPreview(string path, float previewScale) { RenderSearchPreview(path, "", previewScale); }
         internal void RenderSearchPreview(string path, string query) {
-            if (!String.IsNullOrEmpty(query)) source.Text = query;
-            renderingPreview = true;
-            StartPosition = FormStartPosition.Manual;
-            Location = new Point(-30000, -30000);
-            Show(); Application.DoEvents();
+            RenderSearchPreview(path, query, themeScale);
+        }
+        private void FocusSave() {
             ActiveControl = save;
             source.SelectionStart = source.Text.Length; source.SelectionLength = 0;
             target.SelectionStart = target.Text.Length; target.SelectionLength = 0;
+        }
+        internal void RenderSearchPreview(string path, string query, float previewScale) {
+            if (!String.IsNullOrEmpty(query)) source.Text = query;
+            renderingPreview = true;
+            if (previewScale < 0.5f || previewScale > 3f) throw new ArgumentOutOfRangeException("previewScale");
+            float? previousScale = WhaleTheme.RenderScaleOverride; WhaleTheme.RenderScaleOverride = previewScale;
+            try {
+            float ratio = previewScale / themeScale;
+            if (Math.Abs(ratio-1f) > 0.001f) Scale(new SizeF(ratio, ratio));
+            themeScale = previewScale;
+            ClientSize = new Size((int)Math.Round(432*themeScale), (int)Math.Round(330*themeScale));
+            NormalizePreviewFonts(this, previewScale);
+            StartPosition = FormStartPosition.Manual;
+            Location = new Point(-30000, -30000);
+            Show(); Application.DoEvents();
+            FocusSave();
             using (var bitmap = new Bitmap(Width, Height)) {
                 DrawToBitmap(bitmap, new Rectangle(Point.Empty, bitmap.Size));
                 bitmap.Save(path, System.Drawing.Imaging.ImageFormat.Png);
             }
             Close();
+            } finally { WhaleTheme.RenderScaleOverride = previousScale; }
+        }
+        internal static void NormalizePreviewFonts(Control root, float scale) {
+            var fonts = new Dictionary<Control, Font>();
+            CollectPreviewFonts(root, fonts);
+            foreach (var item in fonts) item.Key.Font = new Font(item.Value.FontFamily, item.Value.SizeInPoints*96f/72f*scale, item.Value.Style, GraphicsUnit.Pixel);
+        }
+        private static void CollectPreviewFonts(Control root, Dictionary<Control, Font> fonts) {
+            fonts[root] = root.Font;
+            foreach (Control child in root.Controls) CollectPreviewFonts(child, fonts);
         }
         protected override void Dispose(bool disposing) {
             if (disposing) { if (timer != null) timer.Dispose(); if (themedIcon != null) themedIcon.Dispose(); }

@@ -13,7 +13,11 @@ This page describes the published toolbox source, not unreleased features in a d
 
 ## Home-time Clock
 
-The clock reads the computer's clock and Windows time-zone information and stores its preferences locally at `%LOCALAPPDATA%\TwoZoneClock\settings.xml`. Time conversion does not need a network request. User-requested update checks are described below. This release's clock is 0.3.0; unreleased reset-reading features are not represented here as shipped behavior.
+Clock **0.5.0** reads the computer's clock and Windows time-zone information and stores its preferences locally at `%LOCALAPPDATA%\TwoZoneClock\settings.xml`. Time conversion does not need a network request. It does not change the system timezone. User-requested update checks are described below.
+
+- **Reset-page reading:** after you choose a Claude window and request a read, a time-limited local child process uses Windows UI Automation to inspect visible static labels and eligible Usage headings. Supported windows are Claude Desktop, or Chrome/Edge/Firefox windows whose title identifies Claude. It does not log in, read cookies, tokens, password/edit fields, the clipboard, or an account database, and does not call Claude's account API. It cannot read a closed, minimized or inaccessible Usage page.
+- **Pasted/manual times:** you can paste Usage text into the dialog or enter reset dates yourself. Parsing and timezone conversion happen locally. The full pasted/read Usage text is not saved to the settings file or sent to a server. The settings contain the resulting UTC reset timestamps, observation time, source label, estimate flag and display preferences; internal evidence fingerprints are memory-only. Source-window identity and the automatic-reading choice are also session-only.
+- **Automatic reads:** a successful window read selects the visible 60-second reading option. Review or untick it before **Apply**. While enabled, the clock reads that same visible window about once a minute until the clock closes. Failed/ambiguous reads retain the previous snapshot and show a failure state; reaching the displayed reset time does not verify account quota restoration.
 
 ## Environment Helper
 
@@ -37,6 +41,8 @@ Build-time dependency downloads and a future SignPath signing request concern re
 
 Google 模式会发送用户选中、粘贴或在提问框输入的待翻译文字及语言参数；不会自动上传整个 Claude 聊天。离线模式在本机处理，安装/刷新语言包则会连接 GitHub 的 Argos 目录及允许的 Argos 下载站。翻译历史只在当前进程内保留，不写入磁盘；设置、术语词典、模型包和运行时缓存保存在本机。复制后的文字受 Windows 剪贴板及其他应用规则影响。
 
-时钟的时间换算在本机完成。环境助手的本机检查、修复备份和报告保存在本机；网络检测会向 Net.Coffee 发送 HTTPS 测试请求，服务方可见出口、随机测试域名和观察到的解析器。可选浏览器 WebRTC 测试会连接 Google STUN。它们不上传本地代理订阅或凭据，也不代表所有应用的网络路径。
+时钟 0.5.0 的时间换算与重置时间解析在本机完成。读取功能只检查用户所选 Claude 窗口的可见静态用量文字与标题，不登录账号、不读取密码、Cookie、令牌、剪贴板或账号数据库，不调用 Claude 账号 API。原始用量文字不写入设置文件；仅保存解析后的 UTC 重置时刻、读取时间、来源、估算标记和显示偏好，内部证据指纹只在内存中。窗口读取成功会勾选每 60 秒读取，可在「应用」前取消；自动读取只持续到关闭时钟，不会在后台启动。
+
+环境助手的本机检查、修复备份和报告保存在本机；网络检测会向 Net.Coffee 发送 HTTPS 测试请求，服务方可见出口、随机测试域名和观察到的解析器。可选浏览器 WebRTC 测试会连接 Google STUN。它们不上传本地代理订阅或凭据，也不代表所有应用的网络路径。
 
 打包助手只处理用户选取的文件并生成本地结果，不自动发送给 Claude。手动检查更新会连接 GitHub，下载时获取对应 EXE。备份可能包含原始配置，请当作私人文件保管，分享前自行检查。SignPath Foundation 申请已提交、等待审核，尚未获批或用于生产签名；不会在用户电脑上自动上传文件用于签名或误报申诉。
