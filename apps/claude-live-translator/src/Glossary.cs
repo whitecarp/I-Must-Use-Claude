@@ -18,31 +18,43 @@ namespace ClaudeCompanion {
         internal const int MaxEntries=200;
         // Names that are also everyday English words keep their exact spelling, so
         // "improve your skills" or "a short sonnet" still translate normally.
-        internal static readonly string[] ExactCaseNames={"Skills","Artifacts","Hooks","Opus","Sonnet","Haiku","Fable","Gemini","React","Cursor","Copilot"};
+        internal static readonly string[] ExactCaseNames={"Skills","Artifacts","Hooks","Opus","Sonnet","Haiku","Fable","Gemini","Grok","Llama","Mistral","Perplexity","Windsurf","React","Rust","Swift","Cursor","Copilot"};
         internal static List<GlossaryEntry> Defaults(){
             var rows=new List<GlossaryEntry>();
-            foreach(string name in new[]{"Claude","Claude Code","Claude Desktop","Claude in Chrome","Claude Agent SDK","Codex","Anthropic","OpenAI","ChatGPT","DeepSeek","GitHub","Git","MCP","API","CLI","SDK","JSON","YAML","TOML","Markdown","Python","JavaScript","TypeScript","PowerShell","Node.js","Docker","UTF-8","Cockpit Tools","CC Switch"})
+            foreach(string name in new[]{"Claude","Claude Code","Claude Desktop","Claude in Chrome","Claude Agent SDK","Claude Pro","Claude Max","Claude Team","Claude Enterprise","Claude Console","Cowork","CLAUDE.md","AGENTS.md","Codex","Anthropic","OpenAI","ChatGPT","DeepSeek","Qwen","Kimi","Hugging Face","Ollama","Midjourney","GitHub","GitHub Actions","Git","MCP","API","CLI","SDK","JSON","YAML","TOML","Markdown","Python","JavaScript","TypeScript","PowerShell","Node.js","Docker","Visual Studio Code","VS Code","Visual Studio","UTF-8","Cockpit Tools","CC Switch"})
                 rows.Add(new GlossaryEntry{source=name,replacement=name,target="*"});
             foreach(string name in ExactCaseNames)
                 rows.Add(new GlossaryEntry{source=name,replacement=name,target="*",matchCase=true});
             // Use technical phrases rather than ambiguous words such as build or token.
             string[,] phrases={
-                {"context window","上下文窗口"},{"system prompt","系统提示词"},
-                {"tool call","工具调用"},{"tool calls","工具调用"},
-                {"rate limit","速率限制"},{"rate limiting","限流"},
-                {"code review","代码审查"},{"pull request","拉取请求"},
-                {"merge conflict","合并冲突"},{"unit test","单元测试"},
-                {"regression test","回归测试"},{"environment variable","环境变量"},
-                {"API key","API 密钥"},{"access token","访问令牌"},
-                {"command line","命令行"},{"working directory","工作目录"},
-                {"source code","源代码"},{"read-only","只读"}};
+                {"context window","上下文窗口"},{"system prompt","系统提示词"},{"tool call","工具调用"},
+                {"tool calls","工具调用"},{"tool use","工具调用"},{"function calling","函数调用"},
+                {"rate limit","速率限制"},{"rate limiting","限流"},{"usage limit","用量上限"},
+                {"prompt engineering","提示词工程"},{"prompt caching","提示缓存"},{"extended thinking","扩展思考"},
+                {"structured output","结构化输出"},{"large language model","大语言模型"},{"knowledge cutoff","知识截止日期"},
+                {"fine-tuning","微调"},{"slash command","斜杠命令"},{"plan mode","计划模式"},
+                {"code review","代码审查"},{"pull request","拉取请求"},{"merge conflict","合并冲突"},
+                {"commit message","提交信息"},{"feature branch","功能分支"},{"repository","仓库"},
+                {"unit test","单元测试"},{"integration test","集成测试"},{"end-to-end test","端到端测试"},
+                {"regression test","回归测试"},{"test coverage","测试覆盖率"},{"type checking","类型检查"},
+                {"linter","代码检查工具"},{"stack trace","堆栈跟踪"},{"breaking change","破坏性变更"},
+                {"edge case","边界情况"},{"race condition","竞态条件"},{"memory leak","内存泄漏"},
+                {"dry run","试运行"},{"happy path","正常路径"},{"hot reload","热重载"},
+                {"environment variable","环境变量"},{"API key","API 密钥"},{"access token","访问令牌"},
+                {"command line","命令行"},{"working directory","工作目录"},{"source code","源代码"},
+                {"read-only","只读"}};
             // Terms ignore case, so one row covers "context window", "Context window" and "CONTEXT WINDOW".
             for(int i=0;i<phrases.GetLength(0);i++)rows.Add(new GlossaryEntry{source=phrases[i,0],replacement=phrases[i,1],target="zh-CN"});
             string[,] reverse={
-                {"上下文窗口","context window"},{"系统提示词","system prompt"},
-                {"工具调用","tool call"},{"速率限制","rate limit"},
-                {"单元测试","unit test"},{"回归测试","regression test"},
-                {"代码审查","code review"},{"环境变量","environment variable"}};
+                {"上下文窗口","context window"},{"系统提示词","system prompt"},{"提示词","prompt"},
+                {"提示词工程","prompt engineering"},{"工具调用","tool call"},{"速率限制","rate limit"},
+                {"扩展思考","extended thinking"},{"大语言模型","large language model"},{"单元测试","unit test"},
+                {"集成测试","integration test"},{"端到端测试","end-to-end test"},{"回归测试","regression test"},
+                {"代码审查","code review"},{"拉取请求","pull request"},{"合并冲突","merge conflict"},
+                {"提交信息","commit message"},{"仓库","repository"},{"代码库","codebase"},
+                {"源代码","source code"},{"命令行","command line"},{"工作目录","working directory"},
+                {"环境变量","environment variable"},{"访问令牌","access token"},{"边界情况","edge case"},
+                {"报错信息","error message"}};
             for(int i=0;i<reverse.GetLength(0);i++)rows.Add(new GlossaryEntry{source=reverse[i,0],replacement=reverse[i,1],target="en"});
             return Validate(rows);
         }

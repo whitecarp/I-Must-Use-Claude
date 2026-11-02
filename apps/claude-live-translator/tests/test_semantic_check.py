@@ -27,7 +27,7 @@ class SemanticCheckTests(unittest.TestCase):
             self.assertIsNotNone(block, 'C# phrase-default syntax changed; review semantic defaults')
             self.assertEqual(tuple(re.findall(r'\{"([^"]+)","([^"]+)"\}', block.group(1))), expected)
         rows = semantic.default_glossary()
-        self.assertEqual(len(rows), 66)
+        self.assertEqual(len(rows), 135)
         self.assertEqual(len(semantic.g.validated_entries(rows)), len(rows))
 
     def test_old_way_accepts_and_ignores_dictionary_for_code_and_links(self):

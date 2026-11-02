@@ -33,7 +33,9 @@ internal static class GlossaryHistoryTests {
             foreach(string name in GlossaryStore.ExactCaseNames){var term=Find(defaults,name,"*");Check(term!=null&&term.matchCase,"everyday-word name "+name+" keeps exact case");}
             Check(!Find(defaults,"Claude","*").matchCase&&!Find(defaults,"context window","zh-CN").matchCase,"names and phrases ignore case by default");
             Check(Find(defaults,"Context window","zh-CN")==null,"one ignore-case row replaces capitalised phrase copies");
-            foreach(string name in new[]{"Claude in Chrome","Claude Agent SDK","Artifacts","Hooks","Fable","Cursor","Copilot"})Check(Find(defaults,name,"*")!=null,"starter glossary includes "+name);
+            foreach(string name in new[]{"Claude in Chrome","Claude Agent SDK","Claude Max","Hugging Face","GitHub Actions","Visual Studio Code","Artifacts","Hooks","Fable","Rust","Cursor","Copilot"})Check(Find(defaults,name,"*")!=null,"starter glossary includes "+name);
+            Check(Find(defaults,"Rust","*").matchCase&&!Find(defaults,"Hugging Face","*").matchCase,"new everyday-word names keep exact case, product names ignore it");
+            Check(Find(defaults,"仓库","en")!=null&&Find(defaults,"仓库","en").replacement=="repository"&&Find(defaults,"edge case","zh-CN").replacement=="边界情况","new phrases cover both directions");
             bool duplicate=false;try{GlossaryStore.Validate(new[]{new GlossaryEntry{source="Claude",replacement="a",target="*"},new GlossaryEntry{source="claude",replacement="b",target="*"}});}catch(InvalidOperationException){duplicate=true;}
             Check(duplicate,"ignore-case terms that differ only in case are duplicates");
             Check(GlossaryStore.Validate(new[]{new GlossaryEntry{source="Apple",replacement="苹果公司",target="*",matchCase=true},new GlossaryEntry{source="apple",replacement="苹果",target="*"}}).Count==2,"an exact-case term may sit beside an ignore-case one");
