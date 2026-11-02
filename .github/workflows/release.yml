@@ -127,6 +127,86 @@ jobs:
           New-Item -ItemType Directory -Path $receipts | Out-Null
           Copy-Item -LiteralPath $receiptFiles[0].FullName -Destination (Join-Path $receipts 'translator-build-receipt.json')
 
+      - name: Verify portable extraction, native imports and cache reuse
+        timeout-minutes: 8
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted' -or $env:RUNNER_OS -ne 'Windows') { throw 'Portable execution is restricted to GitHub-hosted Windows runners.' }
+          $receipts = Join-Path $env:RUNNER_TEMP 'release-receipts/portable-runtime'
+          New-Item -ItemType Directory -Path $receipts | Out-Null
+          $cacheRoot = Join-Path $env:RUNNER_TEMP 'portable-runtime-cache'
+          if (Test-Path -LiteralPath $cacheRoot) { throw 'Fresh portable check requires a new cache root.' }
+          $exe = Join-Path $env:RUNNER_TEMP 'unsigned-exes/WhaleTranslator.exe'
+          $versions = Get-Content .github/release-versions.json -Raw | ConvertFrom-Json
+          $build = Get-Content (Join-Path $env:RUNNER_TEMP 'release-receipts/translator-build-receipt.json') -Raw | ConvertFrom-Json
+          function Invoke-PortableCheck([string]$ReportPath) {
+            $arguments = '--portable-check "' + $ReportPath + '" --cache-root "' + $cacheRoot + '"'
+            $process = Start-Process -FilePath $exe -ArgumentList $arguments -WindowStyle Hidden -PassThru
+            try {
+              if (-not $process.WaitForExit(120000)) { $process.Kill(); throw 'Portable extraction/check timed out.' }
+              if ($process.ExitCode -ne 0) { throw "Portable check failed with exit code $($process.ExitCode); inspect the report." }
+            } finally { $process.Dispose() }
+            if (-not (Test-Path -LiteralPath $ReportPath -PathType Leaf)) { throw 'Portable check did not produce a report.' }
+            $report = Get-Content -LiteralPath $ReportPath -Raw | ConvertFrom-Json
+            if ($report.Ok -ne $true -or $report.Version -cne $versions.translator) { throw 'Portable report is unsuccessful or has the wrong version.' }
+            if ($report.PayloadSha256 -cne $build.PayloadSha256 -or $report.ManifestSha256 -cne $build.ManifestSha256) { throw 'Portable report does not match the freshly built payload.' }
+            $expectedCache = [IO.Path]::GetFullPath((Join-Path $cacheRoot $report.PayloadSha256))
+            if ([IO.Path]::GetFullPath($report.CacheDirectory) -ine $expectedCache) { throw 'Portable report returned an unexpected cache path.' }
+            return $report
+          }
+          $fresh = Invoke-PortableCheck (Join-Path $receipts 'fresh-extraction.json')
+          if ($fresh.Extracted -ne $true) { throw 'The first check did not perform a fresh extraction.' }
+          $pythonExe = Join-Path $fresh.CacheDirectory 'runtime/python/python.exe'
+          $probe = Join-Path $receipts 'probe_runtime.py'
+          $probeReport = Join-Path $receipts 'native-imports.json'
+          $probeCode = @'
+          import importlib
+          import importlib.metadata
+          import json
+          import pathlib
+          import sys
+          import traceback
+          cache = pathlib.Path(sys.argv[2]).resolve()
+          output = pathlib.Path(sys.argv[3])
+          result = {"ok": False, "executable": sys.executable, "python": sys.version, "modules": {}}
+          try:
+              assert sys.version_info[:3] == (3, 12, 10), "Wrong bundled Python version"
+              assert pathlib.Path(sys.executable).resolve() == cache / "runtime/python/python.exe", "Not the bundled interpreter"
+              pins = {}
+              for line in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8-sig").splitlines():
+                  line = line.strip()
+                  if line and not line.startswith("#"):
+                      name, version = line.split("==")
+                      pins[name] = version
+              modules = {"ctranslate2": "ctranslate2", "sentencepiece": "sentencepiece", "numpy": "numpy", "PyYAML": "yaml"}
+              assert set(pins) == set(modules), "Unexpected portable dependency list"
+              for distribution, module_name in modules.items():
+                  module = importlib.import_module(module_name)
+                  actual = importlib.metadata.version(distribution)
+                  location = pathlib.Path(module.__file__).resolve()
+                  assert location.is_relative_to(cache), "Import escaped the portable cache: " + module_name
+                  assert actual == pins[distribution], "Distribution version mismatch: " + distribution
+                  assert module.__version__ == pins[distribution], "Imported module version mismatch: " + module_name
+                  result["modules"][distribution] = {"version": actual, "file": str(location)}
+              result["ok"] = True
+          except Exception:
+              result["error"] = traceback.format_exc()
+          output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+          sys.exit(0 if result["ok"] else 1)
+          '@
+          [IO.File]::WriteAllText($probe, $probeCode, (New-Object Text.UTF8Encoding($false)))
+          # -I excludes user/site environment paths; -B avoids changing the verified cache.
+          # This only imports CPU libraries: no translation request or model installation.
+          $requirements = Join-Path $env:GITHUB_WORKSPACE 'apps/claude-live-translator/backend/requirements.txt'
+          & $pythonExe -I -B $probe $requirements $fresh.CacheDirectory $probeReport
+          if ($LASTEXITCODE -ne 0) { throw 'Bundled native-library import/version verification failed.' }
+          $imports = Get-Content -LiteralPath $probeReport -Raw | ConvertFrom-Json
+          if ($imports.ok -ne $true) { throw 'Bundled runtime did not report successful imports.' }
+          $reused = Invoke-PortableCheck (Join-Path $receipts 'cache-reuse.json')
+          if ($reused.Extracted -ne $false -or $reused.CacheDirectory -ine $fresh.CacheDirectory -or $reused.FileCount -ne $fresh.FileCount) { throw 'Portable cache reuse was not verified.' }
+          [ordered]@{ ok=$true; version=$versions.translator; sourceCommit=$env:GITHUB_SHA; freshExtraction=$true; nativeImports=$true; cacheReuse=$true; sha256=(Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant() } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $receipts 'acceptance.json') -Encoding utf8
+          'Portable acceptance passed: fresh extraction, four pinned native/library imports, and verified cache reuse. No Google translation or model download was run.' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
       - name: Upload unsigned signing input (not a release attachment)
         if: inputs.signing == 'required'
         id: signing-input
