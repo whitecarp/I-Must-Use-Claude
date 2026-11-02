@@ -15,7 +15,7 @@
 
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview"><strong>↓ 下载软件</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.4-preview"><strong>↓ 下载软件</strong></a>
   &nbsp; · &nbsp; <a href="#选一个陪你用-claude-的工具">认识工具</a>
   &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">项目主页</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">从源码构建</a>
@@ -29,7 +29,7 @@
 | :--- | :--- | :--- | :--- |
 | **大肥鱼环境助手** | **大肥鱼翻译** | **两地时钟** | **大肥鱼打包助手** |
 | 先测浏览器环境，再处理命中的本地设置，最后复测。 | 翻译 Claude 的回复，也能把中文问题准备成英文。 | 显示原本地区的时间，以及 Claude 本轮和每周重置倒计时。 | 在本机整理源码、图片和视频，每个文件不超过 29 MB。 |
-| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe) |
+| [下载环境助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhaleEnvironmentHelper.exe) | [下载翻译器 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhaleTranslator.exe) | [下载时钟 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/HomeTimeClock.exe) | [下载打包助手 ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhalePackHelper.exe) |
 
 **下载 EXE，双击打开。** 各个软件独立运行，用哪个下哪个。翻译器自带运行库，离线语言包在软件里按需选装。源码仍公开，方便开发者查看。
 
@@ -37,7 +37,7 @@
 <summary><strong>运行要求、版本与语言设置</strong></summary>
 
 - 适用于 Windows 10/11。翻译器便携运行库需要 **x64**；桌面程序使用 **.NET Framework 4.8**。
-- **v0.4.3-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.4**、两地时钟 **0.5.0**、打包助手 **0.1.1**。
+- **v0.4.4-preview** 同时提供四个 EXE：环境助手 **0.7.0**、翻译器 **0.9.5**、两地时钟 **0.5.0**、打包助手 **0.1.1**。
 - 提供 Windows EXE；打包助手 0.1.1 无需旁置配置文件或 ZIP。GitHub 自动生成的源码压缩包面向开发者，不是开箱即用的软件。
 - GitHub 默认展示英文，并提供这份中文说明。软件自身默认语言保持现状，支持 English / 中文切换。
 
@@ -54,7 +54,7 @@
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
+2. 把输出的值和 [本版 SHA-256 校验值](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.4-preview#sha-256) 里同名文件的值对比，一致才说明文件没有被改动。
 3. 一致后，在 SmartScreen 窗口点「更多信息」→「仍要运行」。不一致就删掉文件，重新从本仓库的 Releases 下载。
 
 </details>
@@ -147,7 +147,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 选择 Claude 窗口，划选一段想读的回复，在旁边对照原文和译文。继续和她交流，不用被语言打断。
 
-0.9.4 下载文件为 **29.14 MB（29,143,552 字节）**，小于 30 MB。离线语言包由用户另外选装，不计入这个体积。
+0.9.5 下载文件为 **29.15 MB（29,145,088 字节）**，小于 30 MB。离线语言包由用户另外选装，不计入这个体积。
 
 <p align="center"><img src="docs/images/translator094-saved-zh.png" alt="大肥鱼翻译 0.9.4：译文主动收藏后显示已收藏与标签" width="560"></p>
 <p align="center"><sub>Windows CI 中实际编译的 0.9.4 程序，使用合成示例文字在 96 DPI（100%）离屏渲染；不是用户电脑上的交互验收。</sub></p>
@@ -263,7 +263,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 本地打包不上传文件、不连接 AI 服务；只有用户主动检查或下载更新时才会访问 GitHub。普通打包和 PNG/JPEG/BMP 处理使用自带组件；视频压缩和 WebP 解码需要本机已有 **FFmpeg**。
 
-[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe)
+[下载打包助手 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhalePackHelper.exe)
 
 单个 EXE，无需旁置配置文件或 ZIP。[源码和使用说明](apps/whale-pack-helper/README.md) 包含编译脚本、素材与测试。
 

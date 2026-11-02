@@ -1,14 +1,27 @@
 # Release notes
 
-## Unreleased — Translator 0.9.5 glossary matching
+## v0.4.4-preview — Translator 0.9.5 glossary matching
 
-Not yet published: the source on `main` is translator **0.9.5**, while downloads stay on v0.4.3-preview (translator 0.9.4) until the next release.
+Published **2026-11-02**, with four verified standalone EXEs. Translator **0.9.5** is **29,145,088 bytes (29.15 MB)**, including its runtime; language packs remain optional downloads.
+
+| App | Version | Download |
+| --- | --- | --- |
+| Whale Environment Helper | 0.7.0 | [WhaleEnvironmentHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhaleEnvironmentHelper.exe) |
+| Whale Translator | 0.9.5 | [WhaleTranslator.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhaleTranslator.exe) |
+| Two-Zone Clock | 0.5.0 | [HomeTimeClock.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/HomeTimeClock.exe) |
+| Whale Pack Helper | 0.1.1 | [WhalePackHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhalePackHelper.exe) |
 
 - **Terms ignore case.** `claude code`, `Claude Code` and `CLAUDE CODE` use the same entry. In **⚙ → Glossary**, tick **Match case** for a term that should only match its exact spelling. Built-in names that are also everyday words (Skills, Artifacts, Hooks, Opus, Sonnet, Haiku, Fable, Gemini, Grok, Llama, Mistral, Perplexity, Windsurf, React, Rust, Swift, Cursor, Copilot) have it ticked, so "improve your skills" still translates.
 - **135 built-in entries** (was 76): product names machine translation tends to mangle (Hugging Face, Midjourney, Claude Max, GitHub Actions, VS Code…), more technical phrases (usage limit, prompt caching, edge case, race condition…) and more Chinese → English terms for Write in Chinese (提示词, 仓库, 报错信息…). One entry now covers every case, so the capitalised copies are gone. The editor holds up to 200 entries.
 - **Existing dictionaries upgrade when read.** Rows that differ only in case and share a translation become one row; rows with different translations (Apple / apple) keep Match case, so nothing changes meaning. To add the new built-ins, click **Add built-in terms**, then **Save**.
+- **Four EXEs, one toolbox release:** clock **0.5.0**, helper **0.7.0** and pack **0.1.1** keep their versions from v0.4.3-preview.
 
-**尚未发布 · 翻译器 0.9.5：** main 上的源码已是 0.9.5；下次发布前，下载仍是 v0.4.3-preview（翻译器 0.9.4）。
+**Signing:** this is still an **unsigned preview**. SignPath review is pending; Windows SmartScreen may warn. Verify the [release SHA-256 values](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.4-preview#sha-256); hashes verify integrity, not publisher identity. See [code signing](docs/CODE_SIGNING.md).
+
+<!-- release-validation:v0.4.4-preview:41548334492 -->
+**Validation:** source commit `b2320477b28f9a1a73fbb54241633bb9e7b6782d` passed [build and Windows acceptance](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41547561018), including the glossary and session-history fixtures, the translation-worker tests, the translator UI and saved-reply regressions, and four visible app launches. [Release verification](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41548334492) confirmed portable extraction, native runtime imports, cache reuse, four EXE versions and upload/download byte equality before publication. All four public downloads were then downloaded again and matched their advertised SHA-256 values; the translator reports file version 0.9.5.0.
+
+**已于 2026-11-02 发布：** 环境助手 **0.7.0**、翻译器 **0.9.5**、时钟 **0.5.0**、打包助手 **0.1.1**。四款附件已重新下载核对版本与 SHA-256；翻译器为 **29.15 MB**，含运行库，不含选装语言包。
 
 - **术语默认不区分大小写。** `claude code`、`Claude Code`、`CLAUDE CODE` 用同一条；在 ⚙ → 术语词典 勾选「区分大小写」的词条只认原样写法。Skills、Sonnet、Rust 等本身也是普通英文单词的内置名称默认勾选，"improve your skills" 仍正常翻译。
 - **内置 135 条**（原 76 条）：补充机翻容易弄错的产品名（Hugging Face、Midjourney、Claude Max、GitHub Actions、VS Code 等）、技术词组（用量上限、提示缓存、边界情况、竞态条件等），以及「中文提问」用的中译英词条（提示词、仓库、报错信息等）。一条覆盖所有大小写，首字母大写的重复词条已删除。词典上限 200 条。

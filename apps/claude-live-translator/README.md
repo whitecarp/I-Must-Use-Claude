@@ -1,8 +1,8 @@
-# Whale Translator 0.9.4
+# Whale Translator 0.9.5
 
 Translate selected Claude text, keep preferred terms, and explicitly save useful replies as local Markdown. Windows 10/11 x64 and .NET Framework 4.8 are required for the portable EXE. The interface supports English / 中文.
 
-The 0.9.4 release EXE is **29.14 MB (29,143,552 bytes)**, below 30 MB. Optional offline language packs are separate downloads and use additional disk space.
+The 0.9.5 release EXE is **29.15 MB (29,145,088 bytes)**, below 30 MB. Optional offline language packs are separate downloads and use additional disk space.
 
 ## Select, translate, review
 
@@ -48,9 +48,9 @@ The public files remain **unsigned previews** until production signing is availa
 
 ## 中文说明
 
-**大肥鱼翻译 0.9.4** 保留选择窗口、松手翻译、中文提问和离线包流程，增加主动保存的「回复收藏本」，并提供 **76 条内置术语**（包含产品名称、技术词组、大小写和目标语言变体）。
+**大肥鱼翻译 0.9.5** 保留选择窗口、松手翻译、中文提问和离线包流程，提供主动保存的「回复收藏本」和 **135 条内置术语**（产品名称、技术词组和中译英词条，默认不区分大小写）。
 
-本版 EXE 为 **29.14 MB（29,143,552 字节）**，小于 30 MB；选装离线语言包需另外下载并占用空间。
+本版 EXE 为 **29.15 MB（29,145,088 字节）**，小于 30 MB；选装离线语言包需另外下载并占用空间。
 
 **术语：** 打开 ⚙ → 术语词典 →「补充内置词条」，保留用户原译法并补齐未冲突的词，点「保存」后生效；升级不覆盖已有词典。最多保存 200 条。在线和离线都适用；从 0.9.5 起默认不区分大小写，勾选「区分大小写」的词条只认原样写法（Skills、Sonnet、Rust 等内置名称默认勾选）。长词组优先，代码与链接保持原样。
 

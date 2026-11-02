@@ -15,7 +15,7 @@
 
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
 <p align="center">
-  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview"><strong>↓ Download the apps</strong></a>
+  <a href="https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.4-preview"><strong>↓ Download the apps</strong></a>
   &nbsp; · &nbsp; <a href="https://whitecarp.github.io/I-Must-Use-Claude/">Project page</a>
   &nbsp; · &nbsp; <a href="#choose-your-companion">Explore the tools</a>
   &nbsp; · &nbsp; <a href="docs/BUILDING.md">Build from source</a>
@@ -29,7 +29,7 @@
 | :--- | :--- | :--- | :--- |
 | **Whale Environment Helper** | **Whale Translator** | **Two-Zone Clock** | **Whale Pack Helper** |
 | Measure browser signals, handle matched local settings, and measure again. | Translate Claude's replies and prepare English prompts from Chinese. | Keep home time visible and count down to Claude's next session/weekly reset. | Package source, images and video locally, each file at most 29 MB. |
-| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe) |
+| [Get Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhaleEnvironmentHelper.exe) | [Get Translator ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhaleTranslator.exe) | [Get Clock ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/HomeTimeClock.exe) | [Get Pack Helper ↓](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhalePackHelper.exe) |
 
 **Download an EXE and double-click it.** Each app runs separately; install only what you need. The translator includes its runtime, while offline language packs are optional downloads inside the app. Source code remains public for developers.
 
@@ -37,7 +37,7 @@
 <summary><strong>Requirements, versions and language settings</strong></summary>
 
 - Windows 10/11. The translator's portable runtime requires **x64**; the desktop apps use **.NET Framework 4.8**.
-- **v0.4.3-preview** provides all four EXEs: Environment Helper **0.7.0**, Translator **0.9.4**, Two-Zone Clock **0.5.0**, and Pack Helper **0.1.1**.
+- **v0.4.4-preview** provides all four EXEs: Environment Helper **0.7.0**, Translator **0.9.5**, Two-Zone Clock **0.5.0**, and Pack Helper **0.1.1**.
 - Download the Windows EXEs. Pack Helper 0.1.1 needs no configuration sidecar or ZIP. GitHub's automatic source archives are for development, not the ready-to-run apps.
 - This repository opens in English and also has a Chinese README. App language defaults are unchanged; the apps support English / 中文 switching.
 
@@ -54,7 +54,7 @@ These are **unsigned preview** EXEs. Windows SmartScreen may stop the first laun
    Get-FileHash .\WhaleEnvironmentHelper.exe -Algorithm SHA256
    ```
 
-2. Compare the result with the same file's line in [release SHA-256 checksums](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.3-preview#sha-256). Only a match shows the file is unchanged.
+2. Compare the result with the same file's line in [release SHA-256 checksums](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.4-preview#sha-256). Only a match shows the file is unchanged.
 3. If it matches, choose **More info → Run anyway** in the SmartScreen window. If it does not, delete the file and download it again from this repository's Releases.
 
 </details>
@@ -147,7 +147,7 @@ The page is served locally. Its disclosed WebRTC check contacts Google STUN; the
 
 Understand Claude's replies without changing the way you work. Choose the Claude window, highlight a passage, and read the original and translation together.
 
-The 0.9.4 download is **29.14 MB (29,143,552 bytes)**, below 30 MB. Optional offline language packs are installed separately and are not included in that size.
+The 0.9.5 download is **29.15 MB (29,145,088 bytes)**, below 30 MB. Optional offline language packs are installed separately and are not included in that size.
 
 <p align="center"><img src="docs/images/translator094-saved-en.png" alt="Whale Translator 0.9.4: translated reply explicitly saved with a tag" width="560"></p>
 <p align="center"><sub>Compiled 0.9.4 app rendered by Windows CI at 96 DPI (100%) with synthetic sample text; offscreen rendering, not a real-machine interaction test.</sub></p>
@@ -263,7 +263,7 @@ Package selected source files, images and video locally before handing them to C
 
 Local packing does not upload files or contact an AI service. Only a manually requested update check or download contacts GitHub. Ordinary packaging and PNG/JPEG/BMP processing use built-in components; video compression and WebP decoding need an existing local **FFmpeg**.
 
-[Download Pack Helper 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.3-preview/WhalePackHelper.exe)
+[Download Pack Helper 0.1.1 EXE](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.4-preview/WhalePackHelper.exe)
 
 One EXE, no configuration sidecar or ZIP. [Source and usage](apps/whale-pack-helper/README.md) include the build script, resources and tests.
 
