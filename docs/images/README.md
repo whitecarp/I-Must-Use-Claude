@@ -4,7 +4,7 @@ These assets illustrate the public project. They contain no private conversation
 
 | Asset | Type and provenance |
 | --- | --- |
-| `hero.png` | New artwork generated with the built-in image generation tool, using the existing clock whale-girl artwork as the character reference. |
+| `hero.png` | v0.4.0 banner, composed in HTML and rendered with Chromium: the right-hand part of the earlier generated hero artwork (see the prompt below) as a framed sticker, live lettering for the title and tagline, and the four apps' own icons (`apps/*/icon.ico`, the helper mascot and the clock whale-girl). The previous three-tool banner remains in Git history. |
 | `translator-preview.svg` | Editable, code-authored workflow illustration with invented example text; not an app screenshot or a live translation result. |
 | `clock-preview.svg` | Editable, code-authored workflow illustration with example times. |
 | `helper-preview.svg` | Editable, code-authored workflow illustration of version 0.3.0. It assumes no measured score or successful repair. |
@@ -12,7 +12,7 @@ These assets illustrate the public project. They contain no private conversation
 | `translator-offline-dialog.png` | Existing 0.8.1 demonstration screenshot of the offline retry confirmation. |
 | `translator-compose.png` | Existing 0.8.1 demonstration screenshot with fixed Chinese sample text and no connected chat. |
 | `clock-ui.png` | Existing compact clock screenshot; displayed dates and times are examples. |
-| `site-hero.webp` | Right-hand crop of `hero.png` (the illustration without the title lettering), resized for the project page. |
+| `site-hero.webp` | Right-hand crop of the earlier generated hero artwork (the illustration without the title lettering), resized for the project page. |
 | `site-helper-mascot.webp` | Downscaled copy of the Environment Helper's mascot (`apps/whale-claude-helper/assets/helper-mascot.png`) for the project page. |
 | `site-pack-whale.webp` | Copy of the Pack Helper's whale (`apps/whale-pack-helper/assets/whale.png`) with the flat white backdrop made transparent, for the project page. |
 | `site-clock-girl.webp` | Downscaled copy of the clock's existing whale-girl artwork (`apps/two-zone-clock/assets/whalegirl.png`) for the project page's clock demo. |
@@ -20,7 +20,9 @@ These assets illustrate the public project. They contain no private conversation
 
 The existing screenshots were copied without alterations. Their inclusion does not represent new app execution, a new translation test, or a system-settings test.
 
-## Hero generation prompt
+## Hero illustration prompt
+
+This prompt produced the original banner whose illustration is reused in the current `hero.png` and in `site-hero.webp`.
 
 Built-in tool; opaque background; the existing clock whale-girl image was supplied as a reference.
 
