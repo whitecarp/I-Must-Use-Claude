@@ -1,6 +1,6 @@
 # Code signing and Windows warnings
 
-**Current status: unsigned preview; SignPath application preparation only.** No SignPath application has been submitted or approved, no certificate has been issued to this project, and no production signing credentials are configured. The optional workflow integration is preparation, not evidence of signed downloads. Update this status only after the corresponding real event is verified.
+**Current status: unsigned preview; SignPath Foundation application submitted, awaiting review.** The application form confirmed submission on 2026-11-02 UTC. Approval is still pending, no certificate has been issued to this project, and no production signing credentials are configured. The optional workflow integration is preparation, not evidence of signed downloads. Update this status only after the corresponding real event is verified.
 
 Windows can warn about an unsigned or unfamiliar download. Authenticode identifies a publisher and detects changes after signing; it does not guarantee that SmartScreen reputation warnings disappear or that an application is harmless. Keep Windows security protections enabled. Check the release source and SHA-256, and inspect the digital signature when one is actually provided. Microsoft's [SmartScreen documentation](https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/microsoft-defender-smartscreen/) describes its reputation checks.
 
@@ -10,7 +10,7 @@ The optional integration follows [SignPath's official GitHub instructions](https
 
 Before enabling required signing, the maintainers must:
 
-1. Complete the applicable application, eligibility review and terms/code-of-conduct consent. Approval is not assumed; review the [SignPath Foundation terms](https://signpath.org/terms.html).
+1. Await the submitted application's eligibility review and complete any additional requirements requested by SignPath. Approval is not assumed; review the [SignPath Foundation terms](https://signpath.org/terms.html).
 2. Configure the approved organization, project, certificate, signing policy and authorized submitter/approver roles. Record the actual publisher and policy here after approval; do not invent an organization ID, certificate name or approval.
 3. Install/authorize the SignPath GitHub App and link this repository to the project's trusted GitHub build system. Builds leading to the signing request run on GitHub-hosted runners.
 4. Configure an artifact definition for the uploaded ZIP-shaped Actions artifact with the four EXEs at its root. Sign only this project's four outer EXEs. Do not relabel or sign upstream Python, CTranslate2, FFmpeg or other third-party binaries as this project's code.
@@ -34,7 +34,7 @@ No malware false-positive report has been observed or submitted for this release
 
 ## 中文说明
 
-当前发布仍是**未签名预览版**。SignPath 正在准备申请，尚未提交、获批或配置生产签名凭据。仓库里的签名工作流只是预备实现，不表示下载文件已经签名。
+当前发布仍是**未签名预览版**。SignPath Foundation 申请表已于 2026 年 11 月 2 日（UTC）确认提交，正在等待审核，尚未获批，也未配置生产签名凭据。仓库里的签名工作流只是预备实现，不表示下载文件已经签名。
 
 签名可以验证发布者和签名后的文件完整性，但不能保证 SmartScreen 不再提示，也不能代替安全检查。不要关闭 Windows 安全防护。只有服务获批、实际签名并逐个核验四个 EXE 后，才能改写签名状态。
 

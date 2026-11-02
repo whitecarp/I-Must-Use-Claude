@@ -31,7 +31,7 @@ The app processes files the user selects, writes the chosen output package/files
 
 The **Check for updates** action queries the public GitHub releases API for `whitecarp/I-Must-Use-Claude`. When the user requests a download, the app downloads the matching EXE from GitHub's release infrastructure and checks its advertised SHA-256. This transmits normal HTTP request information and the requested release/asset, not the user's chats or local backups.
 
-Build-time dependency downloads and a future SignPath signing request concern release artifacts, not installed users' conversations. SignPath is currently at application-preparation stage, not submitted/approved or configured for production signing. See [code signing](CODE_SIGNING.md). There is no background upload of users' files to a signing or malware-submission service.
+Build-time dependency downloads and a future SignPath signing request concern release artifacts, not installed users' conversations. The SignPath Foundation application has been submitted and is awaiting review; approval and production signing are not yet in place. See [code signing](CODE_SIGNING.md). There is no background upload of users' files to a signing or malware-submission service.
 
 ## 中文说明
 
@@ -39,4 +39,4 @@ Google 模式会发送用户选中、粘贴或在提问框输入的待翻译文�
 
 时钟的时间换算在本机完成。环境助手的本机检查、修复备份和报告保存在本机；网络检测会向 Net.Coffee 发送 HTTPS 测试请求，服务方可见出口、随机测试域名和观察到的解析器。可选浏览器 WebRTC 测试会连接 Google STUN。它们不上传本地代理订阅或凭据，也不代表所有应用的网络路径。
 
-打包助手只处理用户选取的文件并生成本地结果，不自动发送给 Claude。手动检查更新会连接 GitHub，下载时获取对应 EXE。备份可能包含原始配置，请当作私人文件保管，分享前自行检查。SignPath 尚在准备申请阶段，不会在用户电脑上自动上传文件用于签名或误报申诉。
+打包助手只处理用户选取的文件并生成本地结果，不自动发送给 Claude。手动检查更新会连接 GitHub，下载时获取对应 EXE。备份可能包含原始配置，请当作私人文件保管，分享前自行检查。SignPath Foundation 申请已提交、等待审核，尚未获批或用于生产签名；不会在用户电脑上自动上传文件用于签名或误报申诉。

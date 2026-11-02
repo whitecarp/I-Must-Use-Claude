@@ -82,7 +82,7 @@ namespace WhaleClaudeHelper {
             state.Text=awaitingAfter?T("设置已处理，等待实测结果。","Settings processed; awaiting measurement."):(after!=null?T("复测已完成，请查看实际变化。","Measured again. Review the actual results."):(before==null?T("先测出分数，再决定需要改什么。","Measure first, then decide what needs changing."):(before.CanOptimize?T("检测已收到，仅处理命中的本地项目。","Results received. Only matched local items will be handled."):T("部分必要项目未测或已过期，请重新检测。","Required checks are missing or expired. Measure again."))));
             hint.Text=T("检测会打开浏览器，请点击「开始测量」；复测时使用同一浏览器和资料。\r\n先保存工作并退出 Claude、Chrome、Edge。优化只改命中的时区、语言和个人字体；DNS 在「网络与 DNS」单独预览确认。","Measurement opens your browser; click Start measurement. Reuse the same browser/profile.\r\nSave work and close Claude, Chrome and Edge. Optimize changes matched UTC, language and personal fonts; use Network & DNS for separate DNS preview and confirmation.");
             var report=after??before;
-            details.Text=report==null?T("尚无真实检测结果。\r\n本版已编译，尚未完成独立 Windows 虚拟机端到端验收。","No real measurement yet.\r\nCompiled preview; independent Windows VM end-to-end acceptance is pending."):ReportText(report,Ui.English);
+            details.Text=report==null?T("尚无真实检测结果。\r\n构建与测试记录请查看仓库 Actions。","No real measurement yet.\r\nSee repository Actions for build and test records."):ReportText(report,Ui.English);
             if(operationDetails.Length>0)details.Text=operationDetails+"\r\n\r\n"+details.Text;
             if(demo){state.Text=T("演示模式 · 不进行检测或系统修改","Demo mode · no measurement or system changes");optimize.Text=T("查看流程示例","View sample flow");}
         }
