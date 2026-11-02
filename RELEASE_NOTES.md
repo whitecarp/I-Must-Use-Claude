@@ -10,11 +10,11 @@
 
 Download `WhaleEnvironmentHelper.exe`, or keep `WhalePackHelper.exe` together with `WhalePackHelper.exe.config` (both are also in the convenience ZIP). Translator **0.9.0** and Clock **0.3.0** continue to use their v0.3.0-preview downloads; this release does not replace them.
 
-**Validation:** the final integrated helper passed 1,668 isolated checks, Pack Helper passed 7,088 assertions, and the shared updater passed 54 checks. Asset hashes are recorded in `docs/SHA256SUMS.txt`; Pack Helper's runtime configuration must accompany the EXE. Independent Windows VM end-to-end acceptance remains pending. No personal configuration, credentials, subscriptions, private backups or user logs belong in this release.
+**Validation:** the final integrated helper passed 1,684 isolated checks, Pack Helper passed 7,088 assertions, and the shared updater passed 54 checks. Asset hashes are recorded in `docs/SHA256SUMS.txt`; Pack Helper's runtime configuration must accompany the EXE. Independent Windows VM end-to-end acceptance remains pending. No personal configuration, credentials, subscriptions, private backups or user logs belong in this release.
 
 环境助手 **0.7.0** 保留维护清理、Codex 代理、关闭程序入口和专属图标，增量整合独立 0.3.3 的网络与 DNS 功能，使用重新构建的成品。DNS 结果仅说明助手 HTTPS／默认代理路径，不能代表浏览器独立 DoH 或全系统无泄露；修改须单独预览、私密备份、确认应用，可撤回。WebRTC 是独立可选检测。
 
-新增打包助手 **0.1.0**，在本机整理源码、图片和视频，不上传，原文件不变；视频与 WebP 需要本机 FFmpeg。EXE 和同名配置需放在一起，亦可下载配套 ZIP。翻译器 0.9.0、时钟 0.3.0 保持原发布下载。沿用 Claude 的前端布局、样式与插图，只同步功能说明和下载链接。环境助手 1,668 项、打包助手 7,088 项及共用更新器 54 项隔离检查通过，独立虚拟机端到端验收仍待完成。
+新增打包助手 **0.1.0**，在本机整理源码、图片和视频，不上传，原文件不变；视频与 WebP 需要本机 FFmpeg。EXE 和同名配置需放在一起，亦可下载配套 ZIP。翻译器 0.9.0、时钟 0.3.0 保持原发布下载。沿用 Claude 的前端布局、样式与插图，只同步功能说明和下载链接。环境助手 1,684 项、打包助手 7,088 项及共用更新器 54 项隔离检查通过，独立虚拟机端到端验收仍待完成。
 
 
 ## v0.3.0-preview — terminology, recent translations and updates

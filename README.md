@@ -103,7 +103,7 @@ Offscreen demo rendering with synthetic data. No real cache was scanned or clean
 
 Close Claude and Claude Code normally before cleanup, repair or restore. Chats, login data, cookies, skills, plugins, hooks, MCP settings, custom rules and local identity remain protected. Configuration repair removes **selected authentication overrides**, not stored official login data. Unknown paths and linked files are skipped. CC Switch / Cockpit provider takeover is not switched automatically.
 
-**Preview status:** The 0.7.0 integration passed 1,668 isolated checks and its final build verification. Independent Windows VM end-to-end acceptance is still pending; fixture checks do not establish results for your browser or network. Those tests do not apply cleanup or configuration changes to a personal environment.
+**Preview status:** The 0.7.0 integration passed 1,684 isolated checks and its final build verification. Independent Windows VM end-to-end acceptance is still pending; fixture checks do not establish results for your browser or network. Those tests do not apply cleanup or configuration changes to a personal environment.
 
 <details>
 <summary><strong>What optimization changes — and what it preserves</strong></summary>

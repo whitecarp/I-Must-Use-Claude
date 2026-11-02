@@ -21,13 +21,21 @@ The integrated helper retains 0.6.0's maintenance, Codex proxy repair, blocking-
 | Configuration repair/restore fixtures | 109 |
 | Diagnostic fixtures | 13 |
 | Maintenance UI fixtures | 36 |
-| Codex proxy settings transactions | 203 |
+| Codex proxy settings transactions | 219 |
 | Synthetic loopback proxy discovery | 104 |
 | Injected process-close tests | 153 |
 | Proxy UI/plan fixtures | 30 |
-| **Total** | **1,668** |
+| **Total** | **1,684** |
 
 The DNS UI suite adds 20 checks to the previous 344 for retained maintenance/proxy/close/update entries and the orange theme. The old version-title assertion was updated for 0.7.0. Symbolic-link creation was unavailable for one proxy settings fixture; hardlink/alias guards were tested, and this limitation is not counted as successful symbolic-link creation.
+
+## CI temporary-path portability correction
+
+The first release CI run failed at the accepted `http://localhost:80` fixture. This was reproduced locally by adding a `ci-runner` directory to the process-only `TEMP` and `TMP` paths: the redundant GUID in that fixture's name produced a 214-character transaction directory and a 263-character receipt staging path. Legacy .NET rejected the file operation before changing `.env`; proxy validation itself accepted the explicit port correctly.
+
+The fixture root remains unique, while accepted-URI case directories now use stable indexes instead of another GUID. Failure messages include the safe error code and whether the file changed. Sixteen additional checks cover missing-port rejection, accepted port boundaries 1 and 65535, and preservation of explicit HTTP/SOCKS ports and original spelling. The 219-check proxy settings suite passed both with the ordinary temporary path and the longer path that reproduced the original failure. The 104 proxy-discovery and 30 proxy-UI checks were also rerun successfully; repeated runs are not counted twice above.
+
+Only tests and this report changed for the CI correction. No production URI validation or file-safety behavior changed, and the previously built 0.7.0 executable remains unchanged: 1,923,584 bytes, SHA-256 `13338D0BBE62E0022B08275D383018EBC57E8A25403C468BD7965627867A76DA`. A new CI run is still required to confirm the fix on the hosted Windows runner.
 
 ## Evidence and limits
 

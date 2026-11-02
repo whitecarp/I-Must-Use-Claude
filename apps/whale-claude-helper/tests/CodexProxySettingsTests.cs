@@ -117,13 +117,20 @@ internal static class CodexProxySettingsTests {
             Check(!result.Success && result.Error == "codex_invalid_utf8", "non UTF8 encoding rejected " + i); Exact(encodings[i], f.Bytes(), "invalid encoding preserved");
         }
         var big = new Fixture("too-large", new byte[2097153]); Check(big.Store().Apply(Http, All).Error == "codex_env_too_large", "bounded env read");
-        string[] invalidUris = {"http://example.com:80", "https://127.0.0.1:443", "socks5://127.0.0.1:7890", "http://user:pass@127.0.0.1:7890", "http://127.0.0.1:0", "http://127.0.0.1:65536", "http://127.0.0.1:80/path", "http://127.0.0.1:80\nHTTP_PROXY=evil", "http://127.01.0.1:80", "http://127.999.1.1:80", " http://127.0.0.1:80", "http://127.0.0.1:80/"};
+        string[] invalidUris = {"http://example.com:80", "https://127.0.0.1:443", "socks5://127.0.0.1:7890", "http://user:pass@127.0.0.1:7890", "http://127.0.0.1:0", "http://127.0.0.1:65536", "http://127.0.0.1:80/path", "http://127.0.0.1:80\nHTTP_PROXY=evil", "http://127.01.0.1:80", "http://127.999.1.1:80", " http://127.0.0.1:80", "http://127.0.0.1:80/", "http://localhost", "socks5h://[::1]"};
         var invalid = new Fixture("bad-uri", "KEEP=ok\n");
         foreach (string uri in invalidUris) Check(invalid.Store().Apply(Http, uri).Error == "codex_invalid_proxy_uri", "unsafe proxy URI rejected");
         Check(invalid.Store().Apply(All, All).Error == "codex_invalid_proxy_uri", "HTTP target requires HTTP proxy");
         Check(!Directory.Exists(invalid.Backup) && invalid.Text() == "KEEP=ok\n", "invalid URI has no side effects");
-        foreach (string uri in new[] {"http://localhost:80", "http://[::1]:8080", "http://127.0.0.2:8080", "HTTP://LOCALHOST:80"}) {
-            var f = new Fixture("valid-uri-" + Guid.NewGuid().ToString("N"), ""); Check(f.Store().Apply(uri, "socks5h://[::1]:1080").Success, "loopback URI accepted " + uri);
+        string[] validUris = {"http://localhost:80", "http://[::1]:8080", "http://127.0.0.2:8080", "HTTP://LOCALHOST:80", "http://127.0.0.1:1", "http://127.0.0.1:65535"};
+        for (int i = 0; i < validUris.Length; i++) {
+            // The root is already unique. A second GUID here pushes receipt staging
+            // paths beyond legacy .NET MAX_PATH under longer CI user profiles.
+            string uri = validUris[i]; var f = new Fixture("valid-uri-" + i, "");
+            var accepted = f.Store().Apply(uri, "socks5h://[::1]:1080");
+            Check(accepted.Success, "loopback URI accepted " + uri + "; error=" + accepted.Error + "; changed=" + accepted.Changed);
+            Check(f.Text().Contains("HTTP_PROXY=" + uri + "\r\n"), "explicit HTTP port and original spelling preserved " + uri);
+            Check(f.Text().Contains("ALL_PROXY=socks5h://[::1]:1080\r\n"), "explicit SOCKS IPv6 port preserved");
         }
     }
 
