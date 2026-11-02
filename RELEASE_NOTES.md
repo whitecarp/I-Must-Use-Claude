@@ -1,5 +1,19 @@
 # Release notes
 
+## Unreleased — Translator 0.9.5 glossary matching
+
+Not yet published: the source on `main` is translator **0.9.5**, while downloads stay on v0.4.3-preview (translator 0.9.4) until the next release.
+
+- **Terms ignore case.** `claude code`, `Claude Code` and `CLAUDE CODE` use the same entry. In **⚙ → Glossary**, tick **Match case** for a term that should only match its exact spelling. Built-in names that are also everyday words (Skills, Artifacts, Hooks, Opus, Sonnet, Haiku, Fable, Gemini, Grok, Llama, Mistral, Perplexity, Windsurf, React, Rust, Swift, Cursor, Copilot) have it ticked, so "improve your skills" still translates.
+- **135 built-in entries** (was 76): product names machine translation tends to mangle (Hugging Face, Midjourney, Claude Max, GitHub Actions, VS Code…), more technical phrases (usage limit, prompt caching, edge case, race condition…) and more Chinese → English terms for Write in Chinese (提示词, 仓库, 报错信息…). One entry now covers every case, so the capitalised copies are gone. The editor holds up to 200 entries.
+- **Existing dictionaries upgrade when read.** Rows that differ only in case and share a translation become one row; rows with different translations (Apple / apple) keep Match case, so nothing changes meaning. To add the new built-ins, click **Add built-in terms**, then **Save**.
+
+**尚未发布 · 翻译器 0.9.5：** main 上的源码已是 0.9.5；下次发布前，下载仍是 v0.4.3-preview（翻译器 0.9.4）。
+
+- **术语默认不区分大小写。** `claude code`、`Claude Code`、`CLAUDE CODE` 用同一条；在 ⚙ → 术语词典 勾选「区分大小写」的词条只认原样写法。Skills、Sonnet、Rust 等本身也是普通英文单词的内置名称默认勾选，"improve your skills" 仍正常翻译。
+- **内置 135 条**（原 76 条）：补充机翻容易弄错的产品名（Hugging Face、Midjourney、Claude Max、GitHub Actions、VS Code 等）、技术词组（用量上限、提示缓存、边界情况、竞态条件等），以及「中文提问」用的中译英词条（提示词、仓库、报错信息等）。一条覆盖所有大小写，首字母大写的重复词条已删除。词典上限 200 条。
+- **旧词典读取时自动升级。** 只差大小写且译法相同的行合并为一行；译法不同的行（如 Apple / apple）自动勾选「区分大小写」，意思不变。要加入新的内置词，点「补充内置词条」再保存。
+
 ## v0.4.3-preview — Translator 0.9.4 glossary and saved replies
 
 Published **2026-11-02**, with four verified standalone EXEs. Translator **0.9.4** is **29,143,552 bytes (29.14 MB)**, including its runtime; language packs remain optional downloads.

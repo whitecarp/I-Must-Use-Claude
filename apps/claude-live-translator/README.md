@@ -10,11 +10,11 @@ Open `WhaleTranslator.exe`, choose the source window from its cards, and select 
 
 Google mode uses a key-free web translation endpoint and may fail or rate-limit requests. For offline use, install the desired language direction while online. Offline mode stays local; **Use offline** retries with a compatible installed pack. Source detection, translation, sending and the existing bounded session history retain their workflows.
 
-## 76 starter glossary entries
+## 135 starter glossary entries
 
-Open **⚙ → Glossary**. The initial dictionary includes 76 entries: names such as Claude, Codex and Skills, common technical phrases, and their case/target-language variants. Names can stay unchanged across languages; phrases such as `context window` have a preferred Simplified Chinese translation, with selected reverse terms for English.
+Open **⚙ → Glossary**. From 0.9.5 the initial dictionary includes 135 entries: names such as Claude, Codex, Hugging Face and GitHub Actions, common technical phrases, and Chinese → English terms for Write in Chinese. Names can stay unchanged across languages; phrases such as `context window` have a preferred Simplified Chinese translation, with selected reverse terms for English.
 
-An existing saved dictionary is not replaced by an upgrade. Click **Add built-in terms** to fill nonconflicting gaps while retaining your translations, then click **Save**. The editor supports up to 100 entries. An explicitly saved empty dictionary remains empty until you choose to add terms again. Matching is case-sensitive, longer phrases take priority, and code/URLs stay unchanged. Terms work in online and offline translation.
+An existing saved dictionary is not replaced by an upgrade. Click **Add built-in terms** to fill nonconflicting gaps while retaining your translations, then click **Save**. The editor supports up to 200 entries. An explicitly saved empty dictionary remains empty until you choose to add terms again. Terms ignore case unless **Match case** is ticked; built-in names that are also everyday words (Skills, Sonnet, React, Rust…) keep it on. Dictionaries saved by 0.9.4 or earlier are upgraded when read: rows that differ only in case and share a translation become one row, and rows with different translations keep Match case. Longer phrases take priority, and code/URLs stay unchanged. Terms work in online and offline translation.
 
 ## Save only the replies you choose
 
@@ -52,7 +52,7 @@ The public files remain **unsigned previews** until production signing is availa
 
 本版 EXE 为 **29.14 MB（29,143,552 字节）**，小于 30 MB；选装离线语言包需另外下载并占用空间。
 
-**术语：** 打开 ⚙ → 术语词典 →「补充内置词条」，保留用户原译法并补齐未冲突的词，点「保存」后生效；升级不覆盖已有词典。最多保存 100 条。在线和离线都适用，区分大小写、长词组优先，代码与链接保持原样。
+**术语：** 打开 ⚙ → 术语词典 →「补充内置词条」，保留用户原译法并补齐未冲突的词，点「保存」后生效；升级不覆盖已有词典。最多保存 200 条。在线和离线都适用；从 0.9.5 起默认不区分大小写，勾选「区分大小写」的词条只认原样写法（Skills、Sonnet、Rust 等内置名称默认勾选）。长词组优先，代码与链接保持原样。
 
 **收藏：** 有译文后主动点「☆ 收藏」，小箭头选择或新建标签，默认沿用上次标签。⚙ →「回复收藏本」可以搜索原文与译文、按标签筛选、修改标签和备注后保存、复制文字或打开文件夹。只有用户点击收藏才会保存，不自动归档聊天。
 

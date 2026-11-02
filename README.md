@@ -158,9 +158,9 @@ The 0.9.4 download is **29.14 MB (29,143,552 bytes)**, below 30 MB. Optional off
 2. Choose your target language. In Claude, hold the left mouse button, select text, and release.
 3. Read or copy the translation. Use **Write in Chinese** when you want to write in Chinese and review an English version before sending.
 
-**Automatic language detection · Optional offline packs · 76 built-in glossary entries · Saved replies**
+**Automatic language detection · Optional offline packs · 135 built-in glossary entries · Saved replies**
 
-The starter glossary has **76 entries** for Claude/product names and common technical phrases, including case variants and language-specific entries. Open **⚙ → Glossary → Add built-in terms** to fill gaps in an existing dictionary without overwriting your preferred translations, then **Save**. Existing saved dictionaries are not silently replaced.
+The starter glossary has **135 entries**: Claude and other product names that machine translation tends to mangle, common technical phrases, and Chinese → English terms for Write in Chinese. Terms ignore case, so one entry covers `claude code` and `CLAUDE CODE`; names that are also everyday words (Skills, Sonnet, Rust…) only match their exact spelling. Open **⚙ → Glossary → Add built-in terms** to fill gaps in an existing dictionary without overwriting your preferred translations, then **Save**. Existing saved dictionaries are not silently replaced.
 
 Use **Previous / Next** to revisit translations from the current session. To keep one after closing the app, explicitly click **☆ Save** on its translation card. The arrow beside it chooses or creates a tag; **★ Saved** can be clicked again to remove that reply's Markdown file.
 

@@ -22,7 +22,7 @@ function Assert-PreviewPath([string]$Path) {
 $Executable = Assert-PreviewPath $Executable
 $ScreenshotDirectory = Assert-PreviewPath $ScreenshotDirectory
 if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) { throw 'Build the translator components first.' }
-if ([Diagnostics.FileVersionInfo]::GetVersionInfo($Executable).FileVersion -ne '0.9.4.0') { throw 'Expected translator 0.9.4.0.' }
+if ([Diagnostics.FileVersionInfo]::GetVersionInfo($Executable).FileVersion -ne '0.9.5.0') { throw 'Expected translator 0.9.5.0.' }
 if (Test-Path -LiteralPath $ScreenshotDirectory) { throw 'Preview output already exists; use a fresh directory to avoid stale screenshots.' }
 
 $previewRepo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -115,7 +115,7 @@ Upload only native-100/*.png, scaled-preview-150/*.png and top-level logs/receip
 '@
 $previewNotes | Set-Content -LiteralPath (Join-Path $ScreenshotDirectory 'CAPTURE-NOTES.txt') -Encoding utf8
 [ordered]@{
-    schema=1; appVersion='0.9.4'; passed=($previewRows.Count -eq 32); createdUtc=[DateTime]::UtcNow.ToString('o')
+    schema=1; appVersion='0.9.5'; passed=($previewRows.Count -eq 32); createdUtc=[DateTime]::UtcNow.ToString('o')
     executableSha256=(Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant()
     syntheticOnly=$true; systemDpiChanged=$false; independent150PercentDpiVerified=$false; previews=$previewRows.ToArray()
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $ScreenshotDirectory 'preview-results.json') -Encoding utf8
