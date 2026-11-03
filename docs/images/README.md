@@ -5,9 +5,11 @@ These assets illustrate the public project. They contain no private conversation
 | Asset | Type and provenance |
 | --- | --- |
 | `hero.png` | v0.4.0 banner, composed in HTML and rendered with Chromium: the right-hand part of the earlier generated hero artwork (see the prompt below) as a framed sticker, live lettering for the title and tagline, and the four apps' own icons (`apps/*/icon.ico`, the helper mascot and the clock whale-girl). The previous three-tool banner remains in Git history. |
+| `hero-zh.png` | Chinese edition of the same banner for the Chinese README and the project page's social preview: identical artwork, icons and layout, with Chinese lettering set in Noto Sans SC (Google Fonts) and rendered with Chromium. |
 | `translator-preview.svg` | Editable, code-authored workflow illustration with invented example text; not an app screenshot or a live translation result. |
 | `clock-preview.svg` | Editable, code-authored workflow illustration with example times. |
 | `helper-preview.svg` | Editable, code-authored workflow illustration of version 0.3.0. It assumes no measured score or successful repair. |
+| `helper-preview-zh.svg`, `clock-preview-zh.svg` | Chinese editions of the two illustrations for the Chinese README. Same layout; button and option names match the apps' Chinese interface. |
 | `translator-offline.png` | Existing 0.8.1 demonstration screenshot showing the offline retry entry point. |
 | `translator-offline-dialog.png` | Existing 0.8.1 demonstration screenshot of the offline retry confirmation. |
 | `translator-compose.png` | Existing 0.8.1 demonstration screenshot with fixed Chinese sample text and no connected chat. |

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/hero.png" alt="我一定要用上Claude的鲸鱼主题插画" width="100%">
+  <img src="docs/images/hero-zh.png" alt="我一定要用上Claude：四个小工具，一个更顺手的工作台。鲸鱼主题插画" width="100%">
 </p>
 
 <h1 align="center">我一定要用上Claude</h1>
@@ -79,7 +79,7 @@
 
 先看浏览器实际报告了什么，再决定哪些设置值得调整。保留检测基准，先备份再处理，最后用复测结果确认变化。
 
-<p align="center"><img src="docs/images/helper-preview.svg" alt="功能示意：环境检测、处理命中项、复测与撤回" width="100%"></p>
+<p align="center"><img src="docs/images/helper-preview-zh.svg" alt="功能示意：环境检测、处理命中项、复测与撤回" width="100%"></p>
 <p align="center"><sub>预览版工作流程示意图，并非实测结果。</sub></p>
 
 **三步开始**
@@ -216,7 +216,7 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 
 上方大卡片显示**原本地区**，下方小卡片显示**目标地区**，底部还可显示 **Claude 本轮与每周重置倒计时**。小小的鲸鱼时钟陪在桌面，让你随时知道自己那边现在几点。
 
-<p align="center"><img src="docs/images/clock-preview.svg" alt="功能示意：上下排列的原本地区和目标地区时钟" width="100%"></p>
+<p align="center"><img src="docs/images/clock-preview-zh.svg" alt="功能示意：上下排列的原本地区和目标地区时钟" width="100%"></p>
 <p align="center"><sub>静态功能示意图，其中时间仅作示例，不是当前实时时间。</sub></p>
 
 **三步开始**
