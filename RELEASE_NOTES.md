@@ -1,5 +1,28 @@
 # Release notes
 
+## v0.4.5-preview — Translator 0.9.6 offline-retry status
+
+Published **2026-11-03**, with four verified standalone EXEs. Translator **0.9.6** is **29,146,112 bytes (29.15 MB)**, including its runtime; language packs remain optional downloads.
+
+| App | Version | Download |
+| --- | --- | --- |
+| Whale Environment Helper | 0.7.0 | [WhaleEnvironmentHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.5-preview/WhaleEnvironmentHelper.exe) |
+| Whale Translator | 0.9.6 | [WhaleTranslator.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.5-preview/WhaleTranslator.exe) |
+| Two-Zone Clock | 0.5.0 | [HomeTimeClock.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.5-preview/HomeTimeClock.exe) |
+| Whale Pack Helper | 0.1.1 | [WhalePackHelper.exe](https://github.com/whitecarp/I-Must-Use-Claude/releases/download/v0.4.5-preview/WhalePackHelper.exe) |
+
+- **The offline-retry message is no longer cut off.** When Google rate-limits a selection, the status beside **Use offline** now shows in full at the default and minimum window sizes, in English and Chinese; before, it was truncated with "…". While the button shows, the status gets the rest of the row, and the English text is shorter: "Google is unavailable. Use offline for this selection."
+- **Four EXEs, one toolbox release:** clock **0.5.0**, helper **0.7.0** and pack **0.1.1** keep their versions from v0.4.4-preview.
+
+**Signing:** this is still an **unsigned preview**. SignPath review is pending; Windows SmartScreen may warn. Verify the [release SHA-256 values](https://github.com/whitecarp/I-Must-Use-Claude/releases/tag/v0.4.5-preview#sha-256); hashes verify integrity, not publisher identity. See [code signing](docs/CODE_SIGNING.md).
+
+<!-- release-validation:v0.4.5-preview:41575739298 -->
+**Validation:** source commit `3cbf4bf0a8100bdb1664c6c514482e99c0baaef7` passed [build and Windows acceptance](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41556180523), including the glossary and session-history fixtures, the translation-worker tests, the translator UI and saved-reply regressions, a check that the offline-retry status fits beside Use offline at the default and minimum window sizes in both languages, and four visible app launches. [Release verification](https://github.com/whitecarp/I-Must-Use-Claude/actions/runs/41575739298) confirmed portable extraction, native runtime imports, cache reuse, four EXE versions and upload/download byte equality before publication. All four public downloads were then downloaded again and matched their advertised SHA-256 values; the translator reports file version 0.9.6.0.
+
+**已于 2026-11-03 发布：** 环境助手 **0.7.0**、翻译器 **0.9.6**、时钟 **0.5.0**、打包助手 **0.1.1**。四款附件已重新下载核对版本与 SHA-256；翻译器为 **29.15 MB**，含运行库，不含选装语言包。
+
+- **离线重译的提示不再被截断。** Google 限流时，「改用离线翻译」按钮旁的提示在默认窗口和最小窗口下都能完整显示，中英文都一样；以前会被省略号截掉。
+
 ## v0.4.4-preview — Translator 0.9.5 glossary matching
 
 Published **2026-11-02**, with four verified standalone EXEs. Translator **0.9.5** is **29,145,088 bytes (29.15 MB)**, including its runtime; language packs remain optional downloads.
