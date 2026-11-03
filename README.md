@@ -169,8 +169,8 @@ Open **⚙ → Saved replies** to search the original and translated text, filte
 <p align="center"><img src="docs/images/translator094-notebook-en.png" alt="Reply notebook in English with synthetic saved replies, tag filters, original text and note editor" width="600"></p>
 <p align="center"><sub>Reply notebook, rendered in the same 96-DPI CI run. All replies, tags and source titles shown here are synthetic fixtures.</sub></p>
 
-<p align="center"><img src="docs/images/translator-glossary-en.png" alt="Translator 0.9.5 glossary editor showing built-in terms, with Match case ticked for Skills and Sonnet" width="640"></p>
-<p align="center"><sub>Compiled 0.9.5 app rendered offscreen with an excerpt of the built-in terms; no personal dictionary or conversation was read.</sub></p>
+<p align="center"><img src="docs/images/translator-glossary-en.png" alt="Translator 0.9.6 glossary editor showing built-in terms, with Match case ticked for Skills and Sonnet" width="640"></p>
+<p align="center"><sub>Compiled 0.9.6 app rendered offscreen with an excerpt of the built-in terms; no personal dictionary or conversation was read.</sub></p>
 
 <details>
 <summary><strong>Glossary, saved replies and offline use</strong></summary>
@@ -197,7 +197,7 @@ Open **⚙ → Saved replies** to search the original and translated text, filte
 <p align="center"><img src="docs/images/translator-offline-en.png" alt="Translator showing the Use offline option after Google rate-limits a request" width="460"></p>
 <p align="center"><img src="docs/images/translator-offline-dialog-en.png" alt="Use offline translation dialog with an installed language direction selected" width="430"></p>
 
-Compiled 0.9.5 app rendered offscreen by Windows CI at 96 DPI (100%) using its built-in fixed samples; nothing was translated online or sent, and this is not a real-machine interaction test.
+Compiled 0.9.6 app rendered offscreen by Windows CI at 96 DPI (100%) using its built-in fixed samples; nothing was translated online or sent, and this is not a real-machine interaction test.
 
 </details>
 
