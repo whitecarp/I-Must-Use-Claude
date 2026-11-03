@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
-[assembly:System.Reflection.AssemblyVersion("0.9.5.0")]
-[assembly:System.Reflection.AssemblyFileVersion("0.9.5.0")]
+[assembly:System.Reflection.AssemblyVersion("0.9.6.0")]
+[assembly:System.Reflection.AssemblyFileVersion("0.9.6.0")]
 
 namespace ClaudeCompanion {
     internal static class Json {
@@ -281,7 +281,7 @@ namespace ClaudeCompanion {
         }
     }
     internal static class Program {
-        internal const string Version = "0.9.5";
+        internal const string Version = "0.9.6";
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
         [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]

@@ -156,7 +156,7 @@ namespace ClaudeCompanion {
             var footRight=new Panel{Dock=DockStyle.Fill,Margin=new Padding(0)};footRight.Controls.Add(privacy);
             footerRight=footRight;
             offlineRetry=Button("改用离线翻译","Use offline",true,145);offlineRetry.Height=25;offlineRetry.Dock=DockStyle.Right;offlineRetry.Margin=new Padding(0);offlineRetry.Visible=false;
-            offlineRetry.Click+=delegate{RetryOffline();};offlineRetry.VisibleChanged+=delegate{privacy.Visible=!offlineRetry.Visible;};footRight.Controls.Add(offlineRetry);
+            offlineRetry.Click+=delegate{RetryOffline();};footRight.Controls.Add(offlineRetry);
             footer.Controls.Add(status,0,0);footer.Controls.Add(footRight,1,0);layout.Controls.Add(footer,0,6);Controls.Add(layout);layout.BringToFront();
             status.Click+=delegate{if(serviceError)ShowSettings();};
             watcher.SelectionReleased+=async delegate(IntPtr handle,Point point){await ReadSelection(handle);};
@@ -372,13 +372,20 @@ namespace ClaudeCompanion {
             changingOptions=false;RefreshModePill();
         }
         private string PackStatus(){return direction.SelectedItem is LanguagePack?T("语言包已安装 · 翻译无需联网","Pack installed · Translation needs no network"):T("点「离线语言包」，联网时按需下载","Open Offline packs to download while online");}
-        private void ClearOfflineRetry(){pendingOfflineRetry=null;pendingOfflineEpoch=0;offlineRetry.Visible=false;}
+        private void ClearOfflineRetry(){pendingOfflineRetry=null;pendingOfflineEpoch=0;ShowOfflineRetry(false);}
+        private void ShowOfflineRetry(bool show){
+            offlineRetry.Visible=show;privacy.Visible=!show;if(footerLayout==null)return;
+            // The button needs far less room than the privacy note: give the status the rest so it is not cut off.
+            ColumnStyle left=footerLayout.ColumnStyles[0],right=footerLayout.ColumnStyles[1];
+            left.SizeType=SizeType.Percent;left.Width=show?100:39;
+            right.SizeType=show?SizeType.Absolute:SizeType.Percent;right.Width=show?offlineRetry.Width:61;
+        }
         private bool CanRetryOffline(){return !closing&&!Preferences.Offline&&pendingOfflineRetry!=null&&Object.ReferenceEquals(pendingOfflineRetry,latest)&&pendingOfflineEpoch==epoch&&pendingOfflineRetry.Direction==SelectedDirection;}
         private bool RecordOfflineRetry(Snapshot request,int requestedEpoch,bool offlineMode,Exception error){
             var failure=error as TranslationFailure;
             if(request==null||offlineMode||Preferences.Offline||closing||requestedEpoch!=epoch||!Object.ReferenceEquals(request,latest)||request.Direction!=SelectedDirection||failure==null||(failure.Code!="rate_limited"&&failure.Code!="google_blocked"))return false;
-            pendingOfflineRetry=request;pendingOfflineEpoch=epoch;offlineRetry.Visible=true;
-            SetStatus(T("Google 暂不可用，点「改用离线翻译」继续这段","Google is unavailable. Use offline to translate this selection"),true);return true;
+            pendingOfflineRetry=request;pendingOfflineEpoch=epoch;ShowOfflineRetry(true);
+            SetStatus(T("Google 暂不可用，点「改用离线翻译」继续这段","Google is unavailable. Use offline for this selection."),true);return true;
         }
         private void RetryOffline(){
             if(!CanRetryOffline()){ClearOfflineRetry();return;}

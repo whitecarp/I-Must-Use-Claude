@@ -89,6 +89,7 @@ internal static class FavoritesCaptureHarness {
         object pack=New("LanguagePack");Set(pack,"From","en");Set(pack,"To","zh");Set(pack,"FromName","English");Set(pack,"ToName","Chinese");Set(pack,"Installed",true);packs.Add(pack);
         foreach(bool english in new[]{false,true}){
             Static("Ui","English",english);string prefix=english?"en":"zh";
+            CheckRetryStatusFits(prefix);
             object chat=New("WindowChoice");Set(chat,"Handle","0");Set(chat,"Title",english?"Demo chat":"演示聊天");
             using(var compose=(Form)New("ComposeForm",chat,true))Preview(compose,prefix+"-09-compose");
             using(var main=(Form)New("CompanionForm",true))Preview(main,prefix+"-10-offline-retry",true);
@@ -98,6 +99,23 @@ internal static class FavoritesCaptureHarness {
                 Check(grid.Columns.Contains("matchCase")&&grid.Rows.Count>=9,"Glossary editor shows the sample terms and the Match case column ("+prefix+")");
                 Save(editor,prefix+"-12-glossary");editor.Close();
             }
+        }
+    }
+    // Regression check: when Google is rate-limited, the status beside "Use offline" must not be cut off,
+    // at the default size or at the minimum window size.
+    static void CheckRetryStatusFits(string prefix){
+        using(var main=(Form)New("CompanionForm",true)){
+            Show(main);
+            object snapshot=New("Snapshot");Set(snapshot,"Conversation","preview");Set(snapshot,"MessageId","retry");Set(snapshot,"Text","Keep the original files.");
+            Set(snapshot,"Direction",main.GetType().GetProperty("SelectedDirection",Flags).GetValue(main,null));Set(main,"latest",snapshot);
+            Check((bool)Call(main,"RecordOfflineRetry",snapshot,Get(main,"epoch"),false,New("TranslationFailure","rate_limited")),"Rate-limited Google offers the offline retry ("+prefix+")");
+            var status=(Label)Get(main,"status");
+            foreach(Size size in new[]{main.Size,main.MinimumSize}){
+                main.Size=size;Pump();
+                int need=TextRenderer.MeasureText(status.Text,status.Font).Width;
+                Check(need<=status.ClientSize.Width,"Offline-retry status fits beside Use offline at "+size.Width+"x"+size.Height+" ("+prefix+": "+need+" <= "+status.ClientSize.Width+" px)");
+            }
+            main.Close();
         }
     }
     static void Preview(Form form,string name,params object[] extra){
