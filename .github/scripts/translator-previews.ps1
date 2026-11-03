@@ -1,4 +1,4 @@
-# Synthetic saved-reply previews on a disposable GitHub-hosted Windows runner only.
+# Synthetic saved-reply and README previews on a disposable GitHub-hosted Windows runner only.
 # 150% outputs are explicitly resampled comparisons, not independent OS-DPI tests.
 param(
     [Parameter(Mandatory = $true)][string]$Executable,
@@ -73,7 +73,7 @@ try {
 
 Add-Type -AssemblyName System.Drawing
 $previewRows = [Collections.Generic.List[object]]::new()
-$previewCases = @('01-before-save','02-after-save','03-tag-menu','04-settings','05-notebook','06-notebook-search','07-no-matches','08-empty-notebook')
+$previewCases = @('01-before-save','02-after-save','03-tag-menu','04-settings','05-notebook','06-notebook-search','07-no-matches','08-empty-notebook','09-compose','10-offline-retry','11-retry-dialog','12-glossary')
 foreach ($previewLanguage in @('zh','en')) {
     foreach ($previewCase in $previewCases) {
         $previewName = $previewLanguage + '-' + $previewCase
@@ -108,6 +108,7 @@ Copy-Item -LiteralPath (Join-Path $previewNativeWork 'capture-log.txt') -Destina
 $previewNotes = @'
 Synthetic samples only. No user account, actual reply, real application window, clipboard, translation request or send action is used.
 native-100 contains actual Windows Forms control renders under a 96-DPI thread context. Harness assertions verify saving is explicit and bilingual notebook search works.
+09-12 are README previews: the app's own fixed-sample RenderPreview output (Write in Chinese, offline retry, retry dialog) and the glossary editor with an excerpt of built-in terms.
 scaled-preview-150 contains enlarged PNG comparisons, NOT independently rendered 144-DPI controls. Windows display settings are unchanged.
 The existing FavoritesCaptureHarness 150 mode selects system awareness; it needs a real 144-DPI desktop and cannot manufacture that DPI on a standard 96-DPI GitHub runner.
 These offscreen DrawToBitmap fixtures do not validate DWM title bars, taskbar integration, focus or actual desktop selection.
@@ -115,8 +116,8 @@ Upload only native-100/*.png, scaled-preview-150/*.png and top-level logs/receip
 '@
 $previewNotes | Set-Content -LiteralPath (Join-Path $ScreenshotDirectory 'CAPTURE-NOTES.txt') -Encoding utf8
 [ordered]@{
-    schema=1; appVersion='0.9.5'; passed=($previewRows.Count -eq 32); createdUtc=[DateTime]::UtcNow.ToString('o')
+    schema=1; appVersion='0.9.5'; passed=($previewRows.Count -eq 48); createdUtc=[DateTime]::UtcNow.ToString('o')
     executableSha256=(Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash.ToLowerInvariant()
     syntheticOnly=$true; systemDpiChanged=$false; independent150PercentDpiVerified=$false; previews=$previewRows.ToArray()
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $ScreenshotDirectory 'preview-results.json') -Encoding utf8
-Write-Output '16 native 96-DPI translator previews and 16 clearly labelled 150% size comparisons passed.'
+Write-Output '24 native 96-DPI translator previews and 24 clearly labelled 150% size comparisons passed.'

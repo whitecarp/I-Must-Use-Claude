@@ -66,9 +66,45 @@ internal static class FavoritesCaptureHarness {
             }
             if(args.Length>3&&args[3]=="--probe")return 0;
             CaptureFavorites();
+            CaptureReadme();
             File.WriteAllLines(Path.Combine(output,"capture-log.txt"),receipts);
             return 0;
         }catch(Exception error){Console.WriteLine(error);return 1;}
+    }
+    // README previews: the app's own fixed-sample RenderPreview paths, plus the glossary
+    // editor showing an excerpt of the built-in terms. Synthetic data only; no network.
+    static void CaptureReadme(){
+        Static("Preferences","Pin",false);Static("Preferences","Offline",false);Static("Preferences","Target","zh-CN");
+        var terms=(IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(T("GlossaryEntry")));
+        object[][] rows={
+            new object[]{"Claude Code","Claude Code","*",false},new object[]{"Codex","Codex","*",false},
+            new object[]{"Skills","Skills","*",true},new object[]{"Sonnet","Sonnet","*",true},
+            new object[]{"context window","上下文窗口","zh-CN",false},new object[]{"system prompt","系统提示词","zh-CN",false},
+            new object[]{"rate limit","速率限制","zh-CN",false},new object[]{"提示词","prompt","en",false},new object[]{"代码审查","code review","en",false}};
+        foreach(object[] row in rows){
+            object term=New("GlossaryEntry");Set(term,"source",row[0]);Set(term,"replacement",row[1]);Set(term,"target",row[2]);Set(term,"matchCase",row[3]);terms.Add(term);
+        }
+        StaticCall("GlossaryStore","Save",terms);
+        var packs=(IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(T("LanguagePack")));
+        object pack=New("LanguagePack");Set(pack,"From","en");Set(pack,"To","zh");Set(pack,"FromName","English");Set(pack,"ToName","Chinese");Set(pack,"Installed",true);packs.Add(pack);
+        foreach(bool english in new[]{false,true}){
+            Static("Ui","English",english);string prefix=english?"en":"zh";
+            object chat=New("WindowChoice");Set(chat,"Handle","0");Set(chat,"Title",english?"Demo chat":"演示聊天");
+            using(var compose=(Form)New("ComposeForm",chat,true))Preview(compose,prefix+"-09-compose");
+            using(var main=(Form)New("CompanionForm",true))Preview(main,prefix+"-10-offline-retry",true);
+            using(var retry=(Form)New("OfflineRetryForm",packs))Preview(retry,prefix+"-11-retry-dialog");
+            using(var editor=(Form)New("GlossaryForm")){
+                Show(editor);var grid=(DataGridView)Get(editor,"grid");grid.ClearSelection();Pump();
+                Check(grid.Columns.Contains("matchCase")&&grid.Rows.Count>=9,"Glossary editor shows the sample terms and the Match case column ("+prefix+")");
+                Save(editor,prefix+"-12-glossary");editor.Close();
+            }
+        }
+    }
+    static void Preview(Form form,string name,params object[] extra){
+        // RenderPreview fills the app's own fixed sample, draws the form and writes the PNG.
+        var args=new List<object>{Path.Combine(output,name+".png")};args.AddRange(extra);
+        form.GetType().GetMethod("RenderPreview",Flags).Invoke(form,args.ToArray());Pump();
+        using(var image=Image.FromFile((string)args[0]))receipts.Add(name+" | "+image.Width+"x"+image.Height+" | app RenderPreview under the "+expectedDpi+"-DPI thread context");
     }
     static object StaticCall(string type,string method,params object[] args){return T(type).GetMethod(method,Flags).Invoke(null,args);}
     static void Check(bool value,string message){if(!value)throw new InvalidOperationException(message);receipts.Add("PASS: "+message);}
