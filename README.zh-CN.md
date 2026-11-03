@@ -169,8 +169,8 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 <p align="center"><img src="docs/images/translator094-notebook-zh.png" alt="中文回复收藏本，显示示例收藏、标签筛选、原文和备注编辑区" width="600"></p>
 <p align="center"><sub>同一轮 96 DPI CI 渲染的回复收藏本；图中的回复、标签和来源标题均为合成测试示例。</sub></p>
 
-<p align="center"><img src="docs/images/translator-glossary-zh.png" alt="术语词典界面，显示 Claude、Codex 和 Skills 示例词条" width="600"></p>
-<p align="center"><sub>使用示例词条离屏渲染；未读取个人词典或会话。</sub></p>
+<p align="center"><img src="docs/images/translator-glossary-zh.png" alt="0.9.5 术语词典：节选的内置词条，Skills 和 Sonnet 勾选了「区分大小写」" width="640"></p>
+<p align="center"><sub>0.9.5 程序离屏渲染，显示节选的内置词条；未读取个人词典或会话。</sub></p>
 
 <details>
 <summary><strong>术语词典、回复收藏与离线使用</strong></summary>
@@ -191,13 +191,13 @@ CuteCloud DNS 修改使用独立的「预览 → 私密备份 → 确认应用 �
 <summary><strong>界面预览：中文提问与离线重译</strong></summary>
 
 <p align="center"><strong>先预览英文，再主动发送</strong></p>
-<p align="center"><img src="docs/images/translator-compose.png" alt="中文提问窗口，带空白英文预览区与离线重试入口" width="460"></p>
+<p align="center"><img src="docs/images/translator-compose-zh.png" alt="中文提问窗口：上方写中文，下方预览英文，确认后再发送" width="460"></p>
 
 <p align="center"><strong>选择已安装的语言包，继续离线重译</strong></p>
-<p align="center"><img src="docs/images/translator-offline.png" alt="翻译器0.8.1既有演示截图，显示改用离线翻译入口" width="460"></p>
-<p align="center"><img src="docs/images/translator-offline-dialog.png" alt="离线重试确认弹窗的既有演示截图，显示翻译方向选择" width="460"></p>
+<p align="center"><img src="docs/images/translator-offline-zh.png" alt="Google 限流时，翻译器显示「改用离线翻译」入口" width="460"></p>
+<p align="center"><img src="docs/images/translator-offline-dialog-zh.png" alt="改用离线翻译弹窗：选择已安装语言包的翻译方向" width="430"></p>
 
-既有演示截图，文字为示例内容。
+Windows CI 中实际编译的 0.9.5 程序以 96 DPI（100%）离屏渲染，文字为程序自带的固定示例；没有联网翻译或发送，也不是用户电脑上的交互验收。
 
 </details>
 

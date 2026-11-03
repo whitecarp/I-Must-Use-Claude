@@ -169,8 +169,8 @@ Open **⚙ → Saved replies** to search the original and translated text, filte
 <p align="center"><img src="docs/images/translator094-notebook-en.png" alt="Reply notebook in English with synthetic saved replies, tag filters, original text and note editor" width="600"></p>
 <p align="center"><sub>Reply notebook, rendered in the same 96-DPI CI run. All replies, tags and source titles shown here are synthetic fixtures.</sub></p>
 
-<p align="center"><img src="docs/images/translator-glossary-en.png" alt="Glossary editor with example terms Claude, Codex and Skills" width="600"></p>
-<p align="center"><sub>Rendered offscreen using sample entries; no personal dictionary or conversation was read.</sub></p>
+<p align="center"><img src="docs/images/translator-glossary-en.png" alt="Translator 0.9.5 glossary editor showing built-in terms, with Match case ticked for Skills and Sonnet" width="640"></p>
+<p align="center"><sub>Compiled 0.9.5 app rendered offscreen with an excerpt of the built-in terms; no personal dictionary or conversation was read.</sub></p>
 
 <details>
 <summary><strong>Glossary, saved replies and offline use</strong></summary>
@@ -191,13 +191,13 @@ Open **⚙ → Saved replies** to search the original and translated text, filte
 <summary><strong>App previews: English prompts and offline retry</strong></summary>
 
 <p align="center"><strong>Review an English prompt before sending</strong></p>
-<p align="center"><img src="docs/images/translator-compose.png" alt="Chinese prompt window with an empty English preview area and offline retry option" width="460"></p>
+<p align="center"><img src="docs/images/translator-compose-en.png" alt="Write in Chinese window: Chinese message above, English preview below, sent only after review" width="460"></p>
 
 <p align="center"><strong>Retry with an installed offline language pack</strong></p>
-<p align="center"><img src="docs/images/translator-offline.png" alt="Existing Translator 0.8.1 demonstration showing the Use offline option" width="460"></p>
-<p align="center"><img src="docs/images/translator-offline-dialog.png" alt="Existing offline retry confirmation dialog showing a selected language direction" width="460"></p>
+<p align="center"><img src="docs/images/translator-offline-en.png" alt="Translator showing the Use offline option after Google rate-limits a request" width="460"></p>
+<p align="center"><img src="docs/images/translator-offline-dialog-en.png" alt="Use offline translation dialog with an installed language direction selected" width="430"></p>
 
-Existing demonstration screenshots with sample text.
+Compiled 0.9.5 app rendered offscreen by Windows CI at 96 DPI (100%) using its built-in fixed samples; nothing was translated online or sent, and this is not a real-machine interaction test.
 
 </details>
 
